@@ -686,6 +686,23 @@
         gap: 0.75rem;
       }
 
+      .active_user{
+            position: fixed;
+    top: 80px;
+    left: 350px;
+    background-color: rgb(26, 26, 26);
+    border: 1px solid rgba(241, 196, 15, 0.4);
+    border-radius: 8px;
+    padding: 12px;
+    min-width: auto;
+    min-height: auto;
+    max-height: 400px;
+    display: none;
+    z-index: 2100;
+    box-shadow: rgba(0, 0, 0, 0.5) 0px 4px 20px;
+    overflow-y: auto;
+      }
+
       @keyframes pulse {
         0% {
           opacity: 0.6;
@@ -802,6 +819,37 @@
             <h1>Ramos Law Playbook Chatbot</h1>
             <div style="display: flex; align-items: center; gap: 12px">
               <p>Secure Chatbot Service for Ramos Law Users</p>
+              <!-- Active Users Count -->
+              <button
+                id="active-users-btn"
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                  background: none;
+                  border: none;
+                  cursor: pointer;
+                  padding: 4px 10px;
+                  border-radius: 6px;
+                  transition: all 0.3s;
+                  color: #f1c40f;
+                  font-size: 12px;
+                  font-weight: 600;
+                "
+                onclick="toggleActiveUsersPopover()"
+                title="Active users on this tool"
+              >
+                <span style="
+                  display: inline-block;
+                  width: 8px;
+                  height: 8px;
+                  background: #2ecc71;
+                  border-radius: 50%;
+                  box-shadow: 0 0 8px #2ecc71;
+                "></span>
+                <span id="active-count">0</span>
+                <span style="margin-left: 4px;">Active Users</span>
+              </button>
             </div>
           </div>
         </div>
@@ -937,10 +985,27 @@
           </button>
         </div>
       </div>
+      <!-- Active Users Popover (Outside header) -->
+      <div
+        id="active-users-popover"
+        class="active_user"
+      >
+        <div style="
+          padding: 8px 0;
+          margin-bottom: 8px;
+          border-bottom: 1px solid rgba(241, 196, 15, 0.3);
+          color: #f1c40f;
+          font-size: 12px;
+          font-weight: 600;
+        ">Active Users</div>
+        <div id="active-users-list" style="color: #aaa; font-size: 13px;">
+          <div style="padding: 8px 0; color: #666;">Loading...</div>
+        </div>
+      </div>
     </div>
 
     <script>
-      const API_BASE_URL = "https://attired-hitchily-stephane.ngrok-free.dev";
+      const API_BASE_URL = "";
       let isProcessing = false;
 
       marked.setOptions({
@@ -1364,6 +1429,8 @@ Below are some example questions to get you started:
           if (messagesDiv && messagesDiv.children.length === 0) {
             addWelcomeMessage();
           }
+          // Always refresh active users when authenticated
+          loadActiveUsers();
         } else {
           // User is not logged in
           loginPageWrapper.style.display = "flex";
@@ -1384,6 +1451,103 @@ Below are some example questions to get you started:
         setTimeout(() => {
           checkAuthToken();
         }, 100);
+      });
+
+      // ============ FEATURE: ACTIVE USERS COUNT ============
+      async function loadActiveUsers() {
+        try {
+          const token = localStorage.getItem("jwtsopchatbot");
+          if (!token) return;
+
+          const response = await fetch(
+            `${API_BASE_URL}/Playbook_Chatbot/active-today`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "ngrok-skip-browser-warning": "true",
+              },
+            }
+          );
+
+          const data = await response.json();
+
+          if (Array.isArray(data)) {
+            const count = data.length;
+            const countElement = document.getElementById("active-count");
+            if (countElement) {
+              countElement.textContent = count;
+            }
+
+            const usersList = document.getElementById("active-users-list");
+            if (usersList) {
+              if (count === 0) {
+                usersList.innerHTML = '<div style="padding: 8px 0; color: #666;">No active users</div>';
+              } else {
+                usersList.innerHTML = data
+                  .map(
+                    (user) => `
+                  <div style="
+                    padding: 10px 8px;
+                    border-bottom: 1px solid rgba(241, 196, 15, 0.2);
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    gap: 16px;
+                  ">
+                    <span style="color: #f1c40f; font-weight: 500; flex: 1;">${user.email}</span>
+                    <span style="color: #aaa; font-size: 12px; white-space: nowrap; flex-shrink: 0;">${formatLastActive(user.last_active)}</span>
+                  </div>
+                `,
+                  )
+                  .join("");
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Failed to load active users:", error);
+        }
+      }
+
+      function formatLastActive(dateStr) {
+        try {
+          const date = new Date(dateStr);
+          const now = new Date();
+          const diffMs = now - date;
+          const diffMins = Math.floor(diffMs / 60000);
+          const diffHours = Math.floor(diffMs / 3600000);
+          const diffDays = Math.floor(diffMs / 86400000);
+
+          if (diffMins < 1) return "just now";
+          if (diffMins < 60) return `${diffMins}m ago`;
+          if (diffHours < 24) return `${diffHours}h ago`;
+          if (diffDays < 7) return `${diffDays}d ago`;
+
+          return date.toLocaleDateString();
+        } catch (e) {
+          return dateStr;
+        }
+      }
+
+      function toggleActiveUsersPopover() {
+        const popover = document.getElementById("active-users-popover");
+        if (!popover) return;
+        if (popover.style.display === "none" || popover.style.display === "") {
+          popover.style.display = "block";
+          loadActiveUsers();
+        } else {
+          popover.style.display = "none";
+        }
+      }
+
+      // Close active users popover when clicking outside
+      document.addEventListener("click", function (event) {
+        const popover = document.getElementById("active-users-popover");
+        const btn = document.getElementById("active-users-btn");
+        if (!popover || !btn) return;
+        if (!btn.contains(event.target) && !popover.contains(event.target)) {
+          popover.style.display = "none";
+        }
       });
     </script>
   </body>
