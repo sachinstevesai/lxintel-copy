@@ -273,6 +273,21 @@
         border: 1px solid rgba(241, 196, 15, 0.3);
       }
 
+      .message.assistant.welcome .welcome-content {
+        max-height: 220px;
+        overflow-y: auto;
+        padding-right: 8px;
+      }
+
+      .message.assistant.welcome .welcome-content::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .message.assistant.welcome .welcome-content::-webkit-scrollbar-thumb {
+        background: rgba(241, 196, 15, 0.25);
+        border-radius: 4px;
+      }
+
       .empty-state {
         text-align: center;
         padding: 20px 20px;
@@ -1065,9 +1080,15 @@
         wrapper.className = "message-wrapper assistant";
 
         const messageDiv = document.createElement("div");
-        messageDiv.className = "message assistant";
+        messageDiv.className = "message assistant welcome";
 
-        messageDiv.textContent = content; // IMPORTANT (not innerHTML)
+        // Wrap the welcome text in a scrollable container so only the
+        // first few points are visible; the rest can be scrolled.
+        const inner = document.createElement("div");
+        inner.className = "welcome-content";
+        inner.textContent = content; // keep as text to avoid HTML injection
+
+        messageDiv.appendChild(inner);
 
         wrapper.appendChild(messageDiv);
         messagesDiv.appendChild(wrapper);
