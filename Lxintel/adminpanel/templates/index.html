@@ -168,7 +168,9 @@
         width: 34px;
         height: 34px;
         border-radius: 6px;
-        transition: background 0.15s ease, color 0.15s ease;
+        transition:
+          background 0.15s ease,
+          color 0.15s ease;
         padding: 0;
       }
 
@@ -186,10 +188,18 @@
       }
 
       /* default visibility via classes to avoid overlap flicker */
-      .toggle-password .eye-open { display: block; }
-      .toggle-password .eye-closed { display: none; }
-      .toggle-password.show-closed .eye-open { display: none; }
-      .toggle-password.show-closed .eye-closed { display: block; }
+      .toggle-password .eye-open {
+        display: block;
+      }
+      .toggle-password .eye-closed {
+        display: none;
+      }
+      .toggle-password.show-closed .eye-open {
+        display: none;
+      }
+      .toggle-password.show-closed .eye-closed {
+        display: block;
+      }
 
       .login-form-group input:focus {
         outline: none;
@@ -701,9 +711,35 @@
                   title="Show password"
                 >
                   <!-- Eye (open) -->
-                  <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <svg
+                    class="eye-open"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
                   <!-- Eye (closed) -->
-                  <svg class="eye-closed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.86 21.86 0 0 1 5.06-6.06"/><path d="M1 1l22 22"/></svg>
+                  <svg
+                    class="eye-closed"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.86 21.86 0 0 1 5.06-6.06"
+                    />
+                    <path d="M1 1l22 22" />
+                  </svg>
                 </button>
               </div>
             </div>
@@ -980,7 +1016,7 @@
             </button>
           </div>
         </div>
-        
+
         <!-- NEW: Playbook Chatbot button with Upload action (placeholder) -->
         <div class="dashboard-btn-wrapper">
           <button class="dashboard-btn" data-tool="playbook_chatbot">
@@ -1009,7 +1045,7 @@
             </button>
             <button
               class="popup-btn"
-              onclick=""
+              onclick="showModal('upload-playbook', 'Playbook_Chatbot')"
             >
               Upload
             </button>
@@ -1149,13 +1185,37 @@
 
         // Show modal with loading state
         modal.classList.add("active");
+        // If this is the playbook upload UI
+        if (type === "upload-playbook" && toolName === "Playbook_Chatbot") {
+          modalTitle.textContent = "Playbook Chatbot - Upload";
+          modalBody.innerHTML = `
+      
+                <div style="background: rgba(17, 17, 17, 0.8); border: 2px solid rgba(241, 196, 15, 0.3); border-radius: 12px; padding: 40px;">
+                  <h2 style="color: #f1c40f; font-size: 24px; font-weight: 700; margin-bottom: 32px; text-align: center;">Playbook Chatbot</h2>
+                  <div style="margin-bottom: 24px;">
+                    <label for="playbook-file-input" style="display: block; color: #f1c40f; font-size: 14px; font-weight: 600; margin-bottom: 12px;">Select Document / PDF</label>
+                    <input id="playbook-file-input" type="file" accept=".pdf,.doc,.docx" style="width: 100%; padding: 12px; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(241, 196, 15, 0.3); border-radius: 6px; color: #fff; font-family: 'Montserrat', sans-serif; cursor: pointer;" />
+                  </div>
+                  <div style="margin-bottom: 32px;">
+                    <label for="playbook-department-input" style="display: block; color: #f1c40f; font-size: 14px; font-weight: 600; margin-bottom: 12px;">Department (Optional)</label>
+                    <input id="playbook-department-input" type="text" placeholder="e.g., HR, Legal, Finance" style="width: 100%; padding: 12px; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(241, 196, 15, 0.3); border-radius: 6px; color: #fff; font-family: 'Montserrat', sans-serif; font-size: 14px;" onfocus="this.style.borderColor='rgba(241, 196, 15, 0.6)'" onblur="this.style.borderColor='rgba(241, 196, 15, 0.3)'" />
+                  </div>
+                  <div id="playbook-upload-message" style="margin-bottom: 20px; font-size: 14px; text-align: center; display: none;"></div>
+                  <button id="playbook-upload-btn" type="button" onclick="handlePlaybookUpload()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #ffea00, #ffbb00); color: #000; border: none; border-radius: 6px; font-weight: 700; font-size: 16px; cursor: pointer; transition: all 0.3s; font-family: 'Montserrat', sans-serif;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(255, 235, 0, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">Upload</button>
+                </div>
+              
+            `;
+
+          return; // do not call API for this modal
+        }
+
         modalTitle.textContent = getModalTitle(type, toolName); // CHANGED: Pass toolName to title
         modalBody.innerHTML = `
-        <div class="modal-loading">
-          <div class="spinner"></div>
-          <p>Loading data...</p>
-        </div>
-      `;
+          <div class="modal-loading">
+            <div class="spinner"></div>
+            <p>Loading data...</p>
+          </div>
+        `;
 
         try {
           let endpoint = "";
@@ -1433,32 +1493,225 @@
 
       // Initialize password toggle buttons
       function initPasswordToggles() {
-        document.querySelectorAll('.password-wrapper').forEach((wrapper) => {
-          const input = wrapper.querySelector('input');
-          const btn = wrapper.querySelector('.toggle-password');
-          const eyeOpen = btn.querySelector('.eye-open');
-          const eyeClosed = btn.querySelector('.eye-closed');
+        document.querySelectorAll(".password-wrapper").forEach((wrapper) => {
+          const input = wrapper.querySelector("input");
+          const btn = wrapper.querySelector(".toggle-password");
+          const eyeOpen = btn.querySelector(".eye-open");
+          const eyeClosed = btn.querySelector(".eye-closed");
 
           if (!input || !btn) return;
 
-          btn.addEventListener('click', () => {
-            if (input.type === 'password') {
-              input.type = 'text';
-              btn.setAttribute('aria-label', 'Hide password');
-              btn.title = 'Hide password';
-              btn.classList.add('show-closed');
+          btn.addEventListener("click", () => {
+            if (input.type === "password") {
+              input.type = "text";
+              btn.setAttribute("aria-label", "Hide password");
+              btn.title = "Hide password";
+              btn.classList.add("show-closed");
             } else {
-              input.type = 'password';
-              btn.setAttribute('aria-label', 'Show password');
-              btn.title = 'Show password';
-              btn.classList.remove('show-closed');
+              input.type = "password";
+              btn.setAttribute("aria-label", "Show password");
+              btn.title = "Show password";
+              btn.classList.remove("show-closed");
             }
           });
         });
       }
 
+      // Global variables to store Playbook upload state
+      let lastPlaybookUploadedFile = null;
+      let lastPlaybookUploadedDepartment = null;
+
+      // Handle Playbook file upload
+      async function handlePlaybookUpload() {
+        const fileInput = document.getElementById("playbook-file-input");
+        const departmentInput = document.getElementById("playbook-department-input");
+        const uploadBtn = document.getElementById("playbook-upload-btn");
+        const uploadMessage = document.getElementById("playbook-upload-message");
+        
+        const file = fileInput.files[0];
+        const department = departmentInput.value.trim();
+        
+        // Validation - file is required
+        if (!file) {
+          uploadMessage.style.display = "block";
+          uploadMessage.style.color = "#e74c3c";
+          uploadMessage.textContent = "Please select a file";
+          return;
+        }
+        
+        try {
+          // Disable button and show loading
+          uploadBtn.disabled = true;
+          uploadBtn.textContent = "Uploading...";
+          uploadMessage.style.display = "none";
+          
+          // Create FormData
+          const formData = new FormData();
+          formData.append("file", file);
+          if (department) {
+            formData.append("department", department);
+          }
+          
+          // Get auth token
+          const token = localStorage.getItem("adminToken");
+          if (!token) {
+            throw new Error("Not authenticated. Please login again.");
+          }
+          
+          // Call upload API
+          const response = await fetch(`${API_BASE_URL}/admin/Playbook_Chatbot/upload`, {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
+            body: formData,
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.detail || errorData.message || "Upload failed");
+          }
+          
+          const data = await response.json();
+          
+          // Check if response has indexed status or file already exists
+          if (data.result && (data.result.status === "indexed" || data.result.status.includes("file is already present"))) {
+            // Store the uploaded file and department for regenerate
+            lastPlaybookUploadedFile = file;
+            lastPlaybookUploadedDepartment = department;
+            
+            // Show the status message (either indexed or file already present)
+            uploadMessage.style.display = "block";
+            uploadMessage.style.color = "#f1c40f";
+            uploadMessage.textContent = data.result.status;
+            
+            // Change button to Regenerate
+            uploadBtn.disabled = false;
+            uploadBtn.textContent = "Regenerate";
+            uploadBtn.onclick = handlePlaybookRegenerate;
+            
+            // Disable file and department inputs
+            fileInput.disabled = true;
+            departmentInput.disabled = true;
+          } else {
+            // Success message for other responses
+            uploadMessage.style.display = "block";
+            uploadMessage.style.color = "#2ecc71";
+            uploadMessage.textContent = "✓ File uploaded successfully!";
+            
+            // Reset form after 2 seconds
+            setTimeout(() => {
+              fileInput.value = "";
+              departmentInput.value = "";
+              uploadMessage.style.display = "none";
+              uploadBtn.disabled = false;
+              uploadBtn.textContent = "Upload";
+              uploadBtn.onclick = handlePlaybookUpload;
+              fileInput.disabled = false;
+              departmentInput.disabled = false;
+            }, 2000);
+          }
+          
+        } catch (error) {
+          uploadMessage.style.display = "block";
+          uploadMessage.style.color = "#e74c3c";
+          uploadMessage.textContent = `Error: ${error.message}`;
+          
+          uploadBtn.disabled = false;
+          uploadBtn.textContent = "Upload";
+          uploadBtn.onclick = handlePlaybookUpload;
+        }
+      }
+
+      // Handle Playbook file regenerate
+      async function handlePlaybookRegenerate() {
+        const fileInput = document.getElementById("playbook-file-input");
+        const departmentInput = document.getElementById("playbook-department-input");
+        const uploadBtn = document.getElementById("playbook-upload-btn");
+        const uploadMessage = document.getElementById("playbook-upload-message");
+        
+        if (!lastPlaybookUploadedFile) {
+          uploadMessage.style.display = "block";
+          uploadMessage.style.color = "#e74c3c";
+          uploadMessage.textContent = "No file to regenerate";
+          return;
+        }
+        
+        try {
+          // Disable button and show loading
+          uploadBtn.disabled = true;
+          uploadBtn.innerHTML = '<span class="login-btn-spinner"><span class="spinner"></span>Regenerating...</span>';
+          uploadMessage.style.display = "none";
+          
+          // Enable file and department inputs during regenerate
+          fileInput.disabled = true;
+          departmentInput.disabled = false;
+          
+          // Create FormData
+          const formData = new FormData();
+          formData.append("file", lastPlaybookUploadedFile);
+          if (lastPlaybookUploadedDepartment) {
+            formData.append("department", lastPlaybookUploadedDepartment);
+          }
+          
+          // Get auth token
+          const token = localStorage.getItem("adminToken");
+          if (!token) {
+            throw new Error("Not authenticated. Please login again.");
+          }
+          
+          // Call regenerate API with ?regenerate=true
+          const response = await fetch(`${API_BASE_URL}/admin/Playbook_Chatbot/upload?regenerate=true`, {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
+            body: formData,
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.detail || errorData.message || "Regenerate failed");
+          }
+          
+          const data = await response.json();
+          
+          // Success message
+          uploadMessage.style.display = "block";
+          uploadMessage.style.color = "#2ecc71";
+          uploadMessage.textContent = "✓ File regenerated successfully!";
+          
+          // Reset to Upload state
+          lastPlaybookUploadedFile = null;
+          lastPlaybookUploadedDepartment = null;
+
+          // Enable inputs
+          fileInput.disabled = false;
+          departmentInput.disabled = false;
+
+          // Clear inputs
+          fileInput.value = "";
+          departmentInput.value = "";
+
+          // Reset button
+          uploadBtn.disabled = false;
+          uploadBtn.textContent = "Upload";
+          uploadBtn.onclick = handlePlaybookUpload;
+          
+        } catch (error) {
+          uploadMessage.style.display = "block";
+          uploadMessage.style.color = "#e74c3c";
+          uploadMessage.textContent = `Error: ${error.message}`;
+          
+          uploadBtn.disabled = false;
+          uploadBtn.textContent = "Regenerate";
+        }
+      }
+
       // Run on load to wire up toggles (safe to have multiple DOMContentLoaded listeners)
-      window.addEventListener('DOMContentLoaded', function () {
+      window.addEventListener("DOMContentLoaded", function () {
         initPasswordToggles();
       });
     </script>
