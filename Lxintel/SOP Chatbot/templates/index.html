@@ -189,7 +189,6 @@
         color: #e0e0e0;
         border: 1px solid rgba(241, 196, 15, 0.2);
         border-bottom-left-radius: 4px;
-        white-space: pre-line;
       }
 
       .message.assistant h3 {
@@ -277,6 +276,7 @@
         max-height: 220px;
         overflow-y: auto;
         padding-right: 8px;
+        white-space: pre-line;
       }
 
       .message.assistant.welcome .welcome-content::-webkit-scrollbar {
@@ -1077,7 +1077,7 @@
         showTypingIndicator();
 
         try {
-          const response = await fetch(API_BASE_URL + "/Playbook_Chatbot/chat/", {
+          const response = await fetch(API_BASE_URL + "/Playbook_Chatbot/chat", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
