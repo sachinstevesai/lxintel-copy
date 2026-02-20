@@ -130,8 +130,7 @@
         margin-bottom: 0.75rem;
       }
 
-      .login-form-group input[type="email"],
-      .login-form-group input[type="password"] {
+      .login-form-group input {
         width: 100%;
         padding: 0.875rem 1rem;
         font-size: 0.95rem;
@@ -143,8 +142,56 @@
         transition: border-color 0.3s ease;
       }
 
-      .login-form-group input[type="email"]:focus,
-      .login-form-group input[type="password"]:focus {
+      /* Password input wrapper to position toggle */
+      .password-wrapper {
+        position: relative;
+      }
+
+      /* provide space for the toggle button inside the input */
+      .password-wrapper input[type="password"],
+      .password-wrapper input[type="text"] {
+        padding-right: 3.5rem;
+      }
+
+      .toggle-password {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        color: #000;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 6px;
+        transition: background 0.15s ease, color 0.15s ease;
+        padding: 0;
+      }
+
+      .toggle-password:hover {
+        background: rgba(241, 196, 15, 0.08);
+        color: #000;
+      }
+
+      .toggle-password svg {
+        width: 18px;
+        height: 18px;
+        display: block;
+        stroke: #000;
+        fill: none;
+      }
+
+      /* default visibility via classes to avoid overlap flicker */
+      .toggle-password .eye-open { display: block; }
+      .toggle-password .eye-closed { display: none; }
+      .toggle-password.show-closed .eye-open { display: none; }
+      .toggle-password.show-closed .eye-closed { display: block; }
+
+      .login-form-group input:focus {
         outline: none;
         border-color: #f1c40f;
         box-shadow: 0 0 0 2px rgba(241, 196, 15, 0.1);
@@ -640,12 +687,25 @@
             <!-- Password Input -->
             <div class="login-form-group">
               <label for="admin-password">Password</label>
-              <input
-                id="admin-password"
-                type="password"
-                placeholder="Enter your password"
-                required
-              />
+              <div class="password-wrapper">
+                <input
+                  id="admin-password"
+                  type="password"
+                  placeholder="Enter your password"
+                  required
+                />
+                <button
+                  type="button"
+                  class="toggle-password"
+                  aria-label="Show password"
+                  title="Show password"
+                >
+                  <!-- Eye (open) -->
+                  <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <!-- Eye (closed) -->
+                  <svg class="eye-closed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.86 21.86 0 0 1 5.06-6.06"/><path d="M1 1l22 22"/></svg>
+                </button>
+              </div>
             </div>
 
             <!-- Error Message -->
@@ -1370,6 +1430,37 @@
           document.getElementById("data-modal").classList.remove("active");
         }
       }
+
+      // Initialize password toggle buttons
+      function initPasswordToggles() {
+        document.querySelectorAll('.password-wrapper').forEach((wrapper) => {
+          const input = wrapper.querySelector('input');
+          const btn = wrapper.querySelector('.toggle-password');
+          const eyeOpen = btn.querySelector('.eye-open');
+          const eyeClosed = btn.querySelector('.eye-closed');
+
+          if (!input || !btn) return;
+
+          btn.addEventListener('click', () => {
+            if (input.type === 'password') {
+              input.type = 'text';
+              btn.setAttribute('aria-label', 'Hide password');
+              btn.title = 'Hide password';
+              btn.classList.add('show-closed');
+            } else {
+              input.type = 'password';
+              btn.setAttribute('aria-label', 'Show password');
+              btn.title = 'Show password';
+              btn.classList.remove('show-closed');
+            }
+          });
+        });
+      }
+
+      // Run on load to wire up toggles (safe to have multiple DOMContentLoaded listeners)
+      window.addEventListener('DOMContentLoaded', function () {
+        initPasswordToggles();
+      });
     </script>
   </body>
 </html>
