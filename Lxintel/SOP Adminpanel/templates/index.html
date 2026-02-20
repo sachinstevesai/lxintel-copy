@@ -1,0 +1,804 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LxIntel Playbook Chatbot Admin Panel</title>
+    <link
+      rel="icon"
+      type="image/webp"
+      href="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body,
+      html {
+        font-family: "Montserrat", sans-serif;
+        background-color: #111;
+        color: #f1c40f;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+      }
+
+      /* LOGIN PAGE STYLES */
+      .login-page-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+      }
+
+      .login-page-content {
+        width: 100%;
+        max-width: 600px;
+        padding: 2rem;
+        text-align: center;
+      }
+
+      .login-logo-section {
+        margin-bottom: 3rem;
+      }
+
+      .login-logo-section img {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 2rem;
+        display: inline-block;
+        filter: drop-shadow(0 0 10px rgba(241, 196, 15, 0.3));
+      }
+
+      .login-page-content h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #f1c40f;
+        margin: 0 0 1rem 0;
+        letter-spacing: 2px;
+        text-shadow: 0 0 20px rgba(241, 196, 15, 0.4);
+      }
+
+      .login-page-content > p {
+        font-size: 1rem;
+        color: #aaa;
+        margin: 0 0 2rem 0;
+      }
+
+      .login-form-card {
+        background-color: #1a1a1a;
+        border: 1px solid rgba(241, 196, 15, 0.4);
+        border-radius: 12px;
+        padding: 2.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      }
+
+      .login-form-card h2 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #f1c40f;
+        margin: 0 0 2rem 0;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+
+      .login-form-group {
+        margin-bottom: 2rem;
+        text-align: left;
+      }
+
+      .login-form-group label {
+        display: block;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #f1c40f;
+        margin-bottom: 0.75rem;
+      }
+
+      .login-form-group input[type="email"],
+      .login-form-group input[type="password"] {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        font-size: 0.95rem;
+        background-color: #000;
+        color: #fff;
+        border: 1px solid #444;
+        border-radius: 6px;
+        font-family: "Montserrat", sans-serif;
+        transition: border-color 0.3s ease;
+      }
+
+      .login-form-group input[type="email"]:focus,
+      .login-form-group input[type="password"]:focus {
+        outline: none;
+        border-color: #f1c40f;
+        box-shadow: 0 0 0 2px rgba(241, 196, 15, 0.1);
+      }
+
+      .login-form-group input::placeholder {
+        color: #666;
+      }
+
+      .login-error-message {
+        color: #e74c3c;
+        background-color: rgba(231, 76, 60, 0.1);
+        border: 1px solid rgba(231, 76, 60, 0.3);
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        text-align: center;
+      }
+
+      .login-btn {
+        width: 100%;
+        padding: 0.875rem;
+        font-size: 1rem;
+        font-weight: 700;
+        background-color: #d4ac0d;
+        color: #000;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .login-btn:hover:not(:disabled) {
+        background-color: #f1c40f;
+        box-shadow: 0 4px 12px rgba(241, 196, 15, 0.3);
+      }
+
+      .login-btn:disabled {
+        background-color: #666;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+
+      .login-btn-spinner {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+      }
+
+      .spinner {
+        border: 2px solid rgba(0, 0, 0, 0.3);
+        border-top-color: #000;
+        border-radius: 50%;
+        width: 14px;
+        height: 14px;
+        animation: spin 0.8s linear infinite;
+        display: inline-block;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* DASHBOARD STYLES */
+      .dashboard-wrapper {
+        display: none;
+        min-height: 100vh;
+        padding: 40px 20px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .dashboard-wrapper.active {
+        display: block;
+      }
+
+      .dashboard-header {
+        text-align: center;
+        margin-bottom: 60px;
+      }
+
+      .dashboard-logo {
+        width: 130px;
+        margin-bottom: 20px;
+        filter: drop-shadow(0 0 18px rgba(255, 225, 0, 0.7));
+      }
+
+      .dashboard-header h1 {
+        font-size: 3rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: #ffe900;
+        text-shadow: 0 0 20px rgba(255, 230, 0, 0.5);
+      }
+
+      .dashboard-header p {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        opacity: 0.85;
+        color: #fff;
+      }
+
+      .logout-btn {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        padding: 10px 24px;
+        border-radius: 30px;
+        color: #fff;
+        border: none;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 0 18px rgba(231, 76, 60, 0.4);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 10px;
+      }
+
+      .logout-btn:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 0 28px rgba(231, 76, 60, 0.8);
+      }
+
+      /* Modal for displaying API data */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        overflow-y: auto;
+        padding: 20px;
+      }
+
+      .modal-overlay.active {
+        display: flex;
+      }
+
+      .modal-content {
+        background: rgba(17, 17, 17, 0.98);
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(241, 196, 15, 0.3);
+        border-radius: 16px;
+        padding: 32px;
+        max-width: 100%;
+        width: 100%;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        position: relative;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        border-bottom: 2px solid rgba(241, 196, 15, 0.3);
+        padding-bottom: 16px;
+      }
+
+      .modal-header h2 {
+        color: #f1c40f;
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0;
+      }
+
+      .modal-close-btn {
+        background: none;
+        border: none;
+        color: #f1c40f;
+        font-size: 32px;
+        cursor: pointer;
+        transition: all 0.3s;
+        padding: 0;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+      }
+
+      .modal-close-btn:hover {
+        color: #ffd93d;
+        transform: scale(1.2);
+      }
+
+      .modal-body {
+        color: #e0e0e0;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      .modal-loading {
+        text-align: center;
+        padding: 40px;
+        color: #f1c40f;
+      }
+
+      .modal-loading .spinner {
+        width: 40px;
+        height: 40px;
+        border-width: 4px;
+        border-color: rgba(241, 196, 15, 0.3);
+        border-top-color: #f1c40f;
+        margin: 0 auto 20px;
+      }
+
+      @media (max-width: 991px) {
+
+        .dashboard-header h1 {
+          font-size: 2.5rem;
+        }
+      }
+
+      @media (max-width: 767px) {
+
+        .dashboard-header h1 {
+          font-size: 2rem;
+        }
+
+        .dashboard-header p {
+          font-size: 1rem;
+        }
+
+        .modal-content {
+          padding: 20px;
+        }
+
+        .modal-header h2 {
+          font-size: 20px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <!-- LOGIN PAGE -->
+    <div class="login-page-wrapper" id="login-page">
+      <div class="login-page-content">
+        <div class="login-logo-section">
+          <img
+            src="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
+            alt="LxIntel Logo"
+          />
+          <h1>LxIntel Playbook chatbot Admin Panel</h1>
+          <p>Secure Admin Access</p>
+        </div>
+
+        <div class="login-form-card">
+          <h2>Login</h2>
+
+          <form onsubmit="handleLogin(event)">
+            <!-- Email Input -->
+            <div class="login-form-group">
+              <label for="admin-email">Email</label>
+              <input
+                id="admin-email"
+                type="email"
+                placeholder="Enter your admin email"
+                required
+              />
+            </div>
+
+            <!-- Password Input -->
+            <div class="login-form-group">
+              <label for="admin-password">Password</label>
+              <input
+                id="admin-password"
+                type="password"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+
+            <!-- Error Message -->
+            <div
+              id="login-error"
+              class="login-error-message"
+              style="display: none"
+            ></div>
+
+            <!-- Login Button -->
+            <button type="submit" id="login-btn" class="login-btn">
+              <span id="login-btn-text">Login</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="dashboard-wrapper" id="dashboard">
+      <div class="dashboard-header">
+        <img
+          src="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
+          class="dashboard-logo"
+          alt="LxIntel Logo"
+        />
+        <h1>Ramos Law Playbook Chatbot Admin Panel</h1>
+        <p id="admin-welcome">Welcome, Admin</p>
+        <button class="logout-btn" onclick="handleLogout()">Logout</button>
+      </div>
+
+      <!-- Document Upload Section -->
+      <div style="max-width: 800px; margin: 40px auto; padding: 0 20px;">
+        <div style="background: rgba(17, 17, 17, 0.8); border: 2px solid rgba(241, 196, 15, 0.3); border-radius: 12px; padding: 40px;">
+          <h2 style="color: #f1c40f; font-size: 24px; font-weight: 700; margin-bottom: 32px; text-align: center;">Document Ingestion</h2>
+          
+          <!-- File Input -->
+          <div style="margin-bottom: 24px;">
+            <label for="file-input" style="display: block; color: #f1c40f; font-size: 14px; font-weight: 600; margin-bottom: 12px;">Select Document / PDF</label>
+            <input 
+              id="file-input" 
+              type="file" 
+              accept=".pdf,.doc,.docx" 
+              style="width: 100%; padding: 12px; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(241, 196, 15, 0.3); border-radius: 6px; color: #fff; font-family: 'Montserrat', sans-serif; cursor: pointer;"
+            />
+          </div>
+          
+          <!-- Department Input -->
+          <div style="margin-bottom: 32px;">
+            <label for="department-input" style="display: block; color: #f1c40f; font-size: 14px; font-weight: 600; margin-bottom: 12px;">Department (Optional)</label>
+            <input 
+              id="department-input" 
+              type="text" 
+              placeholder="e.g., HR, Legal, Finance" 
+              style="width: 100%; padding: 12px; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(241, 196, 15, 0.3); border-radius: 6px; color: #fff; font-family: 'Montserrat', sans-serif; font-size: 14px;"
+              onfocus="this.style.borderColor='rgba(241, 196, 15, 0.6)'"
+              onblur="this.style.borderColor='rgba(241, 196, 15, 0.3)'"
+            />
+          </div>
+          
+          <!-- Upload Status Message -->
+          <div id="upload-message" style="margin-bottom: 20px; font-size: 14px; text-align: center; display: none;"></div>
+          
+          <!-- Upload Button -->
+          <button 
+            id="upload-btn" 
+            onclick="handleUpload()" 
+            style="width: 100%; padding: 12px; background: linear-gradient(135deg, #ffea00, #ffbb00); color: #000; border: none; border-radius: 6px; font-weight: 700; font-size: 16px; cursor: pointer; transition: all 0.3s; font-family: 'Montserrat', sans-serif;"
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(255, 235, 0, 0.4)';"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';"
+          >
+            Upload
+          </button>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <!-- MODAL FOR API DATA -->
+    <div class="modal-overlay" id="data-modal" onclick="closeModal(event)">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h2 id="modal-title">Loading...</h2>
+          <button class="modal-close-btn" onclick="closeModal()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body" id="modal-body">
+          <div class="modal-loading">
+            <div class="spinner"></div>
+            <p>Loading data...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE_URL = "";
+
+      // Check if already logged in on page load
+      window.addEventListener("DOMContentLoaded", function () {
+        const token = localStorage.getItem("SOPadminToken");
+        const adminEmail = localStorage.getItem("SOPadminEmail");
+
+        if (token && adminEmail) {
+          showDashboard(adminEmail);
+        }
+      });
+
+      // Handle login form submission
+      async function handleLogin(event) {
+        event.preventDefault();
+
+        const email = document.getElementById("admin-email").value.trim();
+        const password = document.getElementById("admin-password").value;
+        const loginBtn = document.getElementById("login-btn");
+        const loginBtnText = document.getElementById("login-btn-text");
+        const errorDiv = document.getElementById("login-error");
+
+        // Disable button and show loading
+        loginBtn.disabled = true;
+        loginBtnText.innerHTML =
+          '<span class="login-btn-spinner"><span class="spinner"></span>Logging in...</span>';
+        errorDiv.style.display = "none";
+
+        try {
+          // Call your login API - using email and password as per your curl
+          const response = await fetch(`${API_BASE_URL}/auth/admin/login`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "ngrok-skip-browser-warning": "true",
+            },
+            body: JSON.stringify({
+              email: email,
+              password: password
+            }),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(
+              errorData.detail ||
+                errorData.message ||
+                `Login failed with status ${response.status}`,
+            );
+          }
+
+          const data = await response.json();
+
+          if (data.access_token) {
+            // Store token and email
+            localStorage.setItem("SOPadminToken", data.access_token);
+            localStorage.setItem("SOPadminEmail", email);
+
+            // Show dashboard
+            showDashboard(email);
+          } else {
+            throw new Error("No access token received");
+          }
+        } catch (error) {
+          // Show error message
+          errorDiv.textContent =
+            error.message || "Login failed. Please try again.";
+          errorDiv.style.display = "block";
+
+          // Re-enable button
+          loginBtn.disabled = false;
+          loginBtnText.textContent = "Login";
+        }
+      }
+
+      // Show dashboard after successful login
+      function showDashboard(email) {
+        document.getElementById("login-page").style.display = "none";
+        document.getElementById("dashboard").classList.add("active");
+        document.getElementById("admin-welcome").textContent =
+          `Welcome, ${email}`;
+      }
+
+      // Handle logout
+      function handleLogout() {
+        if (confirm("Are you sure you want to logout?")) {
+          localStorage.removeItem("SOPadminToken");
+          localStorage.removeItem("SOPadminEmail");
+          location.reload();
+        }
+      }
+
+      // Global variables to store upload state
+      let lastUploadedFile = null;
+      let lastUploadedDepartment = null;
+
+      // Handle file upload
+      async function handleUpload() {
+        const fileInput = document.getElementById("file-input");
+        const departmentInput = document.getElementById("department-input");
+        const uploadBtn = document.getElementById("upload-btn");
+        const uploadMessage = document.getElementById("upload-message");
+        
+        const file = fileInput.files[0];
+        const department = departmentInput.value.trim();
+        
+        // Validation - file is required
+        if (!file) {
+          uploadMessage.style.display = "block";
+          uploadMessage.style.color = "#e74c3c";
+          uploadMessage.textContent = "Please select a file";
+          return;
+        }
+        
+        try {
+          // Disable button and show loading
+          uploadBtn.disabled = true;
+          uploadBtn.textContent = "Uploading...";
+          uploadMessage.style.display = "none";
+          
+          // Create FormData
+          const formData = new FormData();
+          formData.append("file", file);
+          if (department) {
+            formData.append("department", department);
+          }
+          
+          // Get auth token
+          const token = localStorage.getItem("SOPadminToken");
+          if (!token) {
+            throw new Error("Not authenticated. Please login again.");
+          }
+          
+          // Call upload API
+          const response = await fetch(`${API_BASE_URL}/admin/ingestion/upload`, {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
+            body: formData,
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.detail || errorData.message || "Upload failed");
+          }
+          
+          const data = await response.json();
+          
+          // Check if response has indexed status or file already exists
+          if (data.result && (data.result.status === "indexed" || data.result.status.includes("file is already present"))) {
+            // Store the uploaded file and department for regenerate
+            lastUploadedFile = file;
+            lastUploadedDepartment = department;
+            
+            // Show the status message (either indexed or file already present)
+            uploadMessage.style.display = "block";
+            uploadMessage.style.color = "#f1c40f";
+            uploadMessage.textContent = data.result.status;
+            
+            // Change button to Regenerate
+            uploadBtn.disabled = false;
+            uploadBtn.textContent = "Regenerate";
+            uploadBtn.onclick = handleRegenerate;
+            
+            // Disable file and department inputs
+            fileInput.disabled = true;
+            departmentInput.disabled = true;
+          } else {
+            // Success message for other responses
+            uploadMessage.style.display = "block";
+            uploadMessage.style.color = "#2ecc71";
+            uploadMessage.textContent = "✓ File uploaded successfully!";
+            
+            // Reset form after 2 seconds
+            setTimeout(() => {
+              fileInput.value = "";
+              departmentInput.value = "";
+              uploadMessage.style.display = "none";
+              uploadBtn.disabled = false;
+              uploadBtn.textContent = "Upload";
+              uploadBtn.onclick = handleUpload;
+              fileInput.disabled = false;
+              departmentInput.disabled = false;
+            }, 2000);
+          }
+          
+        } catch (error) {
+          uploadMessage.style.display = "block";
+          uploadMessage.style.color = "#e74c3c";
+          uploadMessage.textContent = `Error: ${error.message}`;
+          
+          uploadBtn.disabled = false;
+          uploadBtn.textContent = "Upload";
+          uploadBtn.onclick = handleUpload;
+        }
+      }
+
+      // Handle file regenerate
+      async function handleRegenerate() {
+        const fileInput = document.getElementById("file-input");
+        const departmentInput = document.getElementById("department-input");
+        const uploadBtn = document.getElementById("upload-btn");
+        const uploadMessage = document.getElementById("upload-message");
+        
+        if (!lastUploadedFile) {
+          uploadMessage.style.display = "block";
+          uploadMessage.style.color = "#e74c3c";
+          uploadMessage.textContent = "No file to regenerate";
+          return;
+        }
+        
+        try {
+          // Disable button and show loading
+          uploadBtn.disabled = true;
+          uploadBtn.innerHTML = '<span class="login-btn-spinner"><span class="spinner"></span>Regenerating...</span>';
+          uploadMessage.style.display = "none";
+          
+          // Enable file and department inputs during regenerate
+          fileInput.disabled = true;
+          departmentInput.disabled = false;
+          
+          // Create FormData
+          const formData = new FormData();
+          formData.append("file", lastUploadedFile);
+          if (lastUploadedDepartment) {
+            formData.append("department", lastUploadedDepartment);
+          }
+          
+          // Get auth token
+          const token = localStorage.getItem("SOPadminToken");
+          if (!token) {
+            throw new Error("Not authenticated. Please login again.");
+          }
+          
+          // Call regenerate API with ?regenerate=true
+          const response = await fetch(`${API_BASE_URL}/admin/ingestion/upload?regenerate=true`, {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
+            body: formData,
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.detail || errorData.message || "Regenerate failed");
+          }
+          
+          const data = await response.json();
+          
+          // Success message
+          uploadMessage.style.display = "block";
+          uploadMessage.style.color = "#2ecc71";
+          uploadMessage.textContent = "✓ File regenerated successfully!";
+          
+          // 🔥 Immediately reset to Upload state
+            lastUploadedFile = null;
+            lastUploadedDepartment = null;
+
+            // Enable inputs
+            fileInput.disabled = false;
+            departmentInput.disabled = false;
+
+            // Clear inputs
+            fileInput.value = "";
+            departmentInput.value = "";
+
+            // Reset button
+            uploadBtn.disabled = false;
+            uploadBtn.textContent = "Upload";
+            uploadBtn.onclick = handleUpload;
+          
+        } catch (error) {
+          uploadMessage.style.display = "block";
+          uploadMessage.style.color = "#e74c3c";
+          uploadMessage.textContent = `Error: ${error.message}`;
+          
+          uploadBtn.disabled = false;
+          uploadBtn.textContent = "Regenerate";
+        }
+      }
+
+      // Close modal
+      function closeModal(event) {
+        if (!event || event.target.id === "data-modal") {
+          document.getElementById("data-modal").classList.remove("active");
+        }
+      }
+    </script>
+  </body>
+</html>

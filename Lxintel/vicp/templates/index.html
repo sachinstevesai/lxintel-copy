@@ -1,0 +1,2239 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VICP Attorney Fees</title>
+    <link
+      rel="icon"
+      type="image/webp"
+      href="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
+    />
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      defer
+      src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"
+    ></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body,
+      html {
+        font-family: "Montserrat", sans-serif;
+        background-color: #111;
+        color: #f1c40f;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .video-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-image: url("https://static.vecteezy.com/system/resources/previews/007/596/744/non_2x/abstract-digital-glossy-particles-and-lines-connected-3d-illustration-on-black-background-free-photo.jpg");
+        background-size: cover;
+        background-position: center top 150px;
+        z-index: -2;
+      }
+
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.85);
+        z-index: -1;
+      }
+
+      .app-container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        position: relative;
+        z-index: 1;
+      }
+
+      .app-header {
+        background: rgba(17, 17, 17, 0.98);
+        backdrop-filter: blur(20px);
+        border-bottom: 2px solid rgba(241, 196, 15, 0.2);
+        padding: 20px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 4px 20px rgba(241, 196, 15, 0.15);
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .logo {
+        height: 56px;
+        width: auto;
+        filter: drop-shadow(0 0 10px rgba(241, 196, 15, 0.3));
+      }
+
+      .header-title h1 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #f1c40f;
+        letter-spacing: 1px;
+        text-shadow: 0 0 20px rgba(241, 196, 15, 0.4);
+      }
+
+      .header-title p {
+        font-size: 13px;
+        color: #999;
+        margin-top: 4px;
+      }
+
+      .header-right {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
+      /* .thread-id { 
+      font-size: 11px; 
+      color: #f1c40f; 
+      background: rgba(241,196,15,0.1); 
+      padding: 8px 14px; 
+      border-radius: 6px; 
+      font-family: 'Courier New', monospace; 
+      border: 1px solid rgba(241,196,15,0.3);
+    } */
+      .new-chat-btn {
+        background: rgba(241, 196, 15, 0.15);
+        color: #f1c40f;
+        border: 1px solid rgba(241, 196, 15, 0.4);
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .new-chat-btn:hover {
+        background: rgba(241, 196, 15, 0.25);
+        border-color: rgba(241, 196, 15, 0.6);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(241, 196, 15, 0.3);
+      }
+
+      .user-email {
+        color: #aaa;
+        font-size: 13px;
+        margin-right: 20px;
+        font-weight: 500;
+      }
+
+      .chat-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        max-width: 100%;
+        width: 100%;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 32px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      .chat-messages::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .chat-messages::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 4px;
+      }
+
+      .chat-messages::-webkit-scrollbar-thumb {
+        background: rgba(241, 196, 15, 0.4);
+        border-radius: 4px;
+      }
+
+      .chat-messages::-webkit-scrollbar-thumb:hover {
+        background: rgba(241, 196, 15, 0.6);
+      }
+
+      /* Scrollbar styling for popovers */
+      #templates-popover::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      #templates-popover::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 4px;
+      }
+
+      #templates-popover::-webkit-scrollbar-thumb {
+        background: rgba(241, 196, 15, 0.4);
+        border-radius: 4px;
+      }
+
+      #templates-popover::-webkit-scrollbar-thumb:hover {
+        background: rgba(241, 196, 15, 0.6);
+      }
+
+      #active-users-popover::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      #active-users-popover::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 4px;
+      }
+
+      #active-users-popover::-webkit-scrollbar-thumb {
+        background: rgba(241, 196, 15, 0.4);
+        border-radius: 4px;
+      }
+
+      #active-users-popover::-webkit-scrollbar-thumb:hover {
+        background: rgba(241, 196, 15, 0.6);
+      }
+
+      .message-wrapper {
+        display: flex;
+        animation: slideUp 0.4s ease-out;
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .message-wrapper.user {
+        justify-content: flex-end;
+      }
+
+      /* .avatar { 
+      width: 40px; 
+      height: 40px; 
+      border-radius: 50%; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      flex-shrink: 0; 
+      font-weight: 700; 
+      font-size: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    .avatar.user { 
+      background: linear-gradient(135deg, #f1c40f 0%, #d4ac0d 100%); 
+      color: #000;
+      border: 2px solid rgba(241,196,15,0.3);
+    }
+    .avatar.assistant { 
+      background: linear-gradient(135deg, #333 0%, #222 100%); 
+      color: #f1c40f;
+      border: 2px solid rgba(241,196,15,0.3);
+    } */
+
+      .message {
+        max-width: 75%;
+        padding: 18px 24px;
+        border-radius: 16px;
+        line-height: 1.7;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      }
+
+      .message.user {
+        background: linear-gradient(135deg, #f1c40f 0%, #d4ac0d 100%);
+        color: #000;
+        border-bottom-right-radius: 4px;
+        font-weight: 500;
+      }
+
+      .message.assistant {
+        background: rgba(17, 17, 17, 0.95);
+        backdrop-filter: blur(10px);
+        color: #e0e0e0;
+        border: 1px solid rgba(241, 196, 15, 0.2);
+        border-bottom-left-radius: 4px;
+      }
+
+      .message.assistant h3 {
+        color: #f1c40f;
+        font-weight: 700;
+        font-size: 17px;
+        margin: 16px 0 10px 0;
+        padding-bottom: 8px;
+        border-bottom: 2px solid rgba(241, 196, 15, 0.4);
+      }
+
+      .message.assistant h3:first-child {
+        margin-top: 0;
+      }
+
+      .message.assistant hr {
+        border: none;
+        border-top: 1px solid rgba(241, 196, 15, 0.3);
+        margin: 16px 0;
+      }
+
+      .message.assistant table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 16px 0;
+        font-size: 14px;
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      .message.assistant th,
+      .message.assistant td {
+        border: 1px solid rgba(241, 196, 15, 0.2);
+        padding: 12px 14px;
+        text-align: left;
+      }
+
+      .message.assistant th {
+        background: rgba(241, 196, 15, 0.2);
+        color: #f1c40f;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.5px;
+      }
+
+      .message.assistant tbody tr:hover {
+        background: rgba(241, 196, 15, 0.05);
+      }
+
+      .message.assistant ul,
+      .message.assistant ol {
+        margin: 12px 0;
+        padding-left: 24px;
+        color: #e0e0e0;
+      }
+
+      .message.assistant li {
+        margin: 6px 0;
+      }
+
+      .message.assistant strong {
+        color: #f1c40f;
+        font-weight: 700;
+      }
+
+      .message.assistant p {
+        margin: 8px 0;
+        color: #e0e0e0;
+      }
+
+      .message.assistant code {
+        background: rgba(241, 196, 15, 0.15);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: "Courier New", monospace;
+        font-size: 13px;
+        color: #f1c40f;
+        border: 1px solid rgba(241, 196, 15, 0.3);
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 20px 20px;
+        color: #777;
+      }
+
+      .empty-state-icon {
+        font-size: 64px;
+        margin-bottom: 16px;
+        opacity: 0.4;
+        filter: grayscale(100%);
+      }
+
+      .empty-state h2 {
+        font-size: 28px;
+        color: #f1c40f;
+        margin-bottom: 16px;
+        font-weight: 700;
+        text-shadow: 0 0 20px rgba(241, 196, 15, 0.3);
+      }
+
+      .empty-state p {
+        font-size: 16px;
+        margin-bottom: 10px;
+        color: #999;
+      }
+
+      .empty-state .hint {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 15px;
+        background: rgba(241, 196, 15, 0.1);
+        padding: 11px 18px;
+        border-radius: 10px;
+        border: 1px solid rgba(241, 196, 15, 0.3);
+        font-size: 14px;
+        color: #f1c40f;
+        box-shadow: 0 4px 12px rgba(241, 196, 15, 0.1);
+      }
+
+      .typing-wrapper {
+        display: flex;
+      }
+
+      .typing-indicator {
+        display: none;
+        padding: 18px 24px;
+        background: rgba(17, 17, 17, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        border-bottom-left-radius: 4px;
+        border: 1px solid rgba(241, 196, 15, 0.2);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      }
+
+      .typing-indicator.active {
+        display: block;
+      }
+
+      .typing-dots {
+        display: flex;
+        gap: 5px;
+      }
+
+      .typing-dots span {
+        width: 10px;
+        height: 10px;
+        background: #f1c40f;
+        border-radius: 50%;
+        animation: typing 1.4s infinite;
+        box-shadow: 0 0 8px rgba(241, 196, 15, 0.5);
+      }
+
+      .typing-dots span:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+
+      .typing-dots span:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      @keyframes typing {
+        0%,
+        60%,
+        100% {
+          transform: translateY(0);
+          opacity: 0.5;
+        }
+
+        30% {
+          transform: translateY(-10px);
+          opacity: 1;
+        }
+      }
+
+      /* Input Area */
+      .input-container {
+        background: rgba(17, 17, 17, 0.98);
+        backdrop-filter: blur(20px);
+        border-top: 2px solid rgba(241, 196, 15, 0.2);
+        padding: 24px 32px;
+        box-shadow: 0 -4px 20px rgba(241, 196, 15, 0.1);
+      }
+
+      .input-wrapper {
+        max-width: 100%;
+        margin: 0 auto;
+        display: flex;
+        gap: 16px;
+        align-items: flex-end;
+        align-items: center;
+      }
+
+      .input-wrapper textarea {
+        flex: 1;
+        min-height: auto;
+        max-height: 200px;
+        padding: 8px 16px;
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.6);
+        border: 2px solid rgba(241, 196, 15, 0.3);
+        color: #f1c40f;
+        resize: none;
+        font-family: "Montserrat", sans-serif;
+        font-size: 15px;
+        line-height: 1.5;
+        transition: all 0.3s;
+      }
+
+      .input-wrapper textarea:focus {
+        outline: none;
+        border-color: rgba(241, 196, 15, 0.6);
+        background: rgba(0, 0, 0, 0.8);
+        box-shadow: 0 0 20px rgba(241, 196, 15, 0.2);
+      }
+
+      .input-wrapper textarea::placeholder {
+        color: #666;
+      }
+
+      .send-btn {
+        background: linear-gradient(135deg, #f1c40f 0%, #d4ac0d 100%);
+        color: #000;
+        border: none;
+        padding: 19px 25px;
+        border-radius: 12px;
+        font-size: 17px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 16px rgba(241, 196, 15, 0.4);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .send-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 24px rgba(241, 196, 15, 0.6);
+        background: linear-gradient(135deg, #ffd93d 0%, #f1c40f 100%);
+      }
+
+      .send-btn:active {
+        transform: translateY(-1px);
+      }
+
+      .send-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: 0 4px 16px rgba(241, 196, 15, 0.2);
+      }
+
+      .spinner {
+        border: 3px solid rgba(0, 0, 0, 0.3);
+        border-top-color: #000;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 0.8s linear infinite;
+        display: inline-block;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .app-header {
+          padding: 16px 20px;
+        }
+
+        .header-title h1 {
+          font-size: 18px;
+        }
+
+        .header-title p {
+          display: none;
+        }
+
+        .thread-id {
+          display: none;
+        }
+
+        .logo {
+          height: 44px;
+        }
+
+        .message {
+          max-width: 85%;
+        }
+
+        .empty-state {
+          padding: 20px 20px;
+        }
+
+        .empty-state h2 {
+          font-size: 22px;
+        }
+
+        .chat-container {
+          padding: 0 16px;
+        }
+      }
+
+      /* LOGIN PAGE STYLES */
+      .login-page-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+      }
+
+      .login-page-content {
+        width: 100%;
+        max-width: 600px;
+        padding: 2rem;
+        text-align: center;
+      }
+
+      .login-logo-section {
+        margin-bottom: 3rem;
+      }
+
+      .login-logo-section img {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 2rem;
+        display: inline-block;
+      }
+
+      .login-page-content h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #f1c40f;
+        margin: 0 0 1rem 0;
+        letter-spacing: 2px;
+      }
+
+      .login-page-content > p {
+        font-size: 1rem;
+        color: #aaa;
+        margin: 0 0 2rem 0;
+      }
+
+      .login-form-card {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 2.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      }
+
+      .login-form-card h2 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #f1c40f;
+        margin: 0 0 2rem 0;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+
+      .login-form-group {
+        margin-bottom: 2rem;
+        text-align: left;
+      }
+
+      .login-form-group label {
+        display: block;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #f1c40f;
+        margin-bottom: 0.75rem;
+      }
+
+      .login-form-group input[type="email"] {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        font-size: 0.95rem;
+        background-color: #000;
+        color: #fff;
+        border: 1px solid #444;
+        border-radius: 6px;
+        font-family: "Montserrat", sans-serif;
+        transition: border-color 0.3s ease;
+      }
+
+      .login-form-group input[type="email"]:focus {
+        outline: none;
+        border-color: #f1c40f;
+        box-shadow: 0 0 0 2px rgba(241, 196, 15, 0.1);
+      }
+
+      .login-form-group input[type="email"]::placeholder {
+        color: #666;
+      }
+
+      .login-email-status {
+        display: flex;
+        align-items: center;
+        margin-top: 0.75rem;
+        font-size: 0.85rem;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .login-email-status.visible {
+        opacity: 1;
+      }
+
+      .login-email-status .status-icon {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        margin-right: 0.5rem;
+      }
+
+      .login-email-status .status-icon.checking {
+        background-color: #3498db;
+        animation: pulse 1.5s infinite;
+      }
+
+      .login-email-status .status-icon.valid {
+        background-color: #2ecc71;
+      }
+
+      .login-email-status .status-icon.invalid {
+        background-color: #e74c3c;
+      }
+
+      .login-error-message {
+        color: #e74c3c;
+        background-color: rgba(231, 76, 60, 0.1);
+        border: 1px solid rgba(231, 76, 60, 0.3);
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        text-align: center;
+      }
+
+      .login-btn {
+        width: 100%;
+        padding: 0.875rem;
+        font-size: 1rem;
+        font-weight: 700;
+        background-color: #d4ac0d;
+        color: #000;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .login-btn:hover:not(:disabled) {
+        background-color: #f1c40f;
+        box-shadow: 0 4px 12px rgba(241, 196, 15, 0.3);
+      }
+
+      .login-btn:disabled {
+        background-color: #666;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+
+      .login-btn-spinner {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+      }
+
+      @keyframes pulse {
+        0% {
+          opacity: 0.6;
+        }
+
+        50% {
+          opacity: 1;
+        }
+
+        100% {
+          opacity: 0.6;
+        }
+      }
+
+      .active_user{
+            position: fixed;
+    top: 80px;
+    left: 350px;
+    background-color: rgb(26, 26, 26);
+    border: 1px solid rgba(241, 196, 15, 0.4);
+    border-radius: 8px;
+    padding: 12px;
+    min-width: auto;
+    min-height: auto;
+    max-height: 400px;
+    display: none;
+    z-index: 2100;
+    box-shadow: rgba(0, 0, 0, 0.5) 0px 4px 20px;
+    overflow-y: auto;
+      }
+
+@media (max-width: 768px) {
+  .header-left {
+    gap: 8px !important;
+    flex-wrap: wrap;
+}
+.header-title h1 {
+    font-weight: 600 !important;
+}
+.header-right {
+    gap: 8px !important;
+}
+button.new-chat-btn {
+    gap: 4px !important;
+    padding: 10px 10px !important;
+    border-radius: 4px !important;
+    font-weight: 600 !important;
+    font-size: 12px !important;
+}
+.send-btn {
+    padding: 15px 18px !important;
+    border-radius: 12px !important;
+    font-size: 14px  !important;
+    letter-spacing: 0 !important;
+}
+
+.active_user {
+   
+    top: 120px;
+    left: 105px;
+   
+}
+div#user-menu-popover {
+    top: 120px !important;
+}
+/* .app-header {
+    width: 100%;
+    position: fixed;
+    
+} */
+/* .chat-messages {
+   
+    padding-top: 120px;
+} */
+/* .input-container {
+
+    padding: 24px 8px;
+  
+    position: fixed;
+    bottom: 0;
+} */
+}
+      #active-users-list > div:last-child {
+  border-bottom: 0 !important;
+}
+    </style>
+  </head>
+
+  <body>
+    <div class="video-background"></div>
+    <div class="overlay"></div>
+
+    <!-- Login Page -->
+    <div id="login-page-wrapper" class="login-page-wrapper" x-data="loginApp()">
+      <div class="login-page-content">
+        <div class="login-logo-section">
+          <h1>VICP Attorney Tab</h1>
+          <p>Professional Legal Case Analysis Platform</p>
+        </div>
+        <div class="login-form-card">
+          <h2>LOGIN</h2>
+          <div x-show="error" class="login-error-message" x-text="error"></div>
+          <form @submit.prevent="login()">
+            <div class="login-form-group">
+              <label for="login-email">Email Address</label>
+              <input
+                type="email"
+                id="login-email"
+                x-model="email"
+                @input.debounce.500="verifyEmail()"
+                placeholder="Enter your email"
+                required
+              />
+              <div
+                class="login-email-status"
+                :class="{ visible: emailChecking || emailValid !== null }"
+              >
+                <span
+                  class="status-icon"
+                  :class="emailChecking ? 'checking' : (emailValid ? 'valid' : 'invalid')"
+                ></span>
+                <span
+                  x-text="emailChecking ? 'Checking...' : (emailValid ? 'Email verified' : 'Email not found')"
+                ></span>
+              </div>
+            </div>
+            <button
+              type="submit"
+              class="login-btn"
+              :disabled="emailValid !== true || loggingIn"
+            >
+              <span x-show="!loggingIn">LOGIN</span>
+              <span x-show="loggingIn" class="login-btn-spinner">
+                <span class="spinner"></span>
+                Logging in...
+              </span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div
+      id="main-app-wrapper"
+      class="app-container"
+      x-data="vicpApp()"
+      x-init="init()"
+      style="display: none"
+    >
+      <!-- Save Template Modal -->
+      <div
+        id="save-template-modal"
+        style="
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.8);
+          display: none;
+          align-items: center;
+          justify-content: center;
+          z-index: 2000;
+        "
+        onclick="event.target.id === 'save-template-modal' && closeSaveTemplateModal()"
+      >
+        <div style="
+          background: #1a1a1a;
+          border: 1px solid rgba(241, 196, 15, 0.4);
+          border-radius: 12px;
+          padding: 32px;
+          max-width: 500px;
+          width: 90%;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        ">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <h2 style="color: #f1c40f; font-size: 20px; font-weight: 700; margin: 0;">Save as Template</h2>
+            <button
+              onclick="closeSaveTemplateModal()"
+              style="
+                background: none;
+                border: none;
+                color: #999;
+                font-size: 24px;
+                cursor: pointer;
+                padding: 0;
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              "
+            >×</button>
+          </div>
+          <p style="color: #aaa; margin: 0 0 20px 0; font-size: 14px;">Save this message as a template for future use</p>
+          <form onsubmit="saveMsgAsTemplate(event)" style="display: flex; flex-direction: column; gap: 16px;">
+            <div>
+              <label style="display: block; color: #f1c40f; font-size: 13px; font-weight: 600; margin-bottom: 8px;">Template Name *</label>
+              <input
+                id="template-name-input"
+                type="text"
+                placeholder="e.g., Demand Letter v1"
+                required
+                style="
+                  width: 100%;
+                  padding: 10px 12px;
+                  background: rgba(0, 0, 0, 0.6);
+                  border: 1px solid rgba(241, 196, 15, 0.3);
+                  border-radius: 6px;
+                  color: #f1c40f;
+                  font-family: 'Montserrat', sans-serif;
+                  font-size: 14px;
+                  transition: all 0.3s;
+                "
+                onfocus="this.style.borderColor='rgba(241, 196, 15, 0.6)'"
+                onblur="this.style.borderColor='rgba(241, 196, 15, 0.3)'"
+              />
+            </div>
+            <div>
+              <label style="display: block; color: #f1c40f; font-size: 13px; font-weight: 600; margin-bottom: 8px;">Description *</label>
+              <textarea
+                id="template-description-input"
+                placeholder="Brief description of this template"
+                required
+                style="
+                  width: 100%;
+                  padding: 10px 12px;
+                  background: rgba(0, 0, 0, 0.6);
+                  border: 1px solid rgba(241, 196, 15, 0.3);
+                  border-radius: 6px;
+                  color: #f1c40f;
+                  font-family: 'Montserrat', sans-serif;
+                  font-size: 14px;
+                  resize: vertical;
+                  min-height: 80px;
+                  transition: all 0.3s;
+                "
+                onfocus="this.style.borderColor='rgba(241, 196, 15, 0.6)'"
+                onblur="this.style.borderColor='rgba(241, 196, 15, 0.3)'"
+              ></textarea>
+            </div>
+            <div id="template-modal-message" style="font-size: 14px; text-align: center; display: none;"></div>
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 8px;">
+              <button
+                type="button"
+                onclick="closeSaveTemplateModal()"
+                style="
+                  background: rgba(241, 196, 15, 0.1);
+                  color: #f1c40f;
+                  border: 1px solid rgba(241, 196, 15, 0.3);
+                  padding: 10px 20px;
+                  border-radius: 6px;
+                  font-weight: 600;
+                  cursor: pointer;
+                  transition: all 0.3s;
+                  font-size: 14px;
+                "
+              >Cancel</button>
+              <button
+                id="save-template-btn"
+                type="submit"
+                style="
+                  background: #f1c40f;
+                  color: #000;
+                  border: none;
+                  padding: 10px 20px;
+                  border-radius: 6px;
+                  font-weight: 700;
+                  cursor: pointer;
+                  transition: all 0.3s;
+                  font-size: 14px;
+                "
+              >Save Template</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Delete Template Confirmation Modal -->
+      <div
+        id="delete-template-modal"
+        style="
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.8);
+          display: none;
+          align-items: center;
+          justify-content: center;
+          z-index: 2000;
+        "
+        onclick="event.target.id === 'delete-template-modal' && closeDeleteTemplateModal()"
+      >
+        <div style="
+          background: #1a1a1a;
+          border: 1px solid rgba(241, 196, 15, 0.4);
+          border-radius: 12px;
+          padding: 32px;
+          max-width: 400px;
+          width: 90%;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        ">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <h2 style="color: #f1c40f; font-size: 20px; font-weight: 700; margin: 0;">Delete Template</h2>
+            <button
+              onclick="closeDeleteTemplateModal()"
+              style="
+                background: none;
+                border: none;
+                color: #999;
+                font-size: 24px;
+                cursor: pointer;
+                padding: 0;
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              "
+            >×</button>
+          </div>
+          <p style="color: #aaa; margin: 0 0 24px 0; font-size: 14px;">Are you sure you want to delete this template? This action cannot be undone.</p>
+          <div id="delete-template-message" style="font-size: 14px; text-align: center; margin-bottom: 20px; display: none;"></div>
+          <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <button
+              type="button"
+              onclick="closeDeleteTemplateModal()"
+              style="
+                background: rgba(241, 196, 15, 0.1);
+                color: #f1c40f;
+                border: 1px solid rgba(241, 196, 15, 0.3);
+                padding: 10px 20px;
+                border-radius: 6px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s;
+                font-size: 14px;
+              "
+            >Cancel</button>
+            <button
+              id="confirm-delete-btn"
+              type="button"
+              onclick="confirmDeleteTemplate()"
+              style="
+                background: #e74c3c;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 6px;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.3s;
+                font-size: 14px;
+              "
+            >Delete</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="app-header">
+        <div class="header-left">
+          <img
+            src="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
+            alt="Ramos Law"
+            class="logo"
+          />
+          <div class="header-title">
+            <h1>VICP ATTORNEY FEES</h1>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <p>AI-Powered Case Analysis</p>
+              <!-- Active Users Count -->
+              <button
+                id="active-users-btn"
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                  background: none;
+                  border: none;
+                  cursor: pointer;
+                  padding: 4px 10px;
+                  border-radius: 6px;
+                  transition: all 0.3s;
+                  color: #f1c40f;
+                  font-size: 12px;
+                  font-weight: 600;
+                "
+                onclick="toggleActiveUsersPopover()"
+                title="Active users on this tool"
+              >
+                <span style="
+                  display: inline-block;
+                  width: 8px;
+                  height: 8px;
+                  background: #2ecc71;
+                  border-radius: 50%;
+                  box-shadow: 0 0 8px #2ecc71;
+                "></span>
+                <span id="active-count">0</span>
+                <span style="margin-left: 4px;">Users</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="header-right" style="display: flex; align-items: center; gap: 16px;">
+          <!-- NEW CHAT BUTTON -->
+          <button 
+            class="new-chat-btn" 
+            onclick="startNewChat()"
+            style="display: flex; align-items: center; gap: 8px; background-color: #f1c40f; color: #111; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px;"
+            title="Start a new conversation"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            NEW CHAT
+          </button>
+          
+          <!-- MENU ICON -->
+          <button
+            style="background: none; border: none; cursor: pointer; padding: 8px; position: relative;"
+            onclick="toggleUserMenu()"
+            title="User menu"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f1c40f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="4" y1="6" x2="20" y2="6"></line>
+              <line x1="4" y1="12" x2="20" y2="12"></line>
+              <line x1="4" y1="18" x2="20" y2="18"></line>
+            </svg>
+          </button>
+          
+          <!-- USER MENU POPOVER -->
+          <div 
+            id="user-menu-popover"
+            style="
+              position: absolute;
+              top: 70px;
+              right: 20px;
+              background-color: #222;
+              border: 1px solid #444;
+              border-radius: 8px;
+              padding: 12px;
+              min-width: 200px;
+              display: none;
+              z-index: 1000;
+              box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            "
+          >
+            <div style="padding: 8px 12px; border-bottom: 1px solid #444; margin-bottom: 8px; color: #bbb; font-size: 13px;">
+              <span x-text="userEmail"></span>
+            </div>
+            <button
+              onclick="logout()"
+              style="
+                width: 100%;
+                padding: 10px 12px;
+                background-color: #e74c3c;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 14px;
+              "
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-container">
+        <div class="chat-messages" id="chat-messages">
+          <div class="empty-state">
+            <div class="empty-state-icon">⚖️</div>
+            <h2>Welcome to VICP Case Analysis</h2>
+            <p>Start by describing your injury case details</p>
+            <div class="hint">
+              Include: Year of injury • Injury Type • Paralegal hours
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <div class="input-wrapper">
+          <textarea
+            id="message-input"
+            placeholder="Describe the injury case. Include: Year of injury • Injury Type • Paralegal hours (Press Enter to send, Shift+Enter for new line)"
+            onkeydown="handleKeyPress(event)"
+          ></textarea>
+          <!-- Templates Button -->
+          <button
+            id="templates-btn"
+            style="
+              background: none;
+              border: none;
+              cursor: pointer;
+              padding: 8px;
+              color: #f1c40f;
+              transition: all 0.3s;
+              position: relative;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 44px;
+              height: 44px;
+              border-radius: 8px;
+            "
+            onmouseover="this.style.background='rgba(241, 196, 15, 0.1)'"
+            onmouseout="this.style.background='none'"
+            onclick="toggleTemplatesPopover(event)"
+            title="Load template message"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <polyline points="17 21 17 13 7 13 7 21"></polyline>
+              <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+          </button>
+          <button class="send-btn" onclick="sendMessage()" id="send-btn">
+            Send
+          </button>
+        </div>
+      </div>
+
+      <!-- Templates Popover (Outside input-container) -->
+      <div
+        id="templates-popover"
+        style="
+          position: fixed;
+          bottom: 90px;
+          right: 32px;
+          background-color: #1a1a1a;
+          border: 1px solid rgba(241, 196, 15, 0.4);
+          border-radius: 8px;
+          padding: 12px;
+          min-width: auto;
+          max-height: auto;
+          display: none;
+          z-index: 2000;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+          overflow-y: auto;
+        "
+      >
+        <div style="
+          padding: 8px 0;
+          margin-bottom: 8px;
+          border-bottom: 1px solid rgba(241, 196, 15, 0.3);
+          color: #f1c40f;
+          font-size: 12px;
+          font-weight: 600;
+        ">Templates</div>
+        <div id="templates-list" style="color: #aaa; font-size: 13px;">
+          <div style="padding: 8px 0; color: #666;">Loading...</div>
+        </div>
+      </div>
+
+      <!-- Active Users Popover (Outside header) -->
+      <div
+        id="active-users-popover"
+        class="active_user"
+      >
+        <div style="
+          padding: 8px 0;
+          margin-bottom: 8px;
+          border-bottom: 1px solid rgba(241, 196, 15, 0.3);
+          color: #f1c40f;
+          font-size: 12px;
+          font-weight: 600;
+        ">Active Users</div>
+        <div id="active-users-list" style="color: #aaa; font-size: 13px;">
+          <div style="padding: 8px 0; color: #666;">Loading...</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE_URL = "https://attired-hitchily-stephane.ngrok-free.dev";
+      let threadId = null;
+      let isProcessing = false;
+      let currentMessageToSave = ""; // Store message for saving as template
+
+      marked.setOptions({
+        gfm: true,
+        breaks: true,
+        tables: true,
+      });
+
+      // Load saved thread ID from localStorage on page load
+      // (function loadSavedThread() {
+      // const savedThreadId = localStorage.getItem('vicp_thread_id');
+      // if (savedThreadId) {
+      //   threadId = savedThreadId;
+      //   console.log('Loaded thread:', threadId);
+      // }
+      // })();
+
+      function handleKeyPress(event) {
+        if (event.key === "Enter" && !event.shiftKey) {
+          event.preventDefault();
+          sendMessage();
+        }
+      }
+
+      function logout() {
+        const vicpApp = window.vicpAppInstance;
+        if (vicpApp) {
+          vicpApp.logout();
+        }
+      }
+
+      function toggleUserMenu() {
+        const popover = document.getElementById("user-menu-popover");
+        if (popover.style.display === "none") {
+          popover.style.display = "block";
+        } else {
+          popover.style.display = "none";
+        }
+      }
+
+      // Close menu when clicking outside
+      document.addEventListener("click", function(event) {
+        const popover = document.getElementById("user-menu-popover");
+        const menuBtn = event.target.closest("button[onclick='toggleUserMenu()']");
+        if (!menuBtn && !popover.contains(event.target)) {
+          popover.style.display = "none";
+        }
+      });
+
+      function toggleUserMenu() {
+        const popover = document.getElementById("user-menu-popover");
+        if (popover.style.display === "none" || popover.style.display === "") {
+          popover.style.display = "block";
+        } else {
+          popover.style.display = "none";
+        }
+      }
+
+      function logout() {
+        localStorage.removeItem("jwtvicp");
+        localStorage.removeItem("vicpEmail");
+        window.dispatchEvent(new Event("logout-success"));
+      }
+
+      function startNewChat() {
+        if (
+          confirm("Start a new conversation? This will clear the current chat.")
+        ) {
+          threadId = null;
+          // localStorage.removeItem('vicp_thread_id');
+          document.getElementById("chat-messages").innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">⚖️</div>
+            <h2>Welcome to VICP Case Analysis</h2>
+            <p>Start by describing your injury case details</p>
+            <div class="hint">
+              💡 Include: Year of injury • Injury Type • Paralegal hours
+            </div>
+          </div>
+        `;
+          // document.getElementById('thread-status').textContent = 'Ready';
+          document.getElementById("message-input").value = "";
+        }
+      }
+
+      async function sendMessage() {
+        if (isProcessing) return;
+
+        const input = document.getElementById("message-input");
+        const message = input.value.trim();
+
+        if (!message) return;
+
+        isProcessing = true;
+        const sendBtn = document.getElementById("send-btn");
+        sendBtn.disabled = true;
+        sendBtn.innerHTML = '<span class="spinner"></span>';
+
+        addMessage("user", message);
+        input.value = "";
+        showTypingIndicator();
+
+        try {
+          const response = await fetch(API_BASE_URL + "/VICP_Attorney_Fees/api/chat", {
+            method: "POST",
+            headers: { 
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${localStorage.getItem("jwtvicp")}`,
+              "ngrok-skip-browser-warning": "true"
+            },
+            body: JSON.stringify({ message, thread_id: threadId }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            threadId = data.thread_id;
+            // localStorage.setItem('vicp_thread_id', threadId);
+            // document.getElementById('thread-status').textContent = threadId.substring(0, 16) + '...';
+
+            const assistantMessages = data.chat_history.filter(
+              (m) => m.role === "assistant"
+            );
+            if (assistantMessages.length > 0) {
+              const lastMessage =
+                assistantMessages[assistantMessages.length - 1];
+              addMessage("assistant", lastMessage.content);
+            }
+          } else {
+            addMessage("assistant", `⚠️ Error: ${data.error}`);
+          }
+        } catch (error) {
+          addMessage("assistant", `⚠️ Connection Error: ${error.message}`);
+        } finally {
+          hideTypingIndicator();
+          isProcessing = false;
+          sendBtn.disabled = false;
+          sendBtn.textContent = "Send";
+          scrollToBottom();
+        }
+      }
+
+      function addMessage(role, content) {
+        const messagesDiv = document.getElementById("chat-messages");
+
+        const emptyState = messagesDiv.querySelector(".empty-state");
+        if (emptyState) emptyState.remove();
+
+        const wrapper = document.createElement("div");
+        wrapper.className = `message-wrapper ${role}`;
+
+        // const avatar = document.createElement('div');
+        // avatar.className = `avatar ${role}`;
+        // avatar.textContent = role === 'user' ? 'U' : 'AI';
+
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `message ${role}`;
+
+        if (role === "assistant") {
+          let processedContent = processTableContent(content);
+          messageDiv.innerHTML = marked.parse(processedContent);
+        } else {
+          messageDiv.textContent = content;
+          
+          // Add save button for user messages
+          const messageContainer = document.createElement("div");
+          messageContainer.style.display = "flex";
+          messageContainer.style.gap = "12px";
+          messageContainer.style.alignItems = "flex-start";
+          
+          const saveBtn = document.createElement("button");
+          saveBtn.style.cssText = `
+            background: none;
+            border: none;
+            color: #f1c40f;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.3s;
+            font-size: 16px;
+            flex-shrink: 0;
+            margin-top: 2px;
+          `;
+          saveBtn.title = "Save this message as template";
+          saveBtn.innerHTML = "💾";
+          saveBtn.onmouseover = function() { this.style.background = "rgba(241, 196, 15, 0.2)"; };
+          saveBtn.onmouseout = function() { this.style.background = "none"; };
+          saveBtn.onclick = function(e) {
+            e.stopPropagation();
+            currentMessageToSave = content;
+            openSaveTemplateModal();
+          };
+          
+          wrapper.appendChild(saveBtn);
+          wrapper.appendChild(messageDiv);
+          messagesDiv.appendChild(wrapper);
+          scrollToBottom();
+          return;
+        }
+
+        // wrapper.appendChild(avatar);
+        wrapper.appendChild(messageDiv);
+        messagesDiv.appendChild(wrapper);
+
+        scrollToBottom();
+      }
+
+      function showTypingIndicator() {
+        const messagesDiv = document.getElementById("chat-messages");
+        const wrapper = document.createElement("div");
+        wrapper.className = "typing-wrapper";
+        wrapper.id = "typing-wrapper";
+
+        // const avatar = document.createElement('div');
+        // avatar.className = 'avatar assistant';
+        // avatar.textContent = 'AI';
+
+        const indicator = document.createElement("div");
+        indicator.className = "typing-indicator active";
+        indicator.innerHTML =
+          '<div class="typing-dots"><span></span><span></span><span></span></div>';
+
+        // wrapper.appendChild(avatar);
+        wrapper.appendChild(indicator);
+        messagesDiv.appendChild(wrapper);
+        scrollToBottom();
+      }
+
+      function hideTypingIndicator() {
+        const wrapper = document.getElementById("typing-wrapper");
+        if (wrapper) wrapper.remove();
+      }
+
+      function processTableContent(content) {
+        const lines = content.split("\n");
+        let processedContent = [];
+        let i = 0;
+
+        while (i < lines.length) {
+          let line = lines[i].trim();
+
+          if (line.startsWith("|") && line.endsWith("|")) {
+            const tableLines = [];
+            while (i < lines.length && lines[i].trim().startsWith("|")) {
+              const tableLine = lines[i].trim();
+              if (tableLine.length > 0) {
+                tableLines.push(tableLine);
+              }
+              i++;
+            }
+
+            if (tableLines.length > 0) {
+              const markdownTable = convertToMarkdownTable(tableLines);
+              processedContent.push(markdownTable);
+            }
+            continue;
+          }
+
+          processedContent.push(line);
+          i++;
+        }
+
+        return processedContent.join("\n");
+      }
+
+      function convertToMarkdownTable(tableLines) {
+        const rows = tableLines.map((line) => {
+          const cells = line
+            .slice(1, -1)
+            .split("|")
+            .map((cell) => cell.trim());
+          return cells;
+        });
+
+        if (rows.length === 0) return "";
+
+        let separatorIndex = rows.findIndex((row) =>
+          row.every((cell) => /^[\s\-]+$/.test(cell) || cell === "")
+        );
+
+        let headerRow, dataRows;
+
+        if (separatorIndex !== -1) {
+          headerRow = rows[0];
+          dataRows = rows
+            .slice(1)
+            .filter((_, idx) => idx !== separatorIndex - 1);
+        } else {
+          headerRow = rows[0];
+          dataRows = rows.slice(1);
+        }
+
+        const numCols = Math.max(
+          headerRow.length,
+          ...dataRows.map((row) => row.length)
+        );
+
+        while (headerRow.length < numCols) {
+          headerRow.push("");
+        }
+
+        dataRows = dataRows.map((row) => {
+          const newRow = [...row];
+          while (newRow.length < numCols) newRow.push("");
+          return newRow;
+        });
+
+        let markdown = "\n\n";
+        markdown += "| " + headerRow.join(" | ") + " |\n";
+        markdown += "| " + headerRow.map(() => "---").join(" | ") + " |\n";
+        dataRows.forEach((row) => {
+          markdown += "| " + row.join(" | ") + " |\n";
+        });
+        markdown += "\n";
+
+        return markdown;
+      }
+
+      function scrollToBottom() {
+        const messagesDiv = document.getElementById("chat-messages");
+        setTimeout(() => {
+          messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }, 100);
+      }
+
+      // Alpine.js Components
+      function loginApp() {
+        return {
+          email: "",
+          emailValid: null,
+          emailChecking: false,
+          error: "",
+          loggedIn: localStorage.getItem("jwt") ? true : false,
+          loggingIn: false,
+
+          verifyEmail() {
+            if (!this.email) {
+              this.emailValid = null;
+              this.emailChecking = false;
+              return;
+            }
+
+            this.emailChecking = true;
+            this.error = "";
+            fetch(
+              `${API_BASE_URL}/VICP_Attorney_Fees/verify-email?email=${this.email}`,
+              {
+                method: "GET",
+                headers: {
+                  "ngrok-skip-browser-warning": "true",
+                },
+              }
+            )
+              .then((res) => res.json())
+              .then((json) => {
+                this.emailValid = json.valid;
+                this.emailChecking = false;
+                if (!json.valid) {
+                  this.error =
+                    "Access denied: Your email is not on the authorized list.";
+                }
+              })
+              .catch(() => {
+                this.emailValid = false;
+                this.emailChecking = false;
+                this.error =
+                  "Access denied: Your email is not on the authorized list.";
+              });
+          },
+
+          login() {
+            if (!this.emailValid) {
+              this.error = "Email not authorized";
+              return;
+            }
+
+            if (!this.email || !this.email.includes("@")) {
+              this.error = "Please enter a valid email";
+              return;
+            }
+
+            this.loggingIn = true;
+
+            const data = new URLSearchParams();
+            data.append("username", this.email);
+            data.append("password", "not-used-but-required");
+
+            fetch(`${API_BASE_URL}/VICP_Attorney_Fees/login`, {
+              method: "POST",
+              headers: {
+                "ngrok-skip-browser-warning": "true",
+              },
+              body: data,
+            })
+              .then((res) => {
+                if (!res.ok) throw new Error("Unauthorized email");
+                return res.json();
+              })
+              .then((json) => {
+                localStorage.setItem("jwtvicp", json.access_token);
+                localStorage.setItem("vicpEmail", this.email);
+                this.loggedIn = true;
+                this.error = "";
+                this.loggingIn = false;
+                window.dispatchEvent(
+                  new CustomEvent("login-success", {
+                    detail: { email: this.email },
+                  })
+                );
+              })
+              .catch((err) => {
+                this.error = "Invalid credentials";
+                this.loggingIn = false;
+              });
+          },
+        };
+      }
+
+      function vicpApp() {
+        return {
+          isLoggedIn: false,
+          userEmail: "",
+
+          init() {
+            this.checkAuth();
+            window.addEventListener("login-success", (e) => {
+              this.userEmail = e.detail.email;
+              this.isLoggedIn = true;
+            });
+          },
+
+          checkAuth() {
+            const token = localStorage.getItem("jwt");
+            const userEmail = localStorage.getItem("vicpEmail");
+            if (token && userEmail) {
+              this.isLoggedIn = true;
+              this.userEmail = userEmail;
+            }
+          },
+
+          logout() {
+            localStorage.removeItem("jwtvicp");
+            localStorage.removeItem("vicpEmail");
+            window.dispatchEvent(new Event("logout-success"));
+          },
+        };
+      }
+    </script>
+
+    <script>
+      // Check token on page load and toggle UIs accordingly
+      function checkAuthToken() {
+        const token = localStorage.getItem("jwtvicp");
+        const loginPageWrapper = document.getElementById("login-page-wrapper");
+        const mainAppWrapper = document.getElementById("main-app-wrapper");
+
+        if (token) {
+          // User is logged in
+          loginPageWrapper.style.display = "none";
+          mainAppWrapper.style.display = "flex";
+          // Load active users when logged in
+          loadActiveUsers();
+        } else {
+          // User is not logged in
+          loginPageWrapper.style.display = "flex";
+          mainAppWrapper.style.display = "none";
+        }
+      }
+
+      // Check on page load
+      document.addEventListener("DOMContentLoaded", checkAuthToken);
+
+      // Re-check when logout-success event fires
+      window.addEventListener("logout-success", () => {
+        setTimeout(checkAuthToken, 100);
+      });
+
+      // Also check after login
+      window.addEventListener("login-success", () => {
+        setTimeout(checkAuthToken, 100);
+      });
+
+      // ============ FEATURE 1: ACTIVE USERS COUNT ============
+      async function loadActiveUsers() {
+        try {
+          const token = localStorage.getItem("jwtvicp");
+          if (!token) return;
+
+          const response = await fetch(
+            `${API_BASE_URL}/VICP_Attorney_Fees/active-today`,
+            {
+              method: "GET",
+              headers: {
+                "Authorization": `Bearer ${token}`,
+                "ngrok-skip-browser-warning": "true"
+              }
+            }
+          );
+
+          const data = await response.json();
+          
+          if (Array.isArray(data)) {
+            // Update active users count
+            const count = data.length;
+            const countElement = document.getElementById("active-count");
+            if (countElement) {
+              countElement.textContent = count;
+            }
+
+            // Populate active users list
+            const usersList = document.getElementById("active-users-list");
+            if (usersList) {
+              if (count === 0) {
+                usersList.innerHTML = '<div style="padding: 8px 0; color: #666;">No active users</div>';
+              } else {
+                usersList.innerHTML = data.map(user => `
+                  <div style="
+                    padding: 10px 8px;
+                    border-bottom: 1px solid rgba(241, 196, 15, 0.2);
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    gap: 16px;
+                  ">
+                    <span style="color: #f1c40f; font-weight: 500; flex: 1;">${user.email}</span>
+                    <span style="color: #aaa; font-size: 12px; white-space: nowrap; flex-shrink: 0;">${formatLastActive(user.last_active)}</span>
+                  </div>
+                `).join("");
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Failed to load active users:", error);
+        }
+      }
+
+      function formatLastActive(dateStr) {
+        try {
+          const date = new Date(dateStr);
+          const now = new Date();
+          const diffMs = now - date;
+          const diffMins = Math.floor(diffMs / 60000);
+          const diffHours = Math.floor(diffMs / 3600000);
+          const diffDays = Math.floor(diffMs / 86400000);
+
+          if (diffMins < 1) return "just now";
+          if (diffMins < 60) return `${diffMins}m ago`;
+          if (diffHours < 24) return `${diffHours}h ago`;
+          if (diffDays < 7) return `${diffDays}d ago`;
+          
+          return date.toLocaleDateString();
+        } catch (e) {
+          return dateStr;
+        }
+      }
+
+      function toggleActiveUsersPopover() {
+        const popover = document.getElementById("active-users-popover");
+        if (popover.style.display === "none" || popover.style.display === "") {
+          popover.style.display = "block";
+          // Reload active users when popover is opened
+          loadActiveUsers();
+        } else {
+          popover.style.display = "none";
+        }
+      }
+
+      // Close active users popover when clicking outside
+      document.addEventListener("click", function(event) {
+        const popover = document.getElementById("active-users-popover");
+        const btn = document.getElementById("active-users-btn");
+        if (!btn.contains(event.target) && !popover.contains(event.target)) {
+          popover.style.display = "none";
+        }
+      });
+
+      // ============ FEATURE 2: SAVE MESSAGE AS TEMPLATE ============
+      function openSaveTemplateModal() {
+        const modal = document.getElementById("save-template-modal");
+        const nameInput = document.getElementById("template-name-input");
+        const descInput = document.getElementById("template-description-input");
+        const messageDiv = document.getElementById("template-modal-message");
+        const saveBtn = document.getElementById("save-template-btn");
+        
+        modal.style.display = "flex";
+        nameInput.value = "";
+        descInput.value = "";
+        messageDiv.style.display = "none";
+        messageDiv.textContent = "";
+        
+        // Reset button state
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Save Template";
+        
+        nameInput.focus();
+      }
+
+      function closeSaveTemplateModal() {
+        const modal = document.getElementById("save-template-modal");
+        modal.style.display = "none";
+        currentMessageToSave = "";
+      }
+
+      async function saveMsgAsTemplate(event) {
+        event.preventDefault();
+        
+        const nameInput = document.getElementById("template-name-input");
+        const descInput = document.getElementById("template-description-input");
+        const saveBtn = document.getElementById("save-template-btn");
+        const messageDiv = document.getElementById("template-modal-message");
+
+        const templateName = nameInput.value.trim();
+        const templateDesc = descInput.value.trim();
+        const templateText = currentMessageToSave;
+
+        if (!templateName || !templateDesc) {
+          messageDiv.style.display = "block";
+          messageDiv.style.color = "#e74c3c";
+          messageDiv.textContent = "Please fill in all fields";
+          return;
+        }
+
+        try {
+          saveBtn.disabled = true;
+          saveBtn.textContent = "Saving...";
+          messageDiv.style.display = "block";
+          messageDiv.style.color = "#f1c40f";
+          messageDiv.textContent = "Saving...";
+
+          const token = localStorage.getItem("jwtvicp");
+          const formData = new URLSearchParams();
+          formData.append("template_name", templateName);
+          formData.append("description", templateDesc);
+          formData.append("tags", "vicp");
+          formData.append("template_text", templateText);
+
+          const response = await fetch(
+            `${API_BASE_URL}/VICP_Attorney_Fees/templates`,
+            {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${token}`,
+                "ngrok-skip-browser-warning": "true",
+                "Content-Type": "application/x-www-form-urlencoded"
+              },
+              body: formData
+            }
+          );
+
+          if (response.ok) {
+            messageDiv.style.color = "#2ecc71";
+            messageDiv.textContent = "✓ Template saved successfully";
+            setTimeout(() => {
+              closeSaveTemplateModal();
+            }, 1500);
+          } else {
+            const errorData = await response.json();
+            messageDiv.style.color = "#e74c3c";
+            messageDiv.textContent = `Error: ${errorData.detail || "Failed to save template"}`;
+            saveBtn.disabled = false;
+            saveBtn.textContent = "Save Template";
+          }
+        } catch (error) {
+          messageDiv.style.color = "#e74c3c";
+          messageDiv.textContent = `Error: ${error.message}`;
+          saveBtn.disabled = false;
+          saveBtn.textContent = "Save Template";
+        }
+      }
+
+      // ============ FEATURE 3: LOAD TEMPLATES ============
+      async function loadTemplates() {
+        try {
+          const token = localStorage.getItem("jwtvicp");
+          if (!token) return;
+
+          const response = await fetch(
+            `${API_BASE_URL}/VICP_Attorney_Fees/templates`,
+            {
+              method: "GET",
+              headers: {
+                "Authorization": `Bearer ${token}`,
+                "ngrok-skip-browser-warning": "true"
+              }
+            }
+          );
+
+          const templates = await response.json();
+          
+          const templatesList = document.getElementById("templates-list");
+          if (!Array.isArray(templates) || templates.length === 0) {
+            templatesList.innerHTML = '<div style="padding: 8px 0; color: #666;">No templates yet</div>';
+            return;
+          }
+
+          templatesList.innerHTML = templates.map(template => `
+            <div
+              style="
+                padding: 12px 8px;
+                border-bottom: 1px solid rgba(241, 196, 15, 0.2);
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                gap: 12px;
+                transition: all 0.2s;
+                border-radius: 4px;
+              "
+              onmouseover="this.style.background='rgba(241, 196, 15, 0.1)'"
+              onmouseout="this.style.background='transparent'"
+            >
+              <div
+                onclick="selectTemplate('${escapeHtml(template['Full Text'] || template.template_text || '')}')"
+                style="
+                  flex: 1;
+                  cursor: pointer;
+                "
+              >
+                <div style="color: #f1c40f; font-weight: 600; font-size: 13px;">${escapeHtml(template.name)}</div>
+                <div style="color: #888; font-size: 12px; margin-top: 4px;">${escapeHtml(template.description)}</div>
+              </div>
+              <button
+                onclick="deleteTemplate(${template.id}, event)"
+                style="
+                  background: none;
+                  border: none;
+                  color: #e74c3c;
+                  cursor: pointer;
+                  padding: 4px 8px;
+                  border-radius: 4px;
+                  transition: all 0.2s;
+                  font-size: 18px;
+                  flex-shrink: 0;
+                "
+                title="Delete template"
+                onmouseover="this.style.background='rgba(231, 76, 60, 0.2)'"
+                onmouseout="this.style.background='none'"
+              >🗑️</button>
+            </div>
+          `).join("");
+        } catch (error) {
+          console.error("Failed to load templates:", error);
+          const templatesList = document.getElementById("templates-list");
+          templatesList.innerHTML = '<div style="padding: 8px 0; color: #e74c3c;">Failed to load templates</div>';
+        }
+      }
+
+      function toggleTemplatesPopover(event) {
+        event.stopPropagation();
+        const popover = document.getElementById("templates-popover");
+        const btn = document.getElementById("templates-btn");
+        
+        if (popover.style.display === "none" || popover.style.display === "") {
+          popover.style.display = "block";
+          // Show loading and fetch templates
+          const templatesList = document.getElementById("templates-list");
+          templatesList.innerHTML = '<div style="padding: 8px 0; color: #666;">Loading...</div>';
+          loadTemplates();
+          
+          // Change button to show loader
+          btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 0.8s linear infinite;"><circle cx="12" cy="12" r="10"></circle></svg>';
+        } else {
+          popover.style.display = "none";
+          btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>';
+        }
+      }
+
+      function selectTemplate(templateText) {
+        const input = document.getElementById("message-input");
+        input.value = templateText;
+        
+        // Close popover
+        const popover = document.getElementById("templates-popover");
+        const btn = document.getElementById("templates-btn");
+        popover.style.display = "none";
+        btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>';
+        
+        // Focus on input
+        input.focus();
+      }
+
+      async function deleteTemplate(templateId, event) {
+        event.stopPropagation();
+        
+        // Store template ID in global variable for confirmation
+        window.templateToDelete = templateId;
+        openDeleteTemplateModal();
+      }
+
+      function openDeleteTemplateModal() {
+        const modal = document.getElementById("delete-template-modal");
+        const messageDiv = document.getElementById("delete-template-message");
+        const deleteBtn = document.getElementById("confirm-delete-btn");
+        
+        modal.style.display = "flex";
+        messageDiv.style.display = "none";
+        messageDiv.textContent = "";
+        deleteBtn.disabled = false;
+        deleteBtn.textContent = "Delete";
+      }
+
+      function closeDeleteTemplateModal() {
+        const modal = document.getElementById("delete-template-modal");
+        modal.style.display = "none";
+        window.templateToDelete = null;
+      }
+
+      async function confirmDeleteTemplate() {
+        const templateId = window.templateToDelete;
+        if (!templateId) return;
+
+        const deleteBtn = document.getElementById("confirm-delete-btn");
+        const messageDiv = document.getElementById("delete-template-message");
+
+        try {
+          deleteBtn.disabled = true;
+          deleteBtn.textContent = "Deleting...";
+          messageDiv.style.display = "block";
+          messageDiv.style.color = "#f1c40f";
+          messageDiv.textContent = "Deleting...";
+
+          const token = localStorage.getItem("jwtvicp");
+          if (!token) return;
+
+          const response = await fetch(
+            `${API_BASE_URL}/VICP_Attorney_Fees/templates/${templateId}`,
+            {
+              method: "DELETE",
+              headers: {
+                "Authorization": `Bearer ${token}`,
+                "ngrok-skip-browser-warning": "true"
+              }
+            }
+          );
+
+          if (response.ok) {
+            messageDiv.style.color = "#2ecc71";
+            messageDiv.textContent = "✓ Template deleted successfully";
+            setTimeout(() => {
+              closeDeleteTemplateModal();
+              loadTemplates();
+            }, 1500);
+          } else {
+            messageDiv.style.color = "#e74c3c";
+            messageDiv.textContent = "Failed to delete template";
+            deleteBtn.disabled = false;
+            deleteBtn.textContent = "Delete";
+          }
+        } catch (error) {
+          console.error("Failed to delete template:", error);
+          messageDiv.style.color = "#e74c3c";
+          messageDiv.textContent = "Error: " + error.message;
+          deleteBtn.disabled = false;
+          deleteBtn.textContent = "Delete";
+        }
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      // Close templates popover when clicking outside
+      document.addEventListener("click", function(event) {
+        const popover = document.getElementById("templates-popover");
+        const btn = document.getElementById("templates-btn");
+        
+        // Don't close if clicking on the button or popover itself
+        if (btn && btn.contains(event.target)) return;
+        if (popover && popover.contains(event.target)) return;
+        
+        if (popover && popover.style.display === "block") {
+          popover.style.display = "none";
+          if (btn) {
+            btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>';
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

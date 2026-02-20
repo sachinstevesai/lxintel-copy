@@ -1,0 +1,307 @@
+<!doctype html>
+<html>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BriefWriter Prototype</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<style>
+        body {
+       font-family: "Montserrat", sans-serif;
+      background-color: #111;
+      color: #f1c40f;
+      margin: 0;
+      height: 100vh;
+    padding: 0px 1rem;
+        }
+
+    h1,
+    h2,
+    h3 {
+      margin-top: 0;
+    }
+
+ input[type=text], textarea, select {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0 12px;
+    max-width: 100%;
+    display: block;
+    box-sizing: border-box;
+}
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+
+
+
+    .btn {
+      background: #111827;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      display: inline-block;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn.secondary {
+      background: #374151;
+    }
+.pill {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 999px;
+    background: #f3f4f6;
+    margin-left: 6px;
+    font-size: 12px;
+    color: #000;
+    font-weight: 600;
+}
+
+    .warn {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .ok {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      padding: 10px;
+      border-radius: 8px;
+    }
+.container {
+    max-width: 1200px;
+    position: relative;
+    z-index: 1;
+    margin: 0 auto;
+    padding-top: 20px;
+}
+.umf {
+    border: 1px solid #f1c40f;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: block;
+}
+form#editForm h3 {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 5px;
+    margin-top: 30px;
+}
+a.btn.secondary {
+    background-color: #f1c40f !important;
+    color: #000 !important;
+    font-weight: bold;
+    border: none !important;
+    padding: 12px 60px !important;
+    font-size: 1.1rem !important;
+    cursor: pointer;
+    display: inline-block !important;
+    visibility: visible !important;
+    z-index: 10 !important;
+    text-decoration: none !important;
+    line-height: 1.5;
+}
+.btn {
+    background: #00000000;
+    color: #f1c40f;
+    padding: 10px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-block;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 12px 60px !important;
+    font-size: 1.1rem !important;
+    margin-right: 20px;
+    border: 1px solid #f1c40f;
+}
+form#editForm {
+    padding-bottom: 20px;
+}
+
+@media (max-width: 767px) {
+.set_select {
+    display: flex;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.grid-3.set_select div {
+    width: 100%;
+}
+.btn {
+    margin-bottom: 15px;
+}
+}
+  </style>
+</head>
+
+<body>
+  <div class="container">
+  <h2>Edit: {{ brief.get('case_caption') or 'Untitled Case' }} <span class="pill">{{ cid[:8] }}</span></h2>
+
+  <form id="editForm" action="/briefwriter/case/{{ cid }}/save" method="post">
+    <h3>Issues (2–5, one per line)</h3>
+    <textarea name="issues" rows="4"
+      placeholder="Whether ____?&#10;Whether ____?">{{ '\n'.join(brief.get('issues', [])) }}</textarea>
+
+    <h3>Facts Intro (optional)</h3>
+    <textarea name="facts_intro" rows="2"
+      placeholder="One line to frame the facts.">{{ brief.get('facts_intro','') }}</textarea>
+
+    <h3>Key Facts (each line becomes a sentence; MUST include a cite like 'Ex. 1 at 3:12')</h3>
+    <textarea name="facts" rows="6"
+      placeholder="- Plaintiff reported neck pain the same day. Ex. 1 at 3:12&#10;- Officer noted rear-end impact. Ex. 2 at 14.">{% if not brief.get('facts') %}- {% else %}{% for f in brief['facts'] %}- {{ f['text'] }} {{ f['cite'] }}
+{% endfor %}{% endif %}</textarea>
+
+    <h3>UMF Grid</h3>
+    {% for u in umfs %}
+    <div class="umf">
+      <div><strong>UMF {{ u['num'] }}</strong> <span class="pill">{% if u['disputed'] %}DISPUTED{% else %}UNDISPUTED{%
+          endif %}</span></div>
+      <div style="margin: 6px 0">{{ u['text'] }}</div>
+      <div class="row">
+        <div>
+          <label>Disputed?</label>
+          <select name="disputed_{{ u['num'] }}">
+            <option value="true" {% if u['disputed'] %}selected{% endif %}>Yes</option>
+            <option value="false" {% if not u['disputed'] %}selected{% endif %}>No</option>
+          </select>
+        </div>
+        <div>
+          <label>Record Cite</label>
+          <input type="text" name="cite_{{ u['num'] }}" placeholder="Ex. 3 at 45:10–46:2" value="{{ u['cite'] }}">
+        </div>
+      </div>
+      <label>Short Explanation / Materiality</label>
+      <textarea name="resp_{{ u['num'] }}" rows="3"
+        placeholder="Explain why disputed or why immaterial.">{{ u['response_text'] }}</textarea>
+    </div>
+    {% endfor %}
+
+    <h3>Argument Points (3–4 concise headings)</h3>
+    <div class="grid-3 set_select">
+      <div>
+        <label>Point 1 Heading</label>
+        <input type="text" name="p1_head" placeholder="Outcome-oriented heading.">
+        <label>Rule</label>
+        <textarea name="p1_rule" rows="3"></textarea>
+        <label>Application (with cites)</label>
+        <textarea name="p1_app" rows="3"></textarea>
+        <label>Counterarguments & Rebuttal</label>
+        <textarea name="p1_reb" rows="3"></textarea>
+      </div>
+      <div>
+        <label>Point 2 Heading</label>
+        <input type="text" name="p2_head">
+        <label>Rule</label>
+        <textarea name="p2_rule" rows="3"></textarea>
+        <label>Application (with cites)</label>
+        <textarea name="p2_app" rows="3"></textarea>
+        <label>Counterarguments & Rebuttal</label>
+        <textarea name="p2_reb" rows="3"></textarea>
+      </div>
+      <div>
+        <label>Point 3 Heading</label>
+        <input type="text" name="p3_head">
+        <label>Rule</label>
+        <textarea name="p3_rule" rows="3"></textarea>
+        <label>Application (with cites)</label>
+        <textarea name="p3_app" rows="3"></textarea>
+        <label>Counterarguments & Rebuttal</label>
+        <textarea name="p3_reb" rows="3"></textarea>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Attorney Name</label>
+        <input type="text" name="attorney_name" placeholder="Jane Q. Lawyer">
+      </div>
+      <div>
+        <label>Bar No.</label>
+        <input type="text" name="bar_no" placeholder="CO Bar #12345">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Firm Name</label>
+        <input type="text" name="firm_name" placeholder="Ramos Law">
+      </div>
+      <div>
+        <label>Phone</label>
+        <input type="text" name="phone" placeholder="(303) 555-1212">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Address Line</label>
+        <input type="text" name="address_line" placeholder="123 Main St., Suite 400">
+      </div>
+      <div>
+        <label>City, State ZIP</label>
+        <input type="text" name="city_state_zip" placeholder="Denver, CO 80202">
+      </div>
+    </div>
+    <div>
+      <label>Email</label>
+      <input type="text" name="email" placeholder="attorney@firm.com">
+    </div>
+
+    <button class="btn" type="submit">Save Edits</button>
+    <a class="btn secondary" href="/briefwriter/case/{{ cid }}/generate">Generate Draft</a>
+  </form>
+  </div>
+  <script>
+    const token = localStorage.getItem("briefwriter_token");
+
+    if (!token) {
+      window.location.href = "/briefwriter";
+    }
+
+    // Listen for logout event
+    window.addEventListener("logout-success", () => {
+      localStorage.removeItem("briefwriter_token");
+      localStorage.removeItem("briefwriter_email");
+      window.location.href = "/briefwriter";
+    });
+
+    document.getElementById("editForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(e.target);
+
+      const res = await fetch("/briefwriter/case/{{ cid }}/save", {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + token
+        },
+        body: formData
+      });
+
+      if (res.redirected) {
+        window.location.href = res.url;
+      } else {
+        alert(await res.text());
+      }
+    });
+  </script>
+</body>
+
+</html>

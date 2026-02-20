@@ -1,0 +1,262 @@
+<!doctype html>
+<html>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BriefWriter Prototype</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<style>
+        body {
+       font-family: "Montserrat", sans-serif;
+      background-color: #111;
+      color: #f1c40f;
+      margin: 0;
+      height: 100vh;
+    padding: 0px 1rem;
+        }
+
+        .container {
+    max-width: 1200px;
+    position: relative;
+    z-index: 1;
+    margin: 0 auto;
+    padding-top: 20px;
+}
+
+     h1, h2, h3 {
+    margin-top: 24px;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 600;
+}
+       input[type=text], textarea, select {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0 12px;
+    max-width: 100%;
+    display: block;
+    box-sizing: border-box;
+}
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+
+
+
+.btn {
+    background: #f1c40f;
+    color: #000000;
+    padding: 10px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-block;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 12px 60px !important;
+    font-size: 1.1rem !important;
+    margin-right: 0;
+    border: 1px solid #f1c40f;
+    margin-left: 20px;
+}
+
+    .btn.secondary {
+      background: #374151;
+    }
+.pill {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 999px;
+    background: #f3f4f6;
+    margin-left: 6px;
+    font-size: 12px;
+    color: #000;
+    font-weight: 600;
+}
+
+   .warn {
+    background: #ffffff00;
+    border: 1px solid #fed7aa;
+    padding: 10px;
+    border-radius: 8px;
+    color: #f1c40f;
+    margin-bottom: 15px;
+}
+.ok {
+    background: #ffffff00;
+    border: 0px solid #f1be0f;
+    padding: 0;
+    border-radius: 0;
+    display: inline-block;
+    color: #fff;
+}
+.container {
+    max-width: 1200px;
+    position: relative;
+    z-index: 1;
+    margin: 0 auto;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+.umf {
+    border: 1px solid #f1c40f;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: block;
+}
+form#editForm h3 {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 5px;
+    margin-top: 30px;
+}
+a.btn.secondary {
+    background-color: #f1c40f !important;
+    color: #000 !important;
+    font-weight: bold;
+    border: none !important;
+    padding: 12px 60px !important;
+    font-size: 1.1rem !important;
+    cursor: pointer;
+    display: inline-block !important;
+    visibility: visible !important;
+    z-index: 10 !important;
+    text-decoration: none !important;
+    line-height: 1.5;
+    margin-left: 0;
+}
+
+.btn:hover {
+    background-color: #d4ac0d !important;
+}
+pre.mono {
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: pre-wrap;     
+    word-wrap: break-word; 
+    box-sizing: border-box;
+    line-height: 1.5;
+    border-radius: 6px;
+}
+
+@media (max-width: 767px) {
+.btn {
+    margin-left: 0;
+    margin-top: 20px;
+}
+}
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+  
+    <h2>Draft Preview</h2>
+    <div class="warn">
+        <strong>Errors</strong>
+        <ul>
+            {% if lint['errors'] %}
+            {% for e in lint['errors'] %}
+            <li>{{ e }}</li>
+            {% endfor %}
+            {% else %}
+            <li>None</li>
+            {% endif %}
+        </ul>
+    </div>
+    <div class="warn">
+        <strong>Warnings</strong>
+        <ul>
+            {% if lint['warnings'] %}
+            {% for w in lint['warnings'] %}
+            <li>{{ w }}</li>
+            {% endfor %}
+            {% else %}
+            <li>None</li>
+            {% endif %}
+        </ul>
+    </div>
+
+    {% if can_export %}
+    <p class="ok">Ready to file. <a class="btn" href="/briefwriter/case/{{ cid }}/download">Download DOCX</a></p>
+    {% else %}
+    <p class="warn">Fix the errors below to export.</p>
+    {% endif %}
+
+    <h3>Introduction</h3>
+    <pre class="mono">{{ blocks['intro'] }}</pre>
+
+    <h3>Issues</h3>
+    <pre class="mono">{{ blocks['issues'] }}</pre>
+
+    <h3>Facts</h3>
+    <pre class="mono">{{ blocks['facts'] }}</pre>
+
+    <h3>Standard of Review</h3>
+    <pre class="mono">{{ blocks['standards'] }}</pre>
+
+    <h3>Argument — UMFs</h3>
+    <pre class="mono">{{ blocks['arg_umfs'] }}</pre>
+
+    <h3>Argument — Points</h3>
+    <pre class="mono">{{ blocks['arg_points'] }}</pre>
+
+    <h3>Conclusion</h3>
+    <pre class="mono">{{ blocks['conclusion'] }}</pre>
+
+    <h3>Signature</h3>
+    <pre class="mono">{{ blocks['signature'] }}</pre>
+
+    <h3>Certificate of Service</h3>
+    <pre class="mono">{{ blocks['certificate'] }}</pre>
+
+    <p><a class="btn secondary" href="/briefwriter/case/{{ cid }}">Back to Edit</a></p>
+      </div>
+</body>
+<script>
+    const token = localStorage.getItem("briefwriter_token");
+
+    if (!token) {
+        window.location.href = "/briefwriter";
+    }
+
+    // Listen for logout event
+    window.addEventListener("logout-success", () => {
+      localStorage.removeItem("briefwriter_token");
+      localStorage.removeItem("briefwriter_email");
+      window.location.href = "/briefwriter";
+    });
+
+    document.getElementById("editForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+
+        const res = await fetch("/briefwriter/case/{{ cid }}", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + token
+            },
+            body: formData
+        });
+
+        if (res.redirected) {
+            window.location.href = res.url;
+        } else {
+            alert(await res.text());
+        }
+    });
+</script>
+
+</html>

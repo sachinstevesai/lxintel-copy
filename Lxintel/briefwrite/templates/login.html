@@ -1,0 +1,330 @@
+<!-- Login.html -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>BriefWriter - Login</title>
+    <script
+      defer
+      src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"
+    ></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Montserrat", sans-serif;
+        background-color: #111;
+        color: #f1c40f;
+      }
+
+      .login-page-wrapper {
+        width: 100%;
+        max-width: 600px;
+        padding: 2rem;
+        text-align: center;
+      }
+
+      .login-logo-section {
+        margin-bottom: 3rem;
+      }
+
+      .login-logo-section img {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 2rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #f1c40f;
+        margin: 0 0 1rem;
+        letter-spacing: 2px;
+      }
+
+      p {
+        font-size: 1rem;
+        color: #aaa;
+        margin: 0 0 2rem;
+      }
+
+      .login-form-card {
+        background: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 2.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      }
+
+      h2 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #f1c40f;
+        margin: 0 0 2rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+
+      .login-form-group {
+        margin-bottom: 2rem;
+        text-align: left;
+      }
+
+      label {
+        display: block;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #f1c40f;
+        margin-bottom: 0.75rem;
+      }
+
+      input[type="email"] {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        background: #000;
+        color: #fff;
+        border: 1px solid #444;
+        border-radius: 6px;
+        box-sizing: border-box;
+        font-size: 0.95rem;
+        transition: border-color 0.3s;
+      }
+
+      input:focus {
+        outline: none;
+        border-color: #f1c40f;
+        box-shadow: 0 0 0 2px rgba(241, 196, 15, 0.1);
+      }
+
+      .login-email-status {
+        display: flex;
+        align-items: center;
+        margin-top: 0.75rem;
+        font-size: 0.85rem;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+
+      .login-email-status.visible {
+        opacity: 1;
+      }
+
+      .status-icon {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        margin-right: 0.5rem;
+      }
+
+      .status-icon.checking {
+        background: #3498db;
+        animation: pulse 1.5s infinite;
+      }
+
+      .status-icon.valid {
+        background: #2ecc71;
+      }
+
+      .status-icon.invalid {
+        background: #e74c3c;
+      }
+
+      .login-error-message {
+        color: #e74c3c;
+        background: rgba(231, 76, 60, 0.1);
+        border: 1px solid rgba(231, 76, 60, 0.3);
+        padding: 0.75rem;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        text-align: center;
+      }
+
+      .login-btn {
+        width: 100%;
+        padding: 0.875rem;
+        font-size: 1rem;
+        font-weight: 700;
+        background: #d4ac0d;
+        color: #000;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        text-transform: uppercase;
+        transition: 0.3s;
+      }
+
+      .login-btn:hover:not(:disabled) {
+        background: #f1c40f;
+        box-shadow: 0 4px 12px rgba(241, 196, 15, 0.3);
+      }
+
+      .login-btn:disabled {
+        background: #666;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+
+      .spinner {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 2px solid #000;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 8px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+
+        50% {
+          opacity: 0.5;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="login-page-wrapper" x-data="loginApp()" x-init="init()">
+      <div class="login-logo-section">
+        <img
+          src="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
+          alt="Ramos Law"
+        />
+        <h1>BriefWriter</h1>
+        <p>Secure Access for Authorized Users</p>
+      </div>
+
+      <div class="login-form-card">
+        <h2>Login</h2>
+        <div class="login-form-group">
+          <label>Email</label>
+          <input
+            type="email"
+            placeholder="Enter your email"
+            x-model="email"
+            @input.debounce.500ms="verifyEmail()"
+            @keydown.enter="emailValid ? login() : null"
+          />
+          <div
+            class="login-email-status"
+            :class="email && email.includes('@') ? 'visible' : ''"
+            x-show="email && email.includes('@')"
+          >
+            <span
+              class="status-icon"
+              :class="emailChecking ? 'checking' : emailValid ? 'valid' : 'invalid'"
+            ></span>
+            <span
+              x-text="emailChecking ? 'Checking...' : emailValid ? 'Email authorized' : 'Email not authorized'"
+            ></span>
+          </div>
+        </div>
+
+        <div x-show="error" x-text="error" class="login-error-message"></div>
+
+        <button
+          @click="login()"
+          :disabled="!emailValid || loggingIn"
+          class="login-btn"
+        >
+          <span x-show="!loggingIn">Login</span>
+          <span x-show="loggingIn"
+            ><span class="spinner"></span> Logging in...</span
+          >
+        </button>
+      </div>
+    </div>
+
+    <script>
+      function loginApp() {
+        return {
+          email: "",
+          emailValid: false,
+          emailChecking: false,
+          error: "",
+          loggingIn: false,
+
+          init() {
+            if (localStorage.getItem("briefwriter_token")) {
+              window.location.href = "/briefwriter/writer";
+            }
+          },
+
+          verifyEmail() {
+            if (!this.email.includes("@")) {
+              this.emailValid = false;
+              return;
+            }
+            this.emailChecking = true;
+            this.error = "";
+
+            fetch(
+              "/briefwriter/verify-email?email=" +
+                encodeURIComponent(this.email),
+            )
+              .then((res) => res.json())
+              .then((data) => {
+                this.emailValid = data.valid;
+                this.emailChecking = false;
+                if (!data.valid) {
+                  this.error = "Access denied: Your email is not authorized.";
+                }
+              })
+              .catch(() => {
+                this.emailValid = false;
+                this.emailChecking = false;
+                this.error = "Verification failed.";
+              });
+          },
+
+          login() {
+            if (!this.emailValid) return;
+
+            this.loggingIn = true;
+            this.error = "";
+
+            const formData = new FormData();
+            formData.append("username", this.email);
+            formData.append("password", "dummy");
+
+            fetch("/briefwriter/login", {
+              method: "POST",
+              body: formData,
+            })
+              .then((res) => {
+                if (!res.ok) throw new Error("Login failed");
+                return res.json();
+              })
+              .then((data) => {
+                localStorage.setItem("briefwriter_token", data.access_token);
+                localStorage.setItem("briefwriter_email", this.email);
+                window.location.href = "/briefwriter/writer";
+              })
+              .catch(() => {
+                this.error = "Login failed. Please try again.";
+                this.loggingIn = false;
+              });
+          },
+        };
+      }
+    </script>
+  </body>
+</html>
