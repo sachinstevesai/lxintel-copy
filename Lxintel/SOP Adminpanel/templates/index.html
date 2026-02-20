@@ -508,7 +508,7 @@
     </div>
 
     <script>
-      const API_BASE_URL = "";
+      const API_BASE_URL = "https://attired-hitchily-stephane.ngrok-free.dev";
 
       // Check if already logged in on page load
       window.addEventListener("DOMContentLoaded", function () {
@@ -538,13 +538,13 @@
 
         try {
           // Call your login API - using email and password as per your curl
-          const response = await fetch(`${API_BASE_URL}/auth/admin/login`, {
+          const response = await fetch(`${API_BASE_URL}/admin/login`, {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": "application/x-www-form-urlencoded",
               "ngrok-skip-browser-warning": "true",
             },
-            body: JSON.stringify({
+            body: new URLSearchParams({
               email: email,
               password: password
             }),
