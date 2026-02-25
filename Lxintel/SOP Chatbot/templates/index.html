@@ -189,6 +189,49 @@
         color: #e0e0e0;
         border: 1px solid rgba(241, 196, 15, 0.2);
         border-bottom-left-radius: 4px;
+        position: relative;
+      }
+
+      /* Feedback buttons (thumbs up / down) */
+      .feedback-buttons {
+        position: absolute;
+        left: 8px;
+        bottom: 2px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .feedback-btn {
+        width: 28px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0,0,0,0.35);
+        border: 1px solid rgba(241,196,15,0.15);
+        color: #f1c40f;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+
+      .feedback-response {
+        font-size: 12px;
+        color: #f1c40f;
+        margin-top: 6px;
+        padding-left: 4px;
+      }
+
+      .feedback-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(241,196,15,0.06);
+      }
+
+      .feedback-btn.disabled {
+        opacity: 0.45;
+        cursor: default;
+        transform: none;
       }
 
       .message.assistant h3 {
@@ -1005,7 +1048,7 @@
     </div>
 
     <script>
-      const API_BASE_URL = "";
+      const API_BASE_URL = "https://attired-hitchily-stephane.ngrok-free.dev";
       let isProcessing = false;
 
       marked.setOptions({
@@ -1096,10 +1139,12 @@
             if (assistantMessages.length > 0) {
               const lastMessage =
                 assistantMessages[assistantMessages.length - 1];
-              addMessage("assistant", lastMessage.content);
+              const mid = lastMessage.message_id || null;
+              addMessage("assistant", lastMessage.content, mid);
             }
           } else {
-            addMessage("assistant", `${data.answer}`);
+            const mid = data.message_id || null;
+            addMessage("assistant", `${data.answer}`, mid);
           }
         } catch (error) {
           addMessage("assistant", `${error.message}`);
@@ -1112,7 +1157,7 @@
         }
       }
 
-      function addMessage(role, content) {
+      function addMessage(role, content, messageId = null) {
         const messagesDiv = document.getElementById("chat-messages");
 
         const emptyState = messagesDiv.querySelector(".empty-state");
@@ -1133,6 +1178,49 @@
 
         // wrapper.appendChild(avatar);
         wrapper.appendChild(messageDiv);
+
+        // Add feedback buttons (thumbs up/down) for assistant messages that are not the welcome message
+        if (role === "assistant" && messageId) {
+          // ensure we don't add feedback to welcome messages
+          if (!messageDiv.classList.contains("welcome")) {
+            const fb = document.createElement("div");
+            fb.className = "feedback-buttons";
+
+            const upBtn = document.createElement("button");
+            upBtn.className = "feedback-btn";
+            upBtn.title = "Helpful";
+            upBtn.innerHTML = `
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 21h4V9H1v12zM23 10c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 2 7.59 8.59C7.22 8.95 7 9.45 7 10v8c0 1.1.9 2 2 2h7c.83 0 1.54-.5 1.84-1.22L23 12.5c.11-.33.16-.68.16-1z"/>
+              </svg>
+            `;
+
+            const downBtn = document.createElement("button");
+            downBtn.className = "feedback-btn";
+            downBtn.title = "Not helpful";
+            downBtn.innerHTML = `
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M23 3h-4v12h4V3zM1 14c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 22l6.58-6.59c.37-.36.59-.86.59-1.41V6c0-1.1-.9-2-2-2H7c-.83 0-1.54.5-1.84 1.22L1 11.5C.89 11.83.84 12.18.84 12.5c0 .33.05.68.16 1z"/>
+              </svg>
+            `;
+
+            upBtn.addEventListener("click", function (e) {
+              e.stopPropagation();
+              if (upBtn.classList.contains("disabled")) return;
+              sendFeedback(messageId, "up", upBtn, downBtn);
+            });
+
+            downBtn.addEventListener("click", function (e) {
+              e.stopPropagation();
+              if (downBtn.classList.contains("disabled")) return;
+              sendFeedback(messageId, "down", upBtn, downBtn);
+            });
+
+            fb.appendChild(upBtn);
+            fb.appendChild(downBtn);
+            messageDiv.appendChild(fb);
+          }
+        }
         messagesDiv.appendChild(wrapper);
 
         scrollToBottom();
@@ -1159,6 +1247,75 @@
         messagesDiv.appendChild(wrapper);
 
         scrollToBottom();
+      }
+
+      async function sendFeedback(messageId, feedback, upBtn, downBtn) {
+        try {
+          // disable buttons during request
+          upBtn.classList.add("disabled");
+          downBtn.classList.add("disabled");
+
+          const resp = await fetch(API_BASE_URL + "/Playbook_Chatbot/chat/feedback", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("jwtsopchatbot")}`,
+              "ngrok-skip-browser-warning": "true",
+            },
+            body: JSON.stringify({ message_id: String(messageId), feedback }),
+          });
+
+          if (!resp.ok) {
+            // re-enable to allow retry
+            upBtn.classList.remove("disabled");
+            downBtn.classList.remove("disabled");
+            upBtn.disabled = false;
+            downBtn.disabled = false;
+            console.warn("Feedback request failed", resp.status);
+            return;
+          }
+
+          // Parse response and show message below the buttons
+          let json = {};
+          try {
+            json = await resp.json();
+          } catch (e) {
+            json = {};
+          }
+          const respText = json.message;
+
+          // Keep buttons disabled after successful feedback
+          upBtn.classList.add("disabled");
+          downBtn.classList.add("disabled");
+          upBtn.disabled = true;
+          downBtn.disabled = true;
+
+          // Visual confirmation: highlight selected
+          if (feedback === "up") {
+            upBtn.style.background = "rgba(46, 204, 113, 0.12)";
+            upBtn.style.borderColor = "rgba(46, 204, 113, 0.25)";
+          } else {
+            downBtn.style.background = "rgba(231, 76, 60, 0.08)";
+            downBtn.style.borderColor = "rgba(231, 76, 60, 0.2)";
+          }
+
+          // Append or update feedback response element under the buttons
+          const fbContainer = upBtn.parentElement; // .feedback-buttons
+          if (fbContainer) {
+            let existing = fbContainer.querySelector('.feedback-response');
+            if (!existing) {
+              existing = document.createElement('div');
+              existing.className = 'feedback-response';
+              // append after the buttons container
+              fbContainer.appendChild(existing);
+            }
+            existing.textContent = respText;
+          }
+        } catch (err) {
+          upBtn.classList.remove("disabled");
+          downBtn.classList.remove("disabled");
+          console.error("Feedback error", err);
+        }
       }
 
       function addWelcomeMessage() {
