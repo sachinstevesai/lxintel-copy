@@ -1088,7 +1088,7 @@
     </div>
 
     <script>
-      const API_BASE_URL = "https://attired-hitchily-stephane.ngrok-free.dev";
+      const API_BASE_URL = "";
       const API_BASE_URL_DS = "https://medicalsummarytool.lxintel.net"; // <-- UPDATE THIS WITH THE Document Summary API URL
 
       // Check if already logged in on page load
@@ -1308,6 +1308,101 @@
             modalBody.innerHTML = `<div class="data-item">${err.message || "Error loading whitelist"}</div>`;
             console.error("Whitelist fetch error", err);
           }
+
+          return; // handled
+        }
+
+        // If this is the whitelist edit view (show form and submit)
+        if (type === "whitelist-edit" && toolName === "Whitelist") {
+          modalTitle.textContent = "Whitelist - Edit";
+          modalBody.innerHTML = `            
+              <div style="margin-bottom:16px; color:#f1c40f; font-weight:700; font-size:16px;">Add Whitelist Member</div>
+              <div style="margin-bottom:12px;">
+                <label style="display:block; color:#f1c40f; margin-bottom:6px; font-size:13px;">Name</label>
+                <input id="whitelist-name-input" type="text" placeholder="Full name" style="width:100%; padding:10px; border-radius:6px; background:rgba(0,0,0,0.6); border:1px solid rgba(241,196,15,0.2); color:#fff;" />
+              </div>
+              <div style="margin-bottom:12px;">
+                <label style="display:block; color:#f1c40f; margin-bottom:6px; font-size:13px;">Email</label>
+                <input id="whitelist-email-input" type="email" placeholder="email@company.com" style="width:100%; padding:10px; border-radius:6px; background:rgba(0,0,0,0.6); border:1px solid rgba(241,196,15,0.2); color:#fff;" />
+              </div>
+              <div id="whitelist-edit-result" style="margin-bottom:12px; display:block;"></div>
+              <button id="whitelist-submit-btn" type="button" style="width:100%; padding:10px; background: linear-gradient(135deg, #ffea00, #ffbb00); color: #000; border: none; border-radius: 6px; font-weight:700; cursor:pointer;">Submit</button>
+          `;
+
+          // Wire up submit handler
+          (function () {
+            const submitBtn = document.getElementById('whitelist-submit-btn');
+            const nameInput = document.getElementById('whitelist-name-input');
+            const emailInput = document.getElementById('whitelist-email-input');
+            const resultDiv = document.getElementById('whitelist-edit-result');
+
+            function validateEmail(email) {
+              return /^\S+@\S+\.\S+$/.test(email);
+            }
+
+            submitBtn.addEventListener('click', async function () {
+              resultDiv.innerHTML = '';
+              const name = (nameInput.value || '').trim();
+              const email = (emailInput.value || '').trim();
+
+              if (!name) {
+                resultDiv.innerHTML = '<div class="data-item" style="color:#e74c3c;">Name is required</div>';
+                return;
+              }
+              if (!email || !validateEmail(email)) {
+                resultDiv.innerHTML = '<div class="data-item" style="color:#e74c3c;">A valid email is required</div>';
+                return;
+              }
+
+              // Disable button while processing
+              submitBtn.disabled = true;
+              const prevText = submitBtn.innerHTML;
+              submitBtn.innerHTML = '<span class="spinner"></span>Submitting...';
+
+              try {
+                // First call: API_BASE_URL with auth
+                const resp1 = await fetch(`${API_BASE_URL}/admin/whitelist`, {
+                  method: 'POST',
+                  headers: Object.assign({}, getAuthHeaders()),
+                  body: JSON.stringify({ name, email }),
+                });
+                const data1 = await resp1.json().catch(() => ({}));
+
+                const msg1 = data1.message || (data1.detail || JSON.stringify(data1));
+                resultDiv.innerHTML = `<div class="data-item">Primary: ${escapeHtml(msg1)}</div>`;
+
+                // Second call: API_BASE_URL_DS without auth
+                try {
+                  const resp2 = await fetch(`${API_BASE_URL_DS}/admin/whitelist`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+                    body: JSON.stringify({ name, email }),
+                  });
+                  const data2 = await resp2.json().catch(() => ({}));
+                  const msg2 = data2.message || (data2.detail || JSON.stringify(data2));
+                  const extra = document.createElement('div');
+                  extra.className = 'data-item';
+                  extra.style.marginTop = '8px';
+                  extra.innerHTML = `Secondary: ${escapeHtml(msg2)}`;
+                  resultDiv.appendChild(extra);
+                } catch (err2) {
+                  const extra = document.createElement('div');
+                  extra.className = 'data-item';
+                  extra.style.marginTop = '8px';
+                  extra.style.color = '#e74c3c';
+                  extra.textContent = 'Secondary: Error calling secondary endpoint';
+                  resultDiv.appendChild(extra);
+                  console.error('Secondary whitelist call error', err2);
+                }
+              } catch (err) {
+                resultDiv.innerHTML = `<div class="data-item" style="color:#e74c3c;">Error: ${escapeHtml(err.message || String(err))}</div>`;
+                console.error('Primary whitelist call error', err);
+              } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = prevText;
+              }
+            });
+          })();
 
           return; // handled
         }
