@@ -771,6 +771,15 @@
         <h1>LxIntel Admin Panel</h1>
         <p id="admin-welcome">Welcome, Admin</p>
         <button class="logout-btn" onclick="handleLogout()">Logout</button>
+        <div style="width:100%; display:flex; justify-content:center;">
+          <div class="dashboard-btn-wrapper" style="margin-top:16px; display:inline-block;">
+            <button class="dashboard-btn" data-tool="whitelist_files">Whitelist Files</button>
+            <div class="tool-popup">
+              <button class="popup-btn" onclick="showModal('whitelist-view', 'Whitelist')">View</button>
+              <button class="popup-btn" onclick="showModal('whitelist-edit', 'Whitelist')">Edit</button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="btn-grid">
@@ -1079,7 +1088,7 @@
     </div>
 
     <script>
-      const API_BASE_URL = "";
+      const API_BASE_URL = "https://attired-hitchily-stephane.ngrok-free.dev";
       const API_BASE_URL_DS = "https://medicalsummarytool.lxintel.net"; // <-- UPDATE THIS WITH THE Document Summary API URL
 
       // Check if already logged in on page load
@@ -1251,6 +1260,53 @@
           } catch (err) {
             modalBody.innerHTML = `<div class="data-item">${err.message || "Error loading feedbacks"}</div>`;
             console.error('Feedbacks fetch error', err);
+          }
+
+          return; // handled
+        }
+
+        // If this is the whitelist view (show members)
+        if (type === "whitelist-view" && toolName === "Whitelist") {
+          modalTitle.textContent = "Whitelist Members";
+          modalBody.innerHTML = `
+            <div class="modal-loading">
+              <div class="spinner"></div>
+              <p>Loading whitelist...</p>
+            </div>
+          `;
+
+          try {
+            const response = await fetch(`${API_BASE_URL}/admin/whitelist`, {
+              method: "GET",
+              headers: getAuthHeaders(),
+            });
+
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+              modalBody.innerHTML = `<div class="data-item">${data.detail || "Failed to load whitelist"}</div>`;
+              return;
+            }
+
+            const members = Array.isArray(data.members) ? data.members : [];
+            if (members.length === 0) {
+              modalBody.innerHTML = '<div class="data-item">No whitelist members found</div>';
+              return;
+            }
+
+            const rows = members
+              .map((m) => `
+                <div style="padding:8px 0; border-bottom:1px solid rgba(241,196,15,0.06);">
+                  <strong style="color:#f1c40f; display:inline-block; width:180px;">${escapeHtml(m.name || "N/A")}</strong>
+                  <span style="color:#ddd;">${escapeHtml(m.email || "N/A")}</span>
+                </div>
+              `)
+              .join("");
+
+            modalBody.innerHTML = `<div class="data-item">${rows}</div>`;
+          } catch (err) {
+            modalBody.innerHTML = `<div class="data-item">${err.message || "Error loading whitelist"}</div>`;
+            console.error("Whitelist fetch error", err);
           }
 
           return; // handled
