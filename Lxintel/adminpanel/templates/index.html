@@ -1049,6 +1049,12 @@
             >
               Upload
             </button>
+            <button
+              class="popup-btn"
+              onclick="showModal('feedbacks', 'Playbook_Chatbot')"
+            >
+              Feedbacks
+            </button>
           </div>
         </div>
       </div>
@@ -1207,6 +1213,47 @@
             `;
 
           return; // do not call API for this modal
+        }
+
+        // If this is the playbook feedbacks view
+        if (type === "feedbacks" && toolName === "Playbook_Chatbot") {
+          modalTitle.textContent = "Playbook Chatbot - Feedbacks";
+          modalBody.innerHTML = `
+            <div class="modal-loading">
+              <div class="spinner"></div>
+              <p>Loading feedbacks...</p>
+            </div>
+          `;
+
+          try {
+            const baseUrl = API_BASE_URL; // Playbook uses main API_BASE_URL
+            const response = await fetch(`${baseUrl}/admin/${toolName}/feedbacks`, {
+              method: "GET",
+              headers: getAuthHeaders(),
+            });
+
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+              modalBody.innerHTML = `<div class="data-item">${data.detail || "Failed to load feedbacks"}</div>`;
+              return;
+            }
+
+            const up = data.total_thumbs_up != null ? data.total_thumbs_up : 0;
+            const down = data.total_thumbs_down != null ? data.total_thumbs_down : 0;
+
+            modalBody.innerHTML = `
+              <div class="data-item">
+                <div style="margin-bottom:8px;"><strong style="color:#f1c40f;">Total Thumbs Up:</strong> ${up}</div>
+                <div><strong style="color:#f1c40f;">Total Thumbs Down:</strong> ${down}</div>
+              </div>
+            `;
+          } catch (err) {
+            modalBody.innerHTML = `<div class="data-item">${err.message || "Error loading feedbacks"}</div>`;
+            console.error('Feedbacks fetch error', err);
+          }
+
+          return; // handled
         }
 
         modalTitle.textContent = getModalTitle(type, toolName); // CHANGED: Pass toolName to title
