@@ -1058,12 +1058,6 @@
             >
               Upload
             </button>
-            <button
-              class="popup-btn"
-              onclick="showModal('feedbacks', 'Playbook_Chatbot')"
-            >
-              Feedbacks
-            </button>
           </div>
         </div>
       </div>
@@ -1225,46 +1219,7 @@
           return; // do not call API for this modal
         }
 
-        // If this is the playbook feedbacks view
-        if (type === "feedbacks" && toolName === "Playbook_Chatbot") {
-          modalTitle.textContent = "Playbook Chatbot - Feedbacks";
-          modalBody.innerHTML = `
-            <div class="modal-loading">
-              <div class="spinner"></div>
-              <p>Loading feedbacks...</p>
-            </div>
-          `;
 
-          try {
-            const baseUrl = API_BASE_URL; // Playbook uses main API_BASE_URL
-            const response = await fetch(`${baseUrl}/admin/${toolName}/feedbacks`, {
-              method: "GET",
-              headers: getAuthHeaders(),
-            });
-
-            const data = await response.json().catch(() => ({}));
-
-            if (!response.ok) {
-              modalBody.innerHTML = `<div class="data-item">${data.detail || "Failed to load feedbacks"}</div>`;
-              return;
-            }
-
-            const up = data.total_thumbs_up != null ? data.total_thumbs_up : 0;
-            const down = data.total_thumbs_down != null ? data.total_thumbs_down : 0;
-
-            modalBody.innerHTML = `
-              <div class="data-item">
-                <div style="margin-bottom:8px;"><strong style="color:#f1c40f;">Total Thumbs Up:</strong> ${up}</div>
-                <div><strong style="color:#f1c40f;">Total Thumbs Down:</strong> ${down}</div>
-              </div>
-            `;
-          } catch (err) {
-            modalBody.innerHTML = `<div class="data-item">${err.message || "Error loading feedbacks"}</div>`;
-            console.error('Feedbacks fetch error', err);
-          }
-
-          return; // handled
-        }
 
         // If this is the whitelist view (show members)
         if (type === "whitelist-view" && toolName === "Whitelist") {
@@ -1492,7 +1447,7 @@
             throw new Error("Failed to fetch data");
           }
 
-          displayModalData(type, data);
+          displayModalData(type, data, toolName);
         } catch (error) {
           // CHANGED: Better error message with endpoint info
           modalBody.innerHTML = `
@@ -1533,7 +1488,7 @@
       }
 
       // Display data in modal based on type
-      function displayModalData(type, data) {
+      function displayModalData(type, data, toolName) {
         const modalBody = document.getElementById("modal-body");
 
         if (!data || (Array.isArray(data) && data.length === 0)) {
@@ -1553,7 +1508,7 @@
             html = formatActiveSessions(data);
             break;
           case "prompt-logs":
-            html = formatPromptLogs(data);
+            html = formatPromptLogs(data, toolName, toolName);
             break;
           default:
             html = "<pre>" + JSON.stringify(data, null, 2) + "</pre>";
@@ -1614,8 +1569,7 @@
       }
 
       // Format prompt logs
-      function formatPromptLogs(data) {
-        console.log("Prompt Logs :===", data);
+      function formatPromptLogs(data, toolName) {
 
         if (!Array.isArray(data)) {
           if (typeof data === "object" && data.detail) {
@@ -1630,7 +1584,14 @@
 
         return data
           .map(
-            (log) => `
+            (log) => {
+              // only include feedback field when viewing Playbook Chatbot logs
+              const feedbackHtml =
+                toolName === "Playbook_Chatbot"
+                  ? `<div><strong>Feedback:</strong> ${log.response_feedback != null ? log.response_feedback : "N/A"}</div>`
+                  : "";
+
+              return `
         <div class="data-item">
           <div><strong>ID:</strong> ${log.id || "N/A"}</div>
           <div><strong>User Email:</strong> ${log.user_email || "N/A"}</div>
@@ -1649,9 +1610,11 @@
           <div><strong>Output Tokens:</strong> ${log.output_tokens != null ? log.output_tokens : "N/A"}</div>
           <div><strong>Input Cost (USD):</strong> ${log.input_cost_usd != null ? log.input_cost_usd : "N/A"}</div>
           <div><strong>Output Cost (USD):</strong> ${log.output_cost_usd != null ? log.output_cost_usd : "N/A"}</div>
+          ${feedbackHtml}
           <div><strong>Timestamp:</strong> ${log.timestamp ? new Date(log.timestamp).toLocaleString() : "N/A"}</div>
         </div>
-      `,
+      `;
+            }
           )
           .join("");
       }
