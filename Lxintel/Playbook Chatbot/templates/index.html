@@ -1048,7 +1048,7 @@
     </div>
 
     <script>
-      const API_BASE_URL = "";
+      const API_BASE_URL = "https://attired-hitchily-stephane.ngrok-free.dev";
       let isProcessing = false;
 
       marked.setOptions({
@@ -1139,11 +1139,11 @@
             if (assistantMessages.length > 0) {
               const lastMessage =
                 assistantMessages[assistantMessages.length - 1];
-              const mid = lastMessage.message_id || null;
+              const mid = lastMessage.prompt_log_id || null;
               addMessage("assistant", lastMessage.content, mid);
             }
           } else {
-            const mid = data.message_id || null;
+            const mid = data.prompt_log_id || null;
             addMessage("assistant", `${data.answer}`, mid);
           }
         } catch (error) {
@@ -1157,7 +1157,7 @@
         }
       }
 
-      function addMessage(role, content, messageId = null) {
+      function addMessage(role, content, prompt_log_id = null) {
         const messagesDiv = document.getElementById("chat-messages");
 
         const emptyState = messagesDiv.querySelector(".empty-state");
@@ -1180,7 +1180,7 @@
         wrapper.appendChild(messageDiv);
 
         // Add feedback buttons (thumbs up/down) for assistant messages that are not the welcome message
-        if (role === "assistant" && messageId) {
+        if (role === "assistant" && prompt_log_id) {
           // ensure we don't add feedback to welcome messages
           if (!messageDiv.classList.contains("welcome")) {
             const fb = document.createElement("div");
@@ -1207,13 +1207,13 @@
             upBtn.addEventListener("click", function (e) {
               e.stopPropagation();
               if (upBtn.classList.contains("disabled")) return;
-              sendFeedback(messageId, "up", upBtn, downBtn);
+              sendFeedback(prompt_log_id, "up", upBtn, downBtn);
             });
 
             downBtn.addEventListener("click", function (e) {
               e.stopPropagation();
               if (downBtn.classList.contains("disabled")) return;
-              sendFeedback(messageId, "down", upBtn, downBtn);
+              sendFeedback(prompt_log_id, "down", upBtn, downBtn);
             });
 
             fb.appendChild(upBtn);
@@ -1249,7 +1249,7 @@
         scrollToBottom();
       }
 
-      async function sendFeedback(messageId, feedback, upBtn, downBtn) {
+      async function sendFeedback(prompt_log_id, feedback, upBtn, downBtn) {
         try {
           // disable buttons during request
           upBtn.classList.add("disabled");
@@ -1262,7 +1262,7 @@
               Authorization: `Bearer ${localStorage.getItem("jwtsopchatbot")}`,
               "ngrok-skip-browser-warning": "true",
             },
-            body: JSON.stringify({ message_id: String(messageId), feedback }),
+            body: JSON.stringify({ prompt_log_id: String(prompt_log_id), feedback }),
           });
 
           if (!resp.ok) {
