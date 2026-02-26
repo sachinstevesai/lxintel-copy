@@ -1089,7 +1089,8 @@
 
     <script>
       const API_BASE_URL = "";
-      const API_BASE_URL_DS = "https://medicalsummarytool.lxintel.net"; // <-- UPDATE THIS WITH THE Document Summary API URL
+      const API_BASE_URL_DS =
+        "https://medicalsummarytool.lxintel.net"; // <-- UPDATE THIS WITH THE Document Summary API URL
 
       // Check if already logged in on page load
       window.addEventListener("DOMContentLoaded", function () {
@@ -1349,54 +1350,72 @@
                 resultDiv.innerHTML = '<div class="data-item" style="color:#e74c3c;">Name is required</div>';
                 return;
               }
+
               if (!email || !validateEmail(email)) {
                 resultDiv.innerHTML = '<div class="data-item" style="color:#e74c3c;">A valid email is required</div>';
                 return;
               }
 
-              // Disable button while processing
               submitBtn.disabled = true;
               const prevText = submitBtn.innerHTML;
               submitBtn.innerHTML = '<span class="spinner"></span>Submitting...';
 
               try {
-                // First call: API_BASE_URL with auth
+                // 1️⃣ PRIMARY CALL
                 const resp1 = await fetch(`${API_BASE_URL}/admin/whitelist`, {
                   method: 'POST',
-                  headers: Object.assign({}, getAuthHeaders()),
+                  headers: getAuthHeaders(),
                   body: JSON.stringify({ name, email }),
                 });
+
                 const data1 = await resp1.json().catch(() => ({}));
 
-                const msg1 = data1.message || (data1.detail || JSON.stringify(data1));
-                resultDiv.innerHTML = `<div class="data-item">Primary: ${escapeHtml(msg1)}</div>`;
+                if (!resp1.ok) {
+                  throw new Error(data1.detail || data1.message || "Primary request failed");
+                }
 
-                // Second call: API_BASE_URL_DS without auth
+                // 2️⃣ SECONDARY CALL
+                let finalMessage = data1.message || "Member added successfully";
+
                 try {
                   const resp2 = await fetch(`${API_BASE_URL_DS}/admin/whitelist`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'ngrok-skip-browser-warning': 'true'
+                    },
                     body: JSON.stringify({ name, email }),
                   });
+
                   const data2 = await resp2.json().catch(() => ({}));
-                  const msg2 = data2.message || (data2.detail || JSON.stringify(data2));
-                  const extra = document.createElement('div');
-                  extra.className = 'data-item';
-                  extra.style.marginTop = '8px';
-                  extra.innerHTML = `Secondary: ${escapeHtml(msg2)}`;
-                  resultDiv.appendChild(extra);
+
+                  if (resp2.ok) {
+                    // If secondary succeeds, override message
+                    finalMessage = data2.message || finalMessage;
+                  }
+
                 } catch (err2) {
-                  const extra = document.createElement('div');
-                  extra.className = 'data-item';
-                  extra.style.marginTop = '8px';
-                  extra.style.color = '#e74c3c';
-                  extra.textContent = 'Secondary: Error calling secondary endpoint';
-                  resultDiv.appendChild(extra);
-                  console.error('Secondary whitelist call error', err2);
+                  console.error("Secondary failed:", err2);
+                  // Do nothing — we already succeeded on primary
                 }
+
+                // ✅ SHOW ONLY ONE SUCCESS MESSAGE
+                resultDiv.innerHTML = `
+                  <div class="data-item" style="color:#2ecc71;">
+                    ${escapeHtml(finalMessage)}
+                  </div>
+                `;
+
+                // Optional: clear inputs
+                nameInput.value = "";
+                emailInput.value = "";
+
               } catch (err) {
-                resultDiv.innerHTML = `<div class="data-item" style="color:#e74c3c;">Error: ${escapeHtml(err.message || String(err))}</div>`;
-                console.error('Primary whitelist call error', err);
+                resultDiv.innerHTML = `
+                  <div class="data-item" style="color:#e74c3c;">
+                    ${escapeHtml(err.message || "Something went wrong")}
+                  </div>
+                `;
               } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = prevText;
