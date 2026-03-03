@@ -1,0 +1,1766 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VerdictIQ — Study Explorer</title>
+    <link
+      rel="icon"
+      type="image/webp"
+      href="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      defer
+      src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"
+    ></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body,
+      html {
+        font-family: "Montserrat", sans-serif;
+        background-color: #111;
+        color: #f1c40f;
+        overflow: hidden;
+      }
+
+      .video-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-image: url("https://static.vecteezy.com/system/resources/previews/007/596/744/non_2x/abstract-digital-glossy-particles-and-lines-connected-3d-illustration-on-black-background-free-photo.jpg");
+        background-size: cover;
+        background-position: center top 150px;
+        z-index: -2;
+      }
+
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.85);
+        z-index: -1;
+      }
+
+      /* ─── LOGIN ─── */
+      .login-page-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+      }
+
+      .login-page-content {
+        width: 100%;
+        max-width: 600px;
+        padding: 2rem;
+        text-align: center;
+      }
+
+      .login-logo-section {
+        margin-bottom: 3rem;
+      }
+
+      .login-logo-section img {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 2rem;
+        display: inline-block;
+      }
+
+      .login-page-content h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #f1c40f;
+        margin: 0 0 1rem 0;
+        letter-spacing: 2px;
+      }
+
+      .login-page-content > p {
+        font-size: 1rem;
+        color: #aaa;
+        margin: 0 0 2rem 0;
+      }
+
+      .login-form-card {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 2.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      }
+
+      .login-form-card h2 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #f1c40f;
+        margin: 0 0 2rem 0;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+
+      .login-form-group {
+        margin-bottom: 2rem;
+        text-align: left;
+      }
+
+      .login-form-group label {
+        display: block;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #f1c40f;
+        margin-bottom: 0.75rem;
+      }
+
+      .login-form-group input[type="email"] {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        font-size: 0.95rem;
+        background-color: #000;
+        color: #fff;
+        border: 1px solid #444;
+        border-radius: 6px;
+        font-family: "Montserrat", sans-serif;
+        transition: border-color 0.3s;
+      }
+
+      .login-form-group input[type="email"]:focus {
+        outline: none;
+        border-color: #f1c40f;
+        box-shadow: 0 0 0 2px rgba(241, 196, 15, 0.1);
+      }
+
+      .login-form-group input[type="email"]::placeholder {
+        color: #666;
+      }
+
+      .login-email-status {
+        display: flex;
+        align-items: center;
+        margin-top: 0.75rem;
+        font-size: 0.85rem;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+
+      .login-email-status.visible {
+        opacity: 1;
+      }
+
+      .login-email-status .status-icon {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        margin-right: 0.5rem;
+      }
+
+      .login-email-status .status-icon.checking {
+        background-color: #3498db;
+        animation: pulse 1.5s infinite;
+      }
+
+      .login-email-status .status-icon.valid {
+        background-color: #2ecc71;
+      }
+
+      .login-email-status .status-icon.invalid {
+        background-color: #e74c3c;
+      }
+
+      .login-error-message {
+        color: #e74c3c;
+        background-color: rgba(231, 76, 60, 0.1);
+        border: 1px solid rgba(231, 76, 60, 0.3);
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        text-align: center;
+      }
+
+      .login-btn {
+        width: 100%;
+        padding: 0.875rem;
+        font-size: 1rem;
+        font-weight: 700;
+        background-color: #d4ac0d;
+        color: #000;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .login-btn:hover:not(:disabled) {
+        background-color: #f1c40f;
+        box-shadow: 0 4px 12px rgba(241, 196, 15, 0.3);
+      }
+
+      .login-btn:disabled {
+        background-color: #666;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+
+      .login-btn-spinner {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.6;
+        }
+
+        50% {
+          opacity: 1;
+        }
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ─── MAIN APP ─── */
+      .app-container {
+        display: flex;
+        flex-direction: column;
+        width: 100vw;
+        height: 100svh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        overflow: hidden;
+      }
+
+      .app-header {
+        background: rgba(17, 17, 17, 0.98);
+        backdrop-filter: blur(20px);
+        border-bottom: 2px solid rgba(241, 196, 15, 0.2);
+        padding: 8px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex: 0 0 auto;
+        box-shadow: 0 4px 20px rgba(241, 196, 15, 0.15);
+        position: relative;
+        z-index: 500;
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .logo {
+        height: 56px;
+        width: auto;
+        filter: drop-shadow(0 0 10px rgba(241, 196, 15, 0.3));
+      }
+
+      .header-title h1 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #f1c40f;
+        letter-spacing: 1px;
+        text-shadow: 0 0 20px rgba(241, 196, 15, 0.4);
+      }
+
+      .header-title p {
+        font-size: 13px;
+        color: #999;
+        margin-top: 4px;
+      }
+
+      .header-right {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .menu-icon-btn {
+        background: rgba(241, 196, 15, 0.15);
+        color: #f1c40f;
+        border: 1px solid rgba(241, 196, 15, 0.4);
+        padding: 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+
+      .menu-icon-btn:hover {
+        background: rgba(241, 196, 15, 0.25);
+        border-color: rgba(241, 196, 15, 0.6);
+      }
+
+      .popover {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        background: rgba(17, 17, 17, 0.98);
+        border: 2px solid rgba(241, 196, 15, 0.3);
+        border-radius: 12px;
+        padding: 8px;
+        min-width: 220px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        z-index: 2200;
+        display: none;
+        transform: translateZ(0);
+      }
+
+      .popover.active {
+        display: block;
+      }
+
+      .popover-item {
+        padding: 12px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .popover-item:hover {
+        background: rgba(241, 196, 15, 0.15);
+      }
+
+      .popover-item.email-info {
+        cursor: default;
+        border-bottom: 1px solid rgba(241, 196, 15, 0.2);
+        margin-bottom: 4px;
+      }
+
+      .popover-item.email-info:hover {
+        background: transparent;
+      }
+
+      .popover-email {
+        color: #f1c40f;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .popover-status {
+        color: #999;
+        font-size: 12px;
+      }
+
+      .popover-item.logout-btn {
+        color: #e74c3c;
+        font-weight: 600;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .popover-item.logout-btn:hover {
+        background: rgba(231, 76, 60, 0.15);
+      }
+
+      /* ─── MAIN CONTENT AREA ─── */
+      .main-content {
+        flex: 1;
+        display: flex;
+        overflow: hidden;
+      }
+
+      /* ─── SIDEBAR ─── */
+      .sidebar {
+        width: 300px;
+        flex: 0 0 300px;
+        background: rgba(17, 17, 17, 0.97);
+        border-right: 1px solid rgba(241, 196, 15, 0.15);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .sidebar-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid rgba(241, 196, 15, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .sidebar-header h2 {
+        font-size: 14px;
+        font-weight: 700;
+        color: #f1c40f;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .search-box {
+        padding: 12px 16px;
+        border-bottom: 1px solid rgba(241, 196, 15, 0.1);
+      }
+
+      .search-box input {
+        width: 100%;
+        padding: 8px 12px;
+        background: rgba(0, 0, 0, 0.6);
+        border: 1px solid rgba(241, 196, 15, 0.3);
+        border-radius: 6px;
+        color: #f1c40f;
+        font-family: "Montserrat", sans-serif;
+        font-size: 13px;
+        transition: all 0.3s;
+      }
+
+      .search-box input:focus {
+        outline: none;
+        border-color: rgba(241, 196, 15, 0.6);
+        background: rgba(0, 0, 0, 0.8);
+      }
+
+      .search-box input::placeholder {
+        color: #555;
+      }
+
+      .studies-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 8px 0;
+      }
+
+      .studies-list::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .studies-list::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .studies-list::-webkit-scrollbar-thumb {
+        background: rgba(241, 196, 15, 0.3);
+        border-radius: 3px;
+      }
+
+      .studies-list::-webkit-scrollbar-thumb:hover {
+        background: rgba(241, 196, 15, 0.5);
+      }
+
+      .study-item {
+        padding: 12px 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+        border-bottom: 1px solid rgba(241, 196, 15, 0.07);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .study-item:hover {
+        background: rgba(241, 196, 15, 0.08);
+      }
+
+      .study-item.active {
+        background: rgba(241, 196, 15, 0.15);
+        border-left: 3px solid #f1c40f;
+      }
+
+      .study-item-id {
+        font-size: 10px;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .study-item-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #e0e0e0;
+        line-height: 1.4;
+      }
+
+      .study-item.active .study-item-title {
+        color: #f1c40f;
+      }
+
+      .study-item-meta {
+        font-size: 11px;
+        color: #777;
+      }
+
+      .sidebar-empty {
+        padding: 24px;
+        color: #555;
+        font-size: 13px;
+        text-align: center;
+      }
+
+      .sidebar-loading {
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+      }
+
+      /* ─── DETAIL PANEL ─── */
+      .detail-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        background: transparent;
+      }
+
+      .detail-empty {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 16px;
+        color: #555;
+      }
+
+      .detail-empty-icon {
+        font-size: 64px;
+        opacity: 0.3;
+        filter: grayscale(100%);
+      }
+
+      .detail-empty h2 {
+        font-size: 28px;
+        color: #f1c40f;
+        font-weight: 700;
+        opacity: 0.4;
+      }
+
+      .detail-empty p {
+        font-size: 15px;
+        color: #666;
+      }
+
+      .detail-scroll {
+        flex: 1;
+        overflow-y: auto;
+        padding: 28px 32px;
+      }
+
+      .detail-scroll::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .detail-scroll::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .detail-scroll::-webkit-scrollbar-thumb {
+        background: rgba(241, 196, 15, 0.3);
+        border-radius: 4px;
+      }
+
+      .detail-scroll::-webkit-scrollbar-thumb:hover {
+        background: rgba(241, 196, 15, 0.5);
+      }
+
+      .detail-card {
+        background: rgba(17, 17, 17, 0.95);
+        border: 1px solid rgba(241, 196, 15, 0.2);
+        border-radius: 16px;
+        padding: 32px;
+        animation: slideUp 0.4s ease-out;
+        position: relative;
+        z-index: 1;
+      }
+
+      .detail-header {
+        margin-bottom: 28px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(241, 196, 15, 0.2);
+      }
+
+      .detail-study-id {
+        font-size: 12px;
+        color: #777;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+      }
+
+      .detail-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: #f1c40f;
+        line-height: 1.4;
+        margin-bottom: 12px;
+      }
+
+      .detail-badges {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+
+      .badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .badge-yellow {
+        background: rgba(241, 196, 15, 0.15);
+        color: #f1c40f;
+        border: 1px solid rgba(241, 196, 15, 0.3);
+      }
+
+      .badge-blue {
+        background: rgba(52, 152, 219, 0.15);
+        color: #3498db;
+        border: 1px solid rgba(52, 152, 219, 0.3);
+      }
+
+      .badge-green {
+        background: rgba(46, 204, 113, 0.15);
+        color: #2ecc71;
+        border: 1px solid rgba(46, 204, 113, 0.3);
+      }
+
+      .badge-red {
+        background: rgba(231, 76, 60, 0.15);
+        color: #e74c3c;
+        border: 1px solid rgba(231, 76, 60, 0.3);
+      }
+
+      .section-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: #f1c40f;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 28px 0 14px 0;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(241, 196, 15, 0.2);
+      }
+
+      .section-title:first-of-type {
+        margin-top: 0;
+      }
+
+      /* Key-value grid */
+      .kv-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 12px;
+      }
+
+      .kv-item {
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(241, 196, 15, 0.1);
+        border-radius: 8px;
+        padding: 12px 14px;
+      }
+
+      .kv-key {
+        font-size: 11px;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+      }
+
+      .kv-value {
+        font-size: 14px;
+        color: #e0e0e0;
+        font-weight: 600;
+        line-height: 1.4;
+        word-break: break-word;
+      }
+
+      .kv-value.highlight {
+        color: #f1c40f;
+      }
+
+      /* Table */
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 8px 0;
+        font-size: 13px;
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      .data-table th,
+      .data-table td {
+        border: 1px solid rgba(241, 196, 15, 0.15);
+        padding: 11px 14px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      .data-table th {
+        background: rgba(241, 196, 15, 0.18);
+        color: #f1c40f;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.5px;
+      }
+
+      .data-table tbody tr:hover {
+        background: rgba(241, 196, 15, 0.05);
+      }
+
+      .data-table td {
+        color: #d0d0d0;
+      }
+
+      /* Text block */
+      .text-block {
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(241, 196, 15, 0.1);
+        border-radius: 8px;
+        padding: 16px;
+        color: #c0c0c0;
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      /* Loading spinner */
+      .spinner {
+        border: 3px solid rgba(241, 196, 15, 0.2);
+        border-top-color: #f1c40f;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        animation: spin 0.8s linear infinite;
+      }
+
+      /* Active users */
+      #active-users-popover {
+        display: none !important;
+      }
+
+      #active-users-popover.open {
+        display: block !important;
+      }
+
+      /* Tooltip */
+      .tooltip {
+        position: absolute;
+        bottom: -35px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(17, 17, 17, 0.95);
+        color: #f1c40f;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        white-space: nowrap;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s;
+        border: 1px solid rgba(241, 196, 15, 0.4);
+        z-index: 1000;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .sidebar {
+          width: 240px;
+          flex: 0 0 240px;
+        }
+
+        .detail-scroll {
+          padding: 16px;
+        }
+
+        .header-title p {
+          display: none;
+        }
+
+        .logo {
+          height: 44px;
+        }
+
+        .kv-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .sidebar {
+          width: 100%;
+          flex: 0 0 auto;
+          height: 240px;
+          border-right: none;
+          border-bottom: 1px solid rgba(241, 196, 15, 0.15);
+        }
+
+        .main-content {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <script>
+      function updateDisplay() {
+        const hasToken = localStorage.getItem("jwtVerdictIQ");
+        const loginPage = document.querySelector(".login-page-wrapper");
+        const mainApp = document.getElementById("main-app-container");
+        if (hasToken) {
+          if (loginPage) loginPage.style.display = "none";
+          if (mainApp) {
+            mainApp.style.display = "flex";
+            mainApp.style.visibility = "visible";
+          }
+        } else {
+          if (loginPage) {
+            loginPage.style.display = "flex";
+            loginPage.style.visibility = "visible";
+          }
+          if (mainApp) {
+            mainApp.style.display = "none";
+            mainApp.style.visibility = "hidden";
+          }
+        }
+      }
+      document.addEventListener("DOMContentLoaded", updateDisplay);
+      window.addEventListener("login-success", () =>
+        setTimeout(updateDisplay, 100),
+      );
+      window.addEventListener("logout-success", () => {
+        const mainApp = document.getElementById("main-app-container");
+        const loginPage = document.querySelector(".login-page-wrapper");
+        if (mainApp) {
+          mainApp.style.display = "none";
+          mainApp.style.visibility = "hidden";
+        }
+        if (loginPage) {
+          loginPage.style.display = "flex";
+          loginPage.style.visibility = "visible";
+        }
+      });
+    </script>
+
+    <div class="video-background"></div>
+    <div class="overlay"></div>
+
+    <!-- ═══════════════ LOGIN PAGE ═══════════════ -->
+    <div
+      class="login-page-wrapper"
+      x-data="loginApp()"
+      x-init="init()"
+      x-show="!loggedIn"
+    >
+      <div class="login-page-content">
+        <div class="login-logo-section">
+          <img
+            src="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
+            alt="VerdictIQ"
+          />
+          <h1>VerdictIQ</h1>
+          <p>Secure Access for Authorized Ramos Law Users</p>
+        </div>
+        <div class="login-form-card">
+          <h2>Login</h2>
+          <div class="login-form-group">
+            <label for="login-email">Email</label>
+            <input
+              id="login-email"
+              type="email"
+              placeholder="Enter your email"
+              x-model="email"
+              @input.debounce.500="verifyEmail()"
+              @keydown.enter="emailValid && login()"
+            />
+            <div
+              class="login-email-status"
+              :class="email && email.includes('@') ? 'visible' : ''"
+              x-show="email && email.includes('@')"
+            >
+              <span
+                class="status-icon"
+                :class="emailChecking ? 'checking' : emailValid ? 'valid' : 'invalid'"
+              ></span>
+              <span
+                x-text="emailChecking ? 'Checking email...' : emailValid ? 'Email authorized' : 'Email not authorized'"
+              ></span>
+            </div>
+          </div>
+          <div x-show="error" x-text="error" class="login-error-message"></div>
+          <button
+            @click="login()"
+            :disabled="!emailValid || !email"
+            class="login-btn"
+          >
+            <span x-show="!loggingIn">Login</span>
+            <span x-show="loggingIn" class="login-btn-spinner">
+              <span
+                style="
+                  width: 14px;
+                  height: 14px;
+                  border: 2px solid rgba(0, 0, 0, 0.3);
+                  border-top-color: #000;
+                  border-radius: 50%;
+                  animation: spin 0.8s linear infinite;
+                  display: inline-block;
+                "
+              ></span>
+              Logging in...
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ MAIN APP ═══════════════ -->
+    <div
+      id="main-app-container"
+      class="app-container"
+      x-data="verdictIQApp()"
+      x-init="init()"
+      x-show="isLoggedIn"
+      style="display: none"
+    >
+      <!-- HEADER -->
+      <div class="app-header">
+        <div class="header-left">
+          <img
+            src="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
+            alt="VerdictIQ"
+            class="logo"
+          />
+          <div class="header-title">
+            <h1>VerdictIQ</h1>
+            <div style="display: flex; align-items: center; gap: 12px">
+              <p>Study & Verdict Intelligence Explorer</p>
+              <button
+                id="active-users-btn"
+                onclick="toggleActiveUsersPopover()"
+                title="Active users"
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                  background: none;
+                  border: none;
+                  cursor: pointer;
+                  padding: 4px 10px;
+                  border-radius: 6px;
+                  color: #f1c40f;
+                  font-size: 12px;
+                  font-weight: 600;
+                  transition: all 0.3s;
+                "
+              >
+                <span
+                  style="
+                    display: inline-block;
+                    width: 8px;
+                    height: 8px;
+                    background: #2ecc71;
+                    border-radius: 50%;
+                    box-shadow: 0 0 8px #2ecc71;
+                  "
+                ></span>
+                <span id="active-count">0</span>
+                <span style="margin-left: 4px">Active Users</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="header-right">
+          <!-- Refresh button -->
+          <button
+            onclick="refreshStudies()"
+            style="
+              background: rgba(241, 196, 15, 0.15);
+              color: #f1c40f;
+              border: 1px solid rgba(241, 196, 15, 0.4);
+              padding: 10px 18px;
+              border-radius: 8px;
+              font-size: 14px;
+              font-weight: 600;
+              cursor: pointer;
+              transition: all 0.3s;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              position: relative;
+            "
+            onmouseover="this.style.background = 'rgba(241,196,15,.25)'"
+            onmouseout="this.style.background = 'rgba(241,196,15,.15)'"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="1 4 1 10 7 10" />
+              <path d="M3.51 15a9 9 0 1 0 .49-3.15" />
+            </svg>
+            Refresh
+          </button>
+          <!-- User menu -->
+          <div style="position: relative">
+            <button class="menu-icon-btn" onclick="toggleUserMenu()">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            </button>
+            <div class="popover" id="user-menu-popover">
+              <div class="popover-item email-info">
+                <span class="popover-email" x-text="userEmail"></span>
+                <span class="popover-status">Logged in</span>
+              </div>
+              <div
+                class="popover-item logout-btn"
+                @click="logout(); toggleUserMenu()"
+              >
+                Logout
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BODY -->
+      <div class="main-content">
+        <!-- SIDEBAR: study list -->
+        <div class="sidebar">
+          <div class="sidebar-header">
+            <h2>Studies</h2>
+            <span
+              id="studies-count"
+              style="font-size: 12px; color: #888"
+            ></span>
+          </div>
+          <div class="search-box">
+            <input
+              type="text"
+              id="search-input"
+              placeholder="Search studies…"
+              oninput="filterStudies(this.value)"
+            />
+          </div>
+          <div class="studies-list" id="studies-list">
+            <div class="sidebar-loading">
+              <div
+                class="spinner"
+                style="width: 24px; height: 24px; border-width: 2px"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DETAIL PANEL -->
+        <div class="detail-panel">
+          <!-- Empty state -->
+          <div class="detail-empty" id="detail-empty">
+            <div class="detail-empty-icon"></div>
+            <h2>VerdictIQ</h2>
+            <p>Select a study from the list to view details</p>
+          </div>
+
+          <!-- Loading state -->
+          <div class="detail-empty" id="detail-loading" style="display: none">
+            <div class="spinner"></div>
+            <p style="color: #888; margin-top: 16px">Loading study…</p>
+          </div>
+
+          <!-- Detail content -->
+          <div class="detail-scroll" id="detail-content" style="display: none">
+            <div class="detail-card" id="detail-card">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Users Popover -->
+      <div
+        id="active-users-popover"
+        style="
+          position: fixed;
+          top: 80px;
+          left: 350px;
+          background: #1a1a1a;
+          border: 1px solid rgba(241, 196, 15, 0.4);
+          border-radius: 8px;
+          padding: 12px;
+          min-width: 280px;
+          max-height: 400px;
+          z-index: 2100;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+          overflow-y: auto;
+        "
+      >
+        <div
+          style="
+            padding: 8px 0;
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(241, 196, 15, 0.3);
+            color: #f1c40f;
+            font-size: 12px;
+            font-weight: 600;
+          "
+        >
+          Active Users
+        </div>
+        <div id="active-users-list" style="color: #aaa; font-size: 13px">
+          <div style="padding: 8px 0; color: #666">Loading…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ SCRIPTS ═══════════════ -->
+    <script>
+      const API_BASE_URL = "https://laurene-clearheaded-nonaromatically.ngrok-free.dev";
+      let allStudies = [];
+      let activeStudyId = null;
+
+      function getAuthHeaders(extra = {}) {
+        const token = localStorage.getItem("jwtVerdictIQ");
+        if (!token) throw new Error("Not authenticated");
+        return {
+          ...extra,
+          Authorization: `Bearer ${token}`,
+          "ngrok-skip-browser-warning": "true",
+        };
+      }
+
+      // ─── UI helpers ───
+      function toggleUserMenu() {
+        document.getElementById("user-menu-popover").classList.toggle("active");
+      }
+      document.addEventListener("click", (e) => {
+        const p = document.getElementById("user-menu-popover");
+        if (!e.target.closest(".menu-icon-btn") && p && !p.contains(e.target))
+          p.classList.remove("active");
+      });
+
+      function toggleActiveUsersPopover() {
+        const pop = document.getElementById("active-users-popover");
+        const opening = !pop.classList.contains("open");
+        pop.classList.toggle("open");
+        if (opening) loadActiveUsers();
+      }
+      document.addEventListener("click", (e) => {
+        const pop = document.getElementById("active-users-popover");
+        const btn = document.getElementById("active-users-btn");
+        if (btn && !btn.contains(e.target) && pop && !pop.contains(e.target))
+          pop.classList.remove("open");
+      });
+
+      // ─── ACTIVE USERS ───
+      async function loadActiveUsers() {
+        try {
+          const res = await fetch(`${API_BASE_URL}/VerdictIQ/active-today`, {
+            headers: getAuthHeaders(),
+          });
+          const data = await res.json();
+          const list = document.getElementById("active-users-list");
+          const count = document.getElementById("active-count");
+          if (!Array.isArray(data)) return;
+          count.textContent = data.length;
+          list.innerHTML =
+            data.length === 0
+              ? '<div style="padding:8px 0;color:#666;">No active users</div>'
+              : data
+                  .map(
+                    (u) => `
+            <div style="padding:10px 8px;border-bottom:1px solid rgba(241,196,15,.15);display:flex;justify-content:space-between;align-items:center;gap:16px;">
+              <span style="color:#f1c40f;font-weight:500;flex:1;">${escapeHtml(u.email)}</span>
+              <span style="color:#aaa;font-size:11px;flex-shrink:0;">${formatLastActive(u.last_active)}</span>
+            </div>`,
+                  )
+                  .join("");
+        } catch (e) {
+          console.error("Active users error", e);
+        }
+      }
+
+      function formatLastActive(d) {
+        try {
+          const diff = Date.now() - new Date(d).getTime();
+          const m = Math.floor(diff / 60000),
+            h = Math.floor(diff / 3600000),
+            day = Math.floor(diff / 86400000);
+          if (m < 1) return "just now";
+          if (m < 60) return `${m}m ago`;
+          if (h < 24) return `${h}h ago`;
+          if (day < 7) return `${day}d ago`;
+          return new Date(d).toLocaleDateString();
+        } catch (e) {
+          return d;
+        }
+      }
+
+      // ─── STUDIES LIST ───
+      async function loadStudies() {
+        const list = document.getElementById("studies-list");
+        list.innerHTML =
+          '<div class="sidebar-loading"><div class="spinner" style="width:24px;height:24px;border-width:2px;"></div></div>';
+        try {
+          const res = await fetch(`${API_BASE_URL}/VerdictIQ/studies`, {
+            headers: {
+              ...getAuthHeaders(),
+              "ngrok-skip-browser-warning": "true",
+              Accept: "application/json",
+            },
+          });
+          const text = await res.text();
+          let data;
+          try {
+            data = JSON.parse(text);
+          } catch (e) {
+            list.innerHTML = `<div class="sidebar-empty" style="color:#e74c3c;">Server error — unexpected response.<br><small>${text.slice(0, 120)}</small></div>`;
+            return;
+          }
+          allStudies = Array.isArray(data)
+            ? data
+            : data.studies || data.results || data.data || [];
+          document.getElementById("studies-count").textContent =
+            `${allStudies.length} total`;
+          renderStudiesList(allStudies);
+        } catch (e) {
+          list.innerHTML = `<div class="sidebar-empty" style="color:#e74c3c;">Failed to load studies.<br><small>${e.message}</small></div>`;
+        }
+      }
+
+      function renderStudiesList(studies) {
+        const list = document.getElementById("studies-list");
+        if (!studies.length) {
+          list.innerHTML = '<div class="sidebar-empty">No studies found.</div>';
+          return;
+        }
+        list.innerHTML = studies
+          .map((s) => {
+            // Robustly find ID and title from any field name
+            const id =
+              s.id ?? s.study_id ?? s.studyId ?? s.study_no ?? s.case_id ?? "?";
+            const title =
+              s.title ||
+              s.name ||
+              s.study_name ||
+              s.case_name ||
+              s.study_title ||
+              s.case_title ||
+              s.subject ||
+              s.heading ||
+              Object.values(s).find(
+                (v) => typeof v === "string" && v.length > 6 && v.length < 200,
+              ) ||
+              `Study #${id}`;
+            // Pick a secondary info line
+            const meta = [
+              s.year,
+              s.date,
+              s.type,
+              s.category,
+              s.jurisdiction,
+              s.court,
+            ]
+              .filter(Boolean)
+              .slice(0, 2)
+              .join(" · ");
+            return `
+          <div class="study-item${activeStudyId == id ? " active" : ""}"
+               onclick="loadStudyDetail(${JSON.stringify(id)})"
+               id="study-item-${id}">
+            <span class="study-item-id">Study ID #${id}</span>
+            <span class="study-item-title">${escapeHtml(String(title))}</span>
+            ${meta ? `<span class="study-item-meta">${escapeHtml(meta)}</span>` : ""}
+          </div>`;
+          })
+          .join("");
+      }
+
+      function filterStudies(q) {
+        if (!q) {
+          renderStudiesList(allStudies);
+          return;
+        }
+        const lq = q.toLowerCase();
+        const filtered = allStudies.filter((s) => {
+          const id = String(s.id || s.study_id || "");
+          const title = String(
+            s.title || s.name || s.study_name || s.case_name || "",
+          );
+          const meta = String(
+            s.year || s.type || s.category || s.jurisdiction || "",
+          );
+          return (
+            id.includes(lq) ||
+            title.toLowerCase().includes(lq) ||
+            meta.toLowerCase().includes(lq)
+          );
+        });
+        renderStudiesList(filtered);
+      }
+
+      function refreshStudies() {
+        loadStudies();
+      }
+
+      // ─── STUDY DETAIL ───
+      async function loadStudyDetail(id) {
+        activeStudyId = id;
+
+        // Mark active in sidebar
+        document
+          .querySelectorAll(".study-item")
+          .forEach((el) => el.classList.remove("active"));
+        const activeEl = document.getElementById(`study-item-${id}`);
+        if (activeEl) activeEl.classList.add("active");
+
+        // Show loading
+        document.getElementById("detail-empty").style.display = "none";
+        document.getElementById("detail-content").style.display = "none";
+        document.getElementById("detail-loading").style.display = "flex";
+
+        try {
+          const res = await fetch(`${API_BASE_URL}/VerdictIQ/studies/${id}`, {
+            headers: {
+              ...getAuthHeaders(),
+              "ngrok-skip-browser-warning": "true",
+              Accept: "application/json",
+            },
+          });
+          const text = await res.text();
+          let study;
+          try {
+            study = JSON.parse(text);
+          } catch (e) {
+            throw new Error("Server returned non-JSON response");
+          }
+          renderStudyDetail(study);
+        } catch (e) {
+          document.getElementById("detail-loading").style.display = "none";
+          document.getElementById("detail-content").style.display = "block";
+          document.getElementById("detail-card").innerHTML =
+            `<div style="color:#e74c3c;padding:20px;">Error loading study: ${e.message}</div>`;
+        }
+      }
+
+      function renderStudyDetail(study) {
+        document.getElementById("detail-loading").style.display = "none";
+        document.getElementById("detail-content").style.display = "block";
+
+        const card = document.getElementById("detail-card");
+        const id = study.id || study.study_id;
+        const title =
+          study.title ||
+          study.name ||
+          study.study_name ||
+          study.case_name ||
+          `Study #${id}`;
+
+        // Collect known fields to skip in raw fields
+        const knownFields = new Set([
+          "id",
+          "study_id",
+          "title",
+          "name",
+          "study_name",
+          "case_name",
+          "description",
+          "summary",
+          "abstract",
+          "notes",
+          "verdict",
+          "outcome",
+          "result",
+          "plaintiff",
+          "defendant",
+          "attorney",
+          "judge",
+          "court",
+          "jurisdiction",
+          "year",
+          "date",
+          "filed_date",
+          "settlement_amount",
+          "verdict_amount",
+          "award",
+          "type",
+          "category",
+          "status",
+          "tags",
+        ]);
+
+        // Build badge tags
+        const badges = [];
+        if (study.year || study.date)
+          badges.push({ text: study.year || study.date, cls: "badge-blue" });
+        if (study.type || study.category)
+          badges.push({
+            text: study.type || study.category,
+            cls: "badge-yellow",
+          });
+        if (study.status)
+          badges.push({
+            text: study.status,
+            cls: study.status.toLowerCase().includes("settled")
+              ? "badge-green"
+              : "badge-red",
+          });
+        if (study.jurisdiction)
+          badges.push({ text: study.jurisdiction, cls: "badge-blue" });
+
+        let html = `
+        <div class="detail-header">
+          <div class="detail-study-id">Study ID #${id}</div>
+          <div class="detail-title">${escapeHtml(title)}</div>
+          ${badges.length ? `<div class="detail-badges">${badges.map((b) => `<span class="badge ${b.cls}">${escapeHtml(String(b.text))}</span>`).join("")}</div>` : ""}
+        </div>`;
+
+        // Core key fields to show in grid
+        const gridFields = [
+          ["Court / Jurisdiction", study.court || study.jurisdiction],
+          ["Year / Date", study.year || study.date || study.filed_date],
+          ["Case Type", study.type || study.category],
+          ["Status", study.status],
+          ["Plaintiff", study.plaintiff],
+          ["Defendant", study.defendant],
+          ["Attorney", study.attorney],
+          ["Judge", study.judge],
+          [
+            "Verdict Amount",
+            study.verdict_amount || study.award
+              ? formatCurrency(study.verdict_amount || study.award)
+              : null,
+          ],
+          [
+            "Settlement Amount",
+            study.settlement_amount
+              ? formatCurrency(study.settlement_amount)
+              : null,
+          ],
+        ].filter(([, v]) => v !== undefined && v !== null && v !== "");
+
+        if (gridFields.length) {
+          html += `<div class="section-title">📋 Case Overview</div>
+          <div class="kv-grid">
+            ${gridFields
+              .map(
+                ([k, v]) => `
+              <div class="kv-item">
+                <div class="kv-key">${escapeHtml(k)}</div>
+                <div class="kv-value ${["Verdict Amount", "Settlement Amount"].includes(k) ? "highlight" : ""}">${escapeHtml(String(v))}</div>
+              </div>`,
+              )
+              .join("")}
+          </div>`;
+        }
+
+        // Narrative fields
+        const narrativeFields = [
+          [
+            "Summary / Abstract",
+            study.summary || study.abstract || study.description,
+          ],
+          ["Verdict / Outcome", study.verdict || study.outcome || study.result],
+          ["Notes", study.notes],
+        ].filter(([, v]) => v !== undefined && v !== null && v !== "");
+
+        narrativeFields.forEach(([k, v]) => {
+          html += `<div class="section-title"> ${k}</div>
+          <div class="text-block">${escapeHtml(String(v))}</div>`;
+        });
+
+        // Tags
+        if (study.tags) {
+          const tags = Array.isArray(study.tags)
+            ? study.tags
+            : String(study.tags)
+                .split(",")
+                .map((t) => t.trim())
+                .filter(Boolean);
+          if (tags.length) {
+            html += `<div class="section-title">Tags</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              ${tags.map((t) => `<span class="badge badge-yellow">${escapeHtml(t)}</span>`).join("")}
+            </div>`;
+          }
+        }
+
+        // Remaining fields as a table (catch-all for extra API fields)
+        const extraEntries = Object.entries(study).filter(
+          ([k]) => !knownFields.has(k) && typeof study[k] !== "object",
+        );
+        if (extraEntries.length) {
+          html += `<div class="section-title">Case Data</div>
+          <table class="data-table">
+            <thead><tr><th>Field</th><th>Value</th></tr></thead>
+            <tbody>
+              ${extraEntries
+                .map(
+                  ([k, v]) => `<tr>
+                <td style="color:#f1c40f;font-weight:600;white-space:nowrap;">${escapeHtml(humanize(k))}</td>
+                <td>${escapeHtml(String(v))}</td>
+              </tr>`,
+                )
+                .join("")}
+            </tbody>
+          </table>`;
+        }
+
+        // Nested objects / arrays (e.g. witnesses, exhibits, etc.)
+        Object.entries(study).forEach(([k, v]) => {
+          if (typeof v === "object" && v !== null && !knownFields.has(k)) {
+            const rows = Array.isArray(v) ? v : [v];
+            if (!rows.length) return;
+            html += `<div class="section-title"> ${humanize(k)}</div>`;
+            if (typeof rows[0] === "object") {
+              const cols = [...new Set(rows.flatMap((r) => Object.keys(r)))];
+              html += `<table class="data-table">
+              <thead><tr>${cols.map((c) => `<th>${escapeHtml(humanize(c))}</th>`).join("")}</tr></thead>
+              <tbody>${rows
+                .map(
+                  (r) =>
+                    `<tr>${cols
+                      .map(
+                        (c) => `<td>${
+                          r[c] === null
+                            ? "null"
+                            : escapeHtml(String(r[c] ?? ""))
+                        }
+</td>`,
+                      )
+                      .join("")}</tr>`,
+                )
+                .join("")}</tbody>
+            </table>`;
+            } else {
+              html += `<div class="text-block">${rows.map((r) => escapeHtml(String(r))).join("<br>")}</div>`;
+            }
+          }
+        });
+
+        card.innerHTML = html;
+        document.getElementById("detail-content").scrollTop = 0;
+      }
+
+      function formatCurrency(v) {
+        const n = parseFloat(String(v).replace(/[^0-9.]/g, ""));
+        if (isNaN(n)) return v;
+        return "$" + n.toLocaleString("en-US");
+      }
+
+      function humanize(str) {
+        return str
+          .replace(/_/g, " ")
+          .replace(/([A-Z])/g, " $1")
+          .replace(/^./, (s) => s.toUpperCase())
+          .trim();
+      }
+
+      function escapeHtml(text) {
+        const d = document.createElement("div");
+        d.textContent = text;
+        return d.innerHTML;
+      }
+
+      // ─── ALPINE APPS ───
+      function loginApp() {
+        return {
+          email: "",
+          emailValid: false,
+          emailChecking: false,
+          error: "",
+          loggedIn: false,
+          loggingIn: false,
+          init() {
+            const token = localStorage.getItem("jwtVerdictIQ");
+            const saved = localStorage.getItem("verdictIQEmail");
+            if (token && saved) {
+              this.loggedIn = true;
+            }
+            window.addEventListener("logout-success", () => {
+              this.loggedIn = false;
+              this.email = "";
+              this.emailValid = false;
+              this.error = "";
+            });
+          },
+          verifyEmail() {
+            if (!this.email.includes("@")) {
+              this.emailValid = false;
+              this.error = "";
+              return;
+            }
+            this.emailChecking = true;
+            this.error = "";
+            fetch(
+              `${API_BASE_URL}/VerdictIQ/verify-email?email=${encodeURIComponent(this.email)}`,
+              { headers: { "ngrok-skip-browser-warning": "true" } },
+            )
+              .then((r) => r.json())
+              .then((j) => {
+                this.emailValid = j.valid;
+                this.emailChecking = false;
+                if (!j.valid)
+                  this.error =
+                    "Access denied: Your email is not on the authorized list.";
+              })
+              .catch(() => {
+                this.emailValid = false;
+                this.emailChecking = false;
+                this.error =
+                  "Access denied: Your email is not on the authorized list.";
+              });
+          },
+          login() {
+            if (!this.emailValid || !this.email) return;
+            this.loggingIn = true;
+            const body = new URLSearchParams({
+              username: this.email,
+              password: "not-used-but-required",
+            });
+            fetch(`${API_BASE_URL}/VerdictIQ/login`, {
+              method: "POST",
+              headers: { "ngrok-skip-browser-warning": "true" },
+              body,
+            })
+              .then((r) => {
+                if (!r.ok) throw new Error("Unauthorized email");
+                return r.json();
+              })
+              .then((j) => {
+                localStorage.setItem("jwtVerdictIQ", j.access_token);
+                localStorage.setItem("verdictIQEmail", this.email);
+                this.loggedIn = true;
+                this.error = "";
+                this.loggingIn = false;
+                window.dispatchEvent(new CustomEvent("login-success"));
+              })
+              .catch((e) => {
+                this.error = e.message;
+                this.loggingIn = false;
+              });
+          },
+        };
+      }
+
+      function verdictIQApp() {
+        return {
+          isLoggedIn: false,
+          userEmail: "",
+          init() {
+            const token = localStorage.getItem("jwtVerdictIQ");
+            const email = localStorage.getItem("verdictIQEmail");
+            if (token && email) {
+              this.isLoggedIn = true;
+              this.userEmail = email;
+            }
+            window.addEventListener("login-success", () => {
+              this.isLoggedIn = true;
+              this.userEmail = localStorage.getItem("verdictIQEmail");
+              setTimeout(() => {
+                loadStudies();
+                loadActiveUsers();
+              }, 200);
+            });
+            window.addEventListener("logout-success", () => {
+              this.isLoggedIn = false;
+              this.userEmail = "";
+            });
+            if (this.isLoggedIn) {
+              setTimeout(() => {
+                loadStudies();
+                loadActiveUsers();
+              }, 200);
+            }
+          },
+          logout() {
+            localStorage.removeItem("jwtVerdictIQ");
+            localStorage.removeItem("verdictIQEmail");
+            window.dispatchEvent(new Event("logout-success"));
+            this.isLoggedIn = false;
+            this.userEmail = "";
+            setTimeout(() => location.reload(), 100);
+          },
+        };
+      }
+
+      // Auto-load on page load if already logged in
+      window.addEventListener("load", () => {
+        const token = localStorage.getItem("jwtVerdictIQ");
+        if (token) {
+          setTimeout(() => {
+            loadStudies();
+            loadActiveUsers();
+          }, 400);
+        }
+      });
+    </script>
+  </body>
+</html>
