@@ -1095,6 +1095,16 @@
       <div class="main-content">
         <!-- SIDEBAR: study list -->
         <div class="sidebar">
+          <!-- upload / regenerate controls -->
+          <div id="study-upload-section" style="padding:12px 16px; border-bottom:1px solid rgba(241,196,15,0.1);">
+            <label for="study-file-input" style="color:#f1c40f;font-size:13px;font-weight:600;display:block;margin-bottom:6px;">Upload file</label>
+            <input id="study-file-input" type="file" accept=".xlsx,.xls,.csv,.json" style="width:100%;padding:8px 10px;background:rgba(0,0,0,0.6);border:1px solid rgba(241,196,15,0.3);border-radius:6px;color:#f1c40f;font-family:'Montserrat',sans-serif;font-size:13px;" />
+            <div style="margin-top:8px; display:flex; gap:8px;">
+              <button id="study-upload-btn" class="login-btn" onclick="handleStudyUpload()" style="flex:1;padding:6px 0;font-size:13px;">Upload</button>
+              <button id="study-regenerate-btn" class="login-btn" onclick="handleStudyRegenerate()" style="flex:1;padding:6px 0;font-size:13px;display:none;">Regenerate</button>
+            </div>
+            <div id="study-upload-message" style="margin-top:6px;font-size:12px; display:none;"></div>
+          </div>
           <div class="sidebar-header">
             <h2>Studies</h2>
             <span
@@ -1185,6 +1195,8 @@
       const API_BASE_URL = "https://laurene-clearheaded-nonaromatically.ngrok-free.dev";
       let allStudies = [];
       let activeStudyId = null;
+      // for upload/regenerate workflow
+      let studyLastFile = null;
 
       function getAuthHeaders(extra = {}) {
         const token = localStorage.getItem("jwtVerdictIQ");
@@ -1368,6 +1380,141 @@
 
       function refreshStudies() {
         loadStudies();
+      }
+
+      // ─── UPLOAD / REGENERATE HANDLERS ───
+      async function handleStudyUpload() {
+        const input = document.getElementById("study-file-input");
+        const uploadBtn = document.getElementById("study-upload-btn");
+        const regenBtn = document.getElementById("study-regenerate-btn");
+        const msg = document.getElementById("study-upload-message");
+        const file = input.files[0];
+        if (!file) {
+          msg.style.display = "block";
+          msg.style.color = "#e74c3c";
+          msg.textContent = "Please select a file";
+          return;
+        }
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = "Uploading...";
+        msg.style.display = "none";
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+          const res = await fetch(`${API_BASE_URL}/VerdictIQ/studies/jurors:upload`, {
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: formData,
+          });
+          const text = await res.text();
+          if (!res.ok) {
+            throw new Error(text);
+          }
+          let data;
+          try {
+            data = JSON.parse(text);
+          } catch (e) {
+            throw new Error("Server returned non-JSON response");
+          }
+
+          if (data.message && data.message.includes("already exists")) {
+            // store the file for later regenerate
+            studyLastFile = file;
+            msg.style.display = "block";
+            msg.style.color = "#f1c40f";
+            msg.textContent = data.message;
+            uploadBtn.style.display = "none";
+            regenBtn.style.display = "inline-block";
+            regenBtn.disabled = false;
+            setTimeout(() => {
+              msg.style.display = "none";
+            }, 3000);
+          } else {
+            msg.style.display = "block";
+            msg.style.color = "#2ecc71";
+            msg.textContent =  data.message || "Uploaded successfully";
+            loadStudies();
+            setTimeout(() => {
+              input.value = "";
+              msg.style.display = "none";
+              uploadBtn.disabled = false;
+              uploadBtn.textContent = "Upload";
+            }, 3000);
+          }
+        } catch (err) {
+          msg.style.display = "block";
+          msg.style.color = "#e74c3c";
+          msg.textContent = `Error: ${err.message}`;
+          uploadBtn.disabled = false;
+          uploadBtn.textContent = "Upload";
+          setTimeout(() => {
+            msg.style.display = "none";
+          }, 3000);
+        }
+      }
+
+      async function handleStudyRegenerate() {
+        const regenBtn = document.getElementById("study-regenerate-btn");
+        const uploadBtn = document.getElementById("study-upload-btn");
+        const input = document.getElementById("study-file-input");
+        const msg = document.getElementById("study-upload-message");
+        if (!studyLastFile) {
+          msg.style.display = "block";
+          msg.style.color = "#e74c3c";
+          msg.textContent = "No file to regenerate";
+          setTimeout(() => {
+            msg.style.display = "none";
+          }, 3000);
+          return;
+        }
+        regenBtn.disabled = true;
+        regenBtn.textContent = "Regenerating...";
+        msg.style.display = "none";
+
+        const formData = new FormData();
+        formData.append("file", studyLastFile);
+
+        try {
+          const res = await fetch(`${API_BASE_URL}/VerdictIQ/studies/jurors:upload?regenerate=true`, {
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: formData,
+          });
+          const txt = await res.text();
+          if (!res.ok) {
+            throw new Error(txt);
+          }
+          // parse JSON if possible to expose message field
+          let data;
+          try {
+            data = JSON.parse(txt);
+          } catch (e) {
+            data = {};
+          }
+          msg.style.display = "block";
+          msg.style.color = "#2ecc71";
+          msg.textContent = data.message || "Regenerated successfully";
+          studyLastFile = null;
+          regenBtn.style.display = "none";
+          uploadBtn.style.display = "inline-block";
+          uploadBtn.disabled = false;
+          uploadBtn.textContent = "Upload";
+          setTimeout(() => {
+            msg.style.display = "none";
+          }, 3000);
+          loadStudies();
+        } catch (err) {
+          msg.style.display = "block";
+          msg.style.color = "#e74c3c";
+          msg.textContent = `Error: ${err.message}`;
+          regenBtn.disabled = false;
+          regenBtn.textContent = "Regenerate";
+          setTimeout(() => {
+            msg.style.display = "none";
+          }, 3000);
+        }
       }
 
       // ─── STUDY DETAIL ───
