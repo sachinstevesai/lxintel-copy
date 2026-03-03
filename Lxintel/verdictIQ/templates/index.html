@@ -1506,7 +1506,7 @@
                onclick='loadStudyDetail(${JSON.stringify(id)}, ${JSON.stringify(studyId)})'
                id="study-item-${id}"
                data-study-id="${studyId}">
-            <span class="study-item-id">Study ID #${id}</span>
+            <span class="study-item-id">Study ID #${studyId}</span>
             <span class="study-item-title">${escapeHtml(String(title))}</span>
             ${meta ? `<span class="study-item-meta">${escapeHtml(meta)}</span>` : ""}
           </div>`;
@@ -1789,7 +1789,7 @@
         document.getElementById("detail-loading").style.display = "flex";
 
         try {
-          const res = await fetch(`${API_BASE_URL}/VerdictIQ/studies/${id}`, {
+          const res = await fetch(`${API_BASE_URL}/VerdictIQ/studies/${encodeURIComponent(activeStudyStudyId)}`, {
             headers: {
               ...getAuthHeaders(),
               "ngrok-skip-browser-warning": "true",
@@ -1817,13 +1817,15 @@
         document.getElementById("detail-content").style.display = "block";
 
         const card = document.getElementById("detail-card");
-        const id = study.id || study.study_id;
+        // show study_id in header if available
+        const displayId = study.study_id || study.id;
+        const id = study.id || study.study_id; // keep logical id for fallback
         const title =
           study.title ||
           study.name ||
           study.study_name ||
           study.case_name ||
-          `Study #${id}`;
+          `Study #${displayId}`;
 
         // Collect known fields to skip in raw fields
         const knownFields = new Set([
@@ -1879,7 +1881,7 @@
 
         let html = `
         <div class="detail-header">
-          <div class="detail-study-id">Study ID #${id}</div>
+          <div class="detail-study-id">Study ID #${displayId}</div>
           <div class="detail-title">${escapeHtml(title)}</div>
           ${badges.length ? `<div class="detail-badges">${badges.map((b) => `<span class="badge ${b.cls}">${escapeHtml(String(b.text))}</span>`).join("")}</div>` : ""}
         </div>`;
