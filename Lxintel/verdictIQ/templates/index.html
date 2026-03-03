@@ -847,6 +847,68 @@
           flex-direction: column;
         }
       }
+      /* Modal for API responses (Recompute / Ingestion Runs) */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 3000;
+        align-items: center;
+        justify-content: center;
+        overflow-y: auto;
+        padding: 20px;
+      }
+
+      .modal-overlay.active {
+        display: flex;
+      }
+
+      .modal-content {
+        background: rgba(17, 17, 17, 0.98);
+        backdrop-filter: blur(6px);
+        border: 2px solid rgba(241, 196, 15, 0.3);
+        border-radius: 12px;
+        padding: 24px;
+        max-width: 920px;
+        width: 100%;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+        position: relative;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+      .modal-header h2 {
+        color: #f1c40f;
+        font-size: 18px;
+        margin: 0;
+      }
+      .modal-close-btn {
+        background: none;
+        border: none;
+        color: #f1c40f;
+        font-size: 28px;
+        cursor: pointer;
+      }
+      .modal-body {
+        color: #e0e0e0;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      .modal-loading {
+        text-align: center;
+        padding: 30px;
+        color: #f1c40f;
+      }
     </style>
   </head>
 
@@ -1081,6 +1143,26 @@
                 <span class="popover-status">Logged in</span>
               </div>
               <div
+                class="popover-item"
+                style="color: #f1c40f; font-weight: 600; cursor: pointer"
+                onclick="
+                  openStudyModal('recompute');
+                  toggleUserMenu();
+                "
+              >
+                Recompute
+              </div>
+              <div
+                class="popover-item"
+                style="color: #f1c40f; font-weight: 600; cursor: pointer"
+                onclick="
+                  openStudyModal('ingestion');
+                  toggleUserMenu();
+                "
+              >
+                Ingestion Runs
+              </div>
+              <div
                 class="popover-item logout-btn"
                 @click="logout(); toggleUserMenu()"
               >
@@ -1096,14 +1178,61 @@
         <!-- SIDEBAR: study list -->
         <div class="sidebar">
           <!-- upload / regenerate controls -->
-          <div id="study-upload-section" style="padding:12px 16px; border-bottom:1px solid rgba(241,196,15,0.1);">
-            <label for="study-file-input" style="color:#f1c40f;font-size:13px;font-weight:600;display:block;margin-bottom:6px;">Upload file</label>
-            <input id="study-file-input" type="file" accept=".xlsx,.xls,.csv,.json" style="width:100%;padding:8px 10px;background:rgba(0,0,0,0.6);border:1px solid rgba(241,196,15,0.3);border-radius:6px;color:#f1c40f;font-family:'Montserrat',sans-serif;font-size:13px;" />
-            <div style="margin-top:8px; display:flex; gap:8px;">
-              <button id="study-upload-btn" class="login-btn" onclick="handleStudyUpload()" style="flex:1;padding:6px 0;font-size:13px;">Upload</button>
-              <button id="study-regenerate-btn" class="login-btn" onclick="handleStudyRegenerate()" style="flex:1;padding:6px 0;font-size:13px;display:none;">Regenerate</button>
+          <div
+            id="study-upload-section"
+            style="
+              padding: 12px 16px;
+              border-bottom: 1px solid rgba(241, 196, 15, 0.1);
+            "
+          >
+            <label
+              for="study-file-input"
+              style="
+                color: #f1c40f;
+                font-size: 13px;
+                font-weight: 600;
+                display: block;
+                margin-bottom: 6px;
+              "
+              >Upload file</label
+            >
+            <input
+              id="study-file-input"
+              type="file"
+              accept=".xlsx,.xls,.csv,.json"
+              style="
+                width: 100%;
+                padding: 8px 10px;
+                background: rgba(0, 0, 0, 0.6);
+                border: 1px solid rgba(241, 196, 15, 0.3);
+                border-radius: 6px;
+                color: #f1c40f;
+                font-family: &quot;Montserrat&quot;, sans-serif;
+                font-size: 13px;
+              "
+            />
+            <div style="margin-top: 8px; display: flex; gap: 8px">
+              <button
+                id="study-upload-btn"
+                class="login-btn"
+                onclick="handleStudyUpload()"
+                style="flex: 1; padding: 6px 0; font-size: 13px"
+              >
+                Upload
+              </button>
+              <button
+                id="study-regenerate-btn"
+                class="login-btn"
+                onclick="handleStudyRegenerate()"
+                style="flex: 1; padding: 6px 0; font-size: 13px; display: none"
+              >
+                Regenerate
+              </button>
             </div>
-            <div id="study-upload-message" style="margin-top:6px;font-size:12px; display:none;"></div>
+            <div
+              id="study-upload-message"
+              style="margin-top: 6px; font-size: 12px; display: none"
+            ></div>
           </div>
           <div class="sidebar-header">
             <h2>Studies</h2>
@@ -1191,10 +1320,40 @@
     </div>
 
     <!-- ═══════════════ SCRIPTS ═══════════════ -->
+    <!-- API Modal (Recompute / Ingestion Runs) -->
+    <div class="modal-overlay" id="api-modal" onclick="closeApiModal(event)">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h2 id="api-modal-title">Loading...</h2>
+          <button class="modal-close-btn" onclick="closeApiModal()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body" id="api-modal-body">
+          <div class="modal-loading">
+            <div
+              class="spinner"
+              style="
+                width: 36px;
+                height: 36px;
+                border-width: 3px;
+                border-color: rgba(241, 196, 15, 0.3);
+                border-top-color: #f1c40f;
+                margin: 0 auto 12px;
+              "
+            ></div>
+            <div>Loading...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
-      const API_BASE_URL = "https://laurene-clearheaded-nonaromatically.ngrok-free.dev";
+      const API_BASE_URL =
+        "https://laurene-clearheaded-nonaromatically.ngrok-free.dev";
       let allStudies = [];
-      let activeStudyId = null;
+      let activeStudyId = null; // numeric or original id
+      let activeStudyStudyId = null; // study_id for recompute/ingestion APIs
       // for upload/regenerate workflow
       let studyLastFile = null;
 
@@ -1316,8 +1475,8 @@
         list.innerHTML = studies
           .map((s) => {
             // Robustly find ID and title from any field name
-            const id =
-              s.id ?? s.study_id ?? s.studyId ?? s.study_no ?? s.case_id ?? "?";
+            const id = s.id ?? s.studyId ?? s.study_no ?? s.case_id ?? "?";
+            const studyId = s.study_id ?? "";
             const title =
               s.title ||
               s.name ||
@@ -1345,8 +1504,9 @@
               .join(" · ");
             return `
           <div class="study-item${activeStudyId == id ? " active" : ""}"
-               onclick="loadStudyDetail(${JSON.stringify(id)})"
-               id="study-item-${id}">
+               onclick='loadStudyDetail(${JSON.stringify(id)}, ${JSON.stringify(studyId)})'
+               id="study-item-${id}"
+               data-study-id="${studyId}">
             <span class="study-item-id">Study ID #${id}</span>
             <span class="study-item-title">${escapeHtml(String(title))}</span>
             ${meta ? `<span class="study-item-meta">${escapeHtml(meta)}</span>` : ""}
@@ -1382,6 +1542,95 @@
         loadStudies();
       }
 
+      // Open API modal for recompute or ingestion runs for active study
+      async function openStudyModal(action) {
+        const modal = document.getElementById("api-modal");
+        const title = document.getElementById("api-modal-title");
+        const body = document.getElementById("api-modal-body");
+
+        if (!activeStudyStudyId) {
+          alert("Please select a study first");
+          return;
+        }
+
+        modal.classList.add("active");
+        title.textContent =
+          action === "recompute"
+            ? `Recompute — ${activeStudyStudyId}`
+            : `Ingestion Runs — ${activeStudyStudyId}`;
+        body.innerHTML = `<div class="modal-loading"><div class="spinner" style="width:36px;height:36px;border-width:3px;border-color:rgba(241,196,15,0.3);border-top-color:#f1c40f;margin:0 auto 12px;"></div><div>Calling API…</div></div>`;
+
+        try {
+          const token = localStorage.getItem("jwtVerdictIQ");
+          if (!token) throw new Error("Not authenticated");
+
+          let res;
+          if (action === "recompute") {
+            // POST with form-data - simulate by sending empty FormData
+            const fd = new FormData();
+            res = await fetch(
+              `${API_BASE_URL}/VerdictIQ/studies/${encodeURIComponent(activeStudyStudyId)}/aggregates:recompute`,
+              {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "ngrok-skip-browser-warning": "true",
+                },
+                body: fd,
+              },
+            );
+          } else {
+            // ingestion runs (GET)
+            res = await fetch(
+              `${API_BASE_URL}/VerdictIQ/studies/${encodeURIComponent(activeStudyStudyId)}/ingestion-runs`,
+              {
+                method: "GET",
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("jwtVerdictIQ")}`,
+                  "ngrok-skip-browser-warning": "true",
+                },
+              },
+            );
+          }
+
+          const text = await res.text();
+          let data;
+          try {
+            data = JSON.parse(text);
+          } catch (e) {
+            data = { raw: text };
+          }
+
+          // Render response
+          if (action === "recompute") {
+            const msg = data.message || (data.raw ? data.raw : "No response");
+            body.innerHTML = `<div class="data-item" style="color:#f1c40f">${escapeHtml(String(msg))}</div>`;
+          } else {
+            // ingestion runs - show table if present
+            const runs = data.ingestion_runs || [];
+            if (runs.length === 0) {
+              body.innerHTML = `<div class="data-item">No ingestion runs found.</div>`;
+            } else {
+              const rows = runs
+                .map(
+                  (r) =>
+                    `<tr><td>${escapeHtml(String(r.run_id))}</td><td>${escapeHtml(r.source_filename || "")}</td><td>${escapeHtml(String(r.row_count_received || "0"))}</td><td>${escapeHtml(String(r.jurors_inserted || "0"))}</td><td>${escapeHtml(String(r.jurors_updated || "0"))}</td><td>${escapeHtml(String(r.warnings_count || "0"))}</td><td>${escapeHtml(r.status || "")}</td><td>${escapeHtml(r.created_at || "")}</td></tr>`,
+                )
+                .join("");
+              body.innerHTML = `<table class="data-table"><thead><tr><th>Run ID</th><th>Source File</th><th>Rows</th><th>Jurors Inserted</th><th>Jurors Updated</th><th>Warnings</th><th>Status</th><th>Created At</th></tr></thead><tbody>${rows}</tbody></table>`;
+            }
+          }
+        } catch (err) {
+          body.innerHTML = `<div class="data-item" style="color:#e74c3c">Error: ${escapeHtml(err.message || String(err))}</div>`;
+        }
+      }
+
+      function closeApiModal(e) {
+        if (!e || e.target.id === "api-modal") {
+          document.getElementById("api-modal").classList.remove("active");
+        }
+      }
+
       // ─── UPLOAD / REGENERATE HANDLERS ───
       async function handleStudyUpload() {
         const input = document.getElementById("study-file-input");
@@ -1403,11 +1652,14 @@
         formData.append("file", file);
 
         try {
-          const res = await fetch(`${API_BASE_URL}/VerdictIQ/studies/jurors:upload`, {
-            method: "POST",
-            headers: getAuthHeaders(),
-            body: formData,
-          });
+          const res = await fetch(
+            `${API_BASE_URL}/VerdictIQ/studies/jurors:upload`,
+            {
+              method: "POST",
+              headers: getAuthHeaders(),
+              body: formData,
+            },
+          );
           const text = await res.text();
           if (!res.ok) {
             throw new Error(text);
@@ -1434,7 +1686,7 @@
           } else {
             msg.style.display = "block";
             msg.style.color = "#2ecc71";
-            msg.textContent =  data.message || "Uploaded successfully";
+            msg.textContent = data.message || "Uploaded successfully";
             loadStudies();
             setTimeout(() => {
               input.value = "";
@@ -1477,11 +1729,14 @@
         formData.append("file", studyLastFile);
 
         try {
-          const res = await fetch(`${API_BASE_URL}/VerdictIQ/studies/jurors:upload?regenerate=true`, {
-            method: "POST",
-            headers: getAuthHeaders(),
-            body: formData,
-          });
+          const res = await fetch(
+            `${API_BASE_URL}/VerdictIQ/studies/jurors:upload?regenerate=true`,
+            {
+              method: "POST",
+              headers: getAuthHeaders(),
+              body: formData,
+            },
+          );
           const txt = await res.text();
           if (!res.ok) {
             throw new Error(txt);
@@ -1518,8 +1773,9 @@
       }
 
       // ─── STUDY DETAIL ───
-      async function loadStudyDetail(id) {
+      async function loadStudyDetail(id, studyId) {
         activeStudyId = id;
+        activeStudyStudyId = studyId || id; // fallback to id if study_id not provided
 
         // Mark active in sidebar
         document
