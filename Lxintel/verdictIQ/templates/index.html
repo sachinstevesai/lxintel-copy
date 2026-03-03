@@ -1871,20 +1871,14 @@
             window.addEventListener("login-success", () => {
               this.isLoggedIn = true;
               this.userEmail = localStorage.getItem("verdictIQEmail");
-              setTimeout(() => {
-                loadStudies();
-                loadActiveUsers();
-              }, 200);
+              setTimeout(scheduleLoad, 200);
             });
             window.addEventListener("logout-success", () => {
               this.isLoggedIn = false;
               this.userEmail = "";
             });
             if (this.isLoggedIn) {
-              setTimeout(() => {
-                loadStudies();
-                loadActiveUsers();
-              }, 200);
+              setTimeout(scheduleLoad, 200);
             }
           },
           logout() {
@@ -1898,16 +1892,15 @@
         };
       }
 
-      // Auto-load on page load if already logged in
-      window.addEventListener("load", () => {
-        const token = localStorage.getItem("jwtVerdictIQ");
-        if (token) {
-          setTimeout(() => {
-            loadStudies();
-            loadActiveUsers();
-          }, 400);
-        }
-      });
+      // helper that ensures studies/active users are only fetched once per second
+      let _lastLoad = 0;
+      function scheduleLoad() {
+        const now = Date.now();
+        if (now - _lastLoad < 1000) return;
+        _lastLoad = now;
+        loadStudies();
+        loadActiveUsers();
+      }
     </script>
   </body>
 </html>
