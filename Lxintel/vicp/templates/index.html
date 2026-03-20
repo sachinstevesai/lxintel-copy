@@ -1129,7 +1129,7 @@
   </div>
 
   <!-- Main App Container -->
-  <div id="main-app-wrapper" class="app-container" x-data="vicpApp()" x-init="init()" style="display: none">
+  <div id="main-app-wrapper" class="app-container" x-data="vicpApp()" style="display: none">
     <!-- Save Template Modal -->
     <div id="save-template-modal" style="
           position: fixed;
@@ -1497,7 +1497,23 @@
                 <option value="manual">Manual</option>
               </select>
               <button @click="resetFilters()" class="text-xs"
-                style="background: rgba(241,196,15,0.15); color: #f1c40f; border: 1px solid rgba(241,196,15,0.4); padding: 7px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; letter-spacing: 0.5px;">Reset</button>
+                style="background: rgba(241,196,15,0.15); color: #f1c40f; border: 1px solid rgba(241,196,15,0.4); padding: 7px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; letter-spacing: 0.5px;">
+                Reset
+              </button>
+
+              <!-- Workflow Type Selector -->
+              <select class="filter-select" x-model="workflowType"
+                style="background: #1a1a1a; border: 1px solid rgba(241,196,15,0.4); color: #f1c40f; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; outline: none; cursor: pointer; letter-spacing: 0.3px;"
+                :disabled="!currentLedgerId || loadingWorkflow">
+                <option value="default">Default Workflow</option>
+                <option value="specialized">Specialized Workflow</option>
+              </select>
+              <!-- Loading indicator for workflow fetch -->
+              <span x-show="loadingWorkflow"
+                style="display:inline-flex; align-items:center; gap:6px; font-size:12px; color:#f1c40f;">
+                <span class="spinner" style="width:14px; height:14px; border-width:2px;"></span>
+                Loading...
+              </span>
               <div style="margin-left: auto; display: flex; gap: 8px;">
                 <button x-show="selectedEntries.length > 1" @click="showBulkModal = true"
                   style="background: rgba(241,196,15,0.15); color: #f1c40f; border: 1px solid rgba(241,196,15,0.4); padding: 7px 16px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px; transition: all 0.2s;"
@@ -1530,6 +1546,7 @@
                     <th style="width: 105px;">Date</th>
                     <th style="width: 120px;">Timekeeper</th>
                     <th>Description</th>
+                    <th x-show="workflowType === 'specialized'" style="width: 220px;">Paralegal</th>
                     <th style="width: 70px; text-align: center;">Hours</th>
                     <th style="width: 140px;">Category</th>
                     <th style="width: 80px; text-align: center;">Source</th>
@@ -1618,6 +1635,11 @@
                           <div
                             style="display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; white-space: normal; overflow: hidden; text-overflow: ellipsis; line-height: 1.4;"
                             :title="entry.description" x-text="entry.description"></div>
+                        </td>
+                        <td x-show="workflowType === 'specialized'" style="font-size: 12px; color: #bbb; vertical-align: middle;">
+                          <div
+                            style="display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; white-space: normal; overflow: hidden; text-overflow: ellipsis; line-height: 1.4;"
+                            :title="entry.paralegal" x-text="entry.paralegal || '—'"></div>
                         </td>
                         <td style="text-align: center; font-weight: 700; font-size: 14px; color: #f1c40f;"
                           x-text="parseFloat(entry.hours).toFixed(1)"></td>
@@ -2176,7 +2198,7 @@
   </div>
 
   <script>
-      const API_BASE_URL = "https://laurene-clearheaded-nonaromatically.ngrok-free.dev";
+    const API_BASE_URL = "https://laurene-clearheaded-nonaromatically.ngrok-free.dev";
     let threadId = null;
     let isProcessing = false;
     let currentMessageToSave = ""; // Store message for saving as template
@@ -2610,6 +2632,7 @@
         loadingAudits: false,
         loadingHistory: false,
         loadingRuns: false,
+        loadingWorkflow: false,
         isGenerating: false,
         showEditModal: false,
         showUploadModal: false,
@@ -2622,6 +2645,8 @@
         expandedRows: [],
         selectedEntries: [],
         currentLedgerId: null,
+        workflowType: "default", // 'default' or 'specialized'
+        _defaultLedgerEntries: [], // cache for original entries when switching workflows
 
         editingEntry: {
           id: null,
@@ -2666,6 +2691,37 @@
           this.filters = { status: "", source: "", confidence: "", search: "" };
         },
 
+        async fetchWorkflow() {
+          if (!this.currentLedgerId) return;
+          this.loadingWorkflow = true;
+          try {
+            const response = await fetch(`${API_BASE_URL}/VICP_Attorney_Fees/ledger/${this.currentLedgerId}/workflow`, {
+              method: 'GET',
+              headers: {
+                "accept": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("jwtvicp")}`,
+                "ngrok-skip-browser-warning": "true"
+              }
+            });
+            if (response.ok) {
+              const data = await response.json();
+              // Cache the current default entries before swapping
+              this._defaultLedgerEntries = [...this.ledgerEntries];
+              this.ledgerEntries = Array.isArray(data) ? data : [];
+              this.calculateStats();
+            } else {
+              console.error('Workflow API error:', response.status);
+              // Revert selector back to default on error
+              this.workflowType = 'default';
+            }
+          } catch (error) {
+            console.error('Failed to fetch workflow:', error);
+            this.workflowType = 'default';
+          } finally {
+            this.loadingWorkflow = false;
+          }
+        },
+
         init() {
           this.checkAuth();
           window.addEventListener("login-success", (e) => {
@@ -2680,6 +2736,24 @@
                 this.fetchLedger();
                 this.fetchAudits();
                 this.fetchEditHistory();
+              }
+            }
+          });
+
+          // Watch workflowType changes to switch between default and specialized data
+          this.$watch('workflowType', value => {
+            if (value === 'specialized') {
+              if (this.currentLedgerId) {
+                this.fetchWorkflow();
+              }
+            } else {
+              // Restore default ledger entries from cache (or refetch if cache empty)
+              if (this._defaultLedgerEntries.length > 0) {
+                this.ledgerEntries = [...this._defaultLedgerEntries];
+                this._defaultLedgerEntries = [];
+                this.calculateStats();
+              } else if (this.currentLedgerId) {
+                this.fetchLedger();
               }
             }
           });
