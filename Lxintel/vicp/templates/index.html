@@ -1437,7 +1437,7 @@
               style="margin-left: auto; background: rgba(241,196,15,0.15); color: #f1c40f; border: 1px solid rgba(241,196,15,0.4); padding: 7px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; letter-spacing: 0.5px;">
               UPLOAD LEDGER</button>
           </div>
-          <div class="ledger-table-container" style="margin: 0; max-height: 240px; overflow-y: auto;">
+          <div class="ledger-table-container" style="margin: 0; max-height: 240px; overflow-y: auto; overflow-x: auto;">
             <div x-show="loadingRuns" style="padding: 40px; text-align: center;">
               <span class="spinner" style="width: 24px; height: 24px; border-width: 3px;"></span>
               <p style="margin-top: 12px; color: #f1c40f; font-size: 12px;">Fetching run history...</p>
@@ -1448,7 +1448,8 @@
               <p style="font-size: 13px;">No previous runs found.</p>
             </div>
 
-            <table class="ledger-table" x-show="!loadingRuns && ledgerRuns.length > 0">
+            <table class="ledger-table" x-show="!loadingRuns && ledgerRuns.length > 0"
+              style="table-layout: auto; min-width: 2500px;">
               <thead style="position: sticky; top: 0; background: rgba(10, 10, 10, 0.98); z-index: 10;">
                 <tr>
                   <th style="width: 200px;">User Name</th>
@@ -1538,13 +1539,13 @@
             </div>
 
             <!-- Ledger Table -->
-            <div class="ledger-table-container" style="margin: 0; max-height: 520px;">
+            <div class="ledger-table-container" style="margin: 0; max-height: 520px; overflow-x: auto;">
               <div x-show="loadingLedger" style="padding: 80px; text-align: center;">
                 <span class="spinner" style="width: 40px; height: 40px; border-width: 4px;"></span>
                 <p style="margin-top: 16px; color: #f1c40f; font-size: 14px;">Loading Ledger Entries...</p>
               </div>
 
-              <table class="ledger-table" x-show="!loadingLedger">
+              <table class="ledger-table" x-show="!loadingLedger" style="table-layout: auto; min-width: 2500px;">
                 <thead>
                   <tr>
                     <th style="width: 40px; text-align: center;">#</th>
@@ -1634,8 +1635,8 @@
                             'row-deleted': entry.status === 'deleted'
                           }" :style="entry.status === 'deleted' ? 'opacity:0.45;' : ''">
                         <td style="text-align: center; color: #555; font-size: 12px;" x-text="idx + 1"></td>
-                        <td style="text-align: center;"><input type="checkbox" :value="entry.id"
-                            x-model="selectedEntries" style="cursor:pointer;"></td>
+                        <td><input type="checkbox" :value="entry.id" x-model="selectedEntries" style="cursor:pointer;">
+                        </td>
                         <td style="font-size: 13px; color: #ccc; white-space: nowrap;" x-text="entry.date"></td>
                         <td style="font-size: 13px; color: #ddd;" x-text="entry.timekeeper"></td>
                         <td style="font-size: 13px; color: #e0e0e0; vertical-align: middle;">
