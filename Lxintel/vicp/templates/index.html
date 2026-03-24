@@ -1552,9 +1552,10 @@
                     <th style="width: 40px;"><input type="checkbox" @change="toggleAllSelection($event)"
                         style="cursor:pointer;"></th>
                     <th style="width: 105px;">Date</th>
-                    <th style="width: 120px;">Timekeeper</th>
-                    <th style="width: 220px;">Description</th>
-                    <th x-show="workflowType === 'specialized'" style="width: 220px;">Paralegal</th>
+                    <th style="width: 120px;">Role</th>
+                    <th style="width: 220px;">Generated Ledger Entry</th>
+                    <th x-show="workflowType === 'specialized'" style="width:120px;">Initials</th>
+                    <th x-show="workflowType === 'specialized'" style="width: 220px;">Original Text</th>
                     <th style="width: 70px; text-align: center;">Hours</th>
                     <th style="width: 140px;">Category</th>
                     <th style="width: 80px; text-align: center;">Source</th>
@@ -1638,17 +1639,21 @@
                         <td><input type="checkbox" :value="entry.id" x-model="selectedEntries" style="cursor:pointer;">
                         </td>
                         <td style="font-size: 13px; color: #ccc; white-space: nowrap;" x-text="entry.date"></td>
-                        <td style="font-size: 13px; color: #ddd;" x-text="entry.timekeeper"></td>
+                        <td style="font-size: 13px; color: #ddd;" x-text="entry.role"></td>
                         <td style="font-size: 13px; color: #e0e0e0; vertical-align: middle;">
                           <div
                             style="display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; white-space: normal; overflow: hidden; text-overflow: ellipsis; line-height: 1.4;"
-                            :title="entry.description" x-text="entry.description"></div>
+                            :title="entry.generated_ledger_entry" x-text="entry.generated_ledger_entry"></div>
+                        </td>
+                        </td>
+                        <td x-show="workflowType === 'specialized'"
+                          style="font-size: 13px; color: #f8f8f8; font-weight:600;" x-text="entry.initial || '—'">
                         </td>
                         <td x-show="workflowType === 'specialized'"
                           style="font-size: 13px; color: #e0e0e0; vertical-align: middle;">
                           <div
                             style="display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; white-space: normal; overflow: hidden; text-overflow: ellipsis; line-height: 1.4;"
-                            :title="entry.paralegal" x-text="entry.paralegal || '—'"></div>
+                            :title="entry.original_text" x-text="entry.original_text || '—'"></div>
                         </td>
                         <td style="text-align: center; font-weight: 700; font-size: 14px; color: #f1c40f;"
                           x-text="parseFloat(entry.hours).toFixed(1)"></td>
@@ -2112,6 +2117,12 @@
               style="color-scheme: dark; cursor: pointer;">
           </div>
 
+          <div class="col-span-1">
+            <label class="block text-xs font-bold text-[#f1c40f] mb-2 uppercase">Initials</label>
+            <input type="text" x-model="editingEntry.initial"
+              class="login-form-group !mb-0 w-full bg-black border border-[#444] rounded p-2 text-white">
+          </div>
+
           <div class="col-span-2">
             <label class="block text-xs font-bold text-[#f1c40f] mb-2 uppercase">Description</label>
             <textarea x-model="editingEntry.description" rows="3"
@@ -2207,7 +2218,7 @@
   </div>
 
   <script>
-    const API_BASE_URL = "";
+    const API_BASE_URL = "https://laurene-clearheaded-nonaromatically.ngrok-free.dev";
     let threadId = null;
     let isProcessing = false;
     let currentMessageToSave = ""; // Store message for saving as template
@@ -2661,7 +2672,8 @@
         editingEntry: {
           id: null,
           date: "",
-          timekeeper: "",
+          initial: "",
+          role: "",
           description: "",
           hours: 0,
           category: ""
@@ -2707,37 +2719,6 @@
           this.filters = { status: "", source: "", confidence: "", search: "" };
         },
 
-        async fetchWorkflow() {
-          if (!this.currentLedgerId) return;
-          this.loadingWorkflow = true;
-          try {
-            const response = await fetch(`${API_BASE_URL}/VICP_Attorney_Fees/ledger/${this.currentLedgerId}/workflow`, {
-              method: 'GET',
-              headers: {
-                "accept": "application/json",
-                "Authorization": `Bearer ${localStorage.getItem("jwtvicp")}`,
-                "ngrok-skip-browser-warning": "true"
-              }
-            });
-            if (response.ok) {
-              const data = await response.json();
-              // Cache the current default entries before swapping
-              this._defaultLedgerEntries = [...this.ledgerEntries];
-              this.ledgerEntries = Array.isArray(data) ? data : [];
-              this.calculateStats();
-            } else {
-              console.error('Workflow API error:', response.status);
-              // Revert selector back to default on error
-              this.workflowType = 'default';
-            }
-          } catch (error) {
-            console.error('Failed to fetch workflow:', error);
-            this.workflowType = 'default';
-          } finally {
-            this.loadingWorkflow = false;
-          }
-        },
-
         init() {
           this.checkAuth();
           window.addEventListener("login-success", (e) => {
@@ -2760,7 +2741,7 @@
           this.$watch('workflowType', value => {
             if (value === 'specialized') {
               if (this.currentLedgerId) {
-                this.fetchWorkflow();
+                this.fetchLedger();
               }
             } else {
               // Restore default ledger entries from cache (or refetch if cache empty)
@@ -3059,6 +3040,7 @@
               },
               body: JSON.stringify({
                 date: this.editingEntry.date,
+                initial: this.editingEntry.initial,
                 description: this.editingEntry.description,
                 hours: parseFloat(this.editingEntry.hours),
                 category: this.editingEntry.category
