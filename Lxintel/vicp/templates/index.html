@@ -1522,6 +1522,15 @@
                 <option value="desc">Descending</option>
               </select>
 
+              <!-- this all roles shold show in default workflow also -->
+              <select x-model="filters.assigned_role" class="filter-select"
+                style="background:#1a1a1a; border:1px solid rgba(241,196,15,0.4); color:#f1c40f; padding:6px 8px; border-radius:6px; font-size:12px; font-weight:600; outline:none; cursor:pointer;">
+                <option value="">All Roles</option>
+                <template x-for="val in uniqueAssignedRoles" :key="val">
+                  <option :value="val" x-text="val"></option>
+                </template>
+              </select>
+
               <!-- Specialized Workflow Filters (dynamic dropdowns) -->
               <template x-if="workflowType === 'specialized'">
                 <div style="display:flex; gap:8px; align-items:center; flex-shrink:0;">
@@ -1529,13 +1538,6 @@
                     style="background:#1a1a1a; border:1px solid rgba(241,196,15,0.4); color:#f1c40f; padding:6px 8px; border-radius:6px; font-size:12px; font-weight:600; outline:none; cursor:pointer;">
                     <option value="">All Staff Codes</option>
                     <template x-for="val in uniqueStaffCodes" :key="val">
-                      <option :value="val" x-text="val"></option>
-                    </template>
-                  </select>
-                  <select x-model="filters.assigned_role" class="filter-select"
-                    style="background:#1a1a1a; border:1px solid rgba(241,196,15,0.4); color:#f1c40f; padding:6px 8px; border-radius:6px; font-size:12px; font-weight:600; outline:none; cursor:pointer;">
-                    <option value="">All Roles</option>
-                    <template x-for="val in uniqueAssignedRoles" :key="val">
                       <option :value="val" x-text="val"></option>
                     </template>
                   </select>
@@ -2772,10 +2774,11 @@
             if (this.filters.source && e.source !== this.filters.source)
               return false;
 
+            if (this.filters.assigned_role && e.assigned_role !== this.filters.assigned_role)
+              return false;
+
             if (this.workflowType === 'specialized') {
               if (this.filters.staff_code && e.assigned_staff_code !== this.filters.staff_code)
-                return false;
-              if (this.filters.assigned_role && e.assigned_role !== this.filters.assigned_role)
                 return false;
               if (this.filters.sheet_name && e.sheet_name !== this.filters.sheet_name)
                 return false;
