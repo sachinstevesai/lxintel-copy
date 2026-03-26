@@ -1518,6 +1518,7 @@
               <select class="filter-select" x-model="dateSort"
                 style="flex-shrink:0;
                 background: #1a1a1a; border: 1px solid rgba(241,196,15,0.4); color: #f1c40f; padding: 6px 6px; border-radius: 6px; font-size: 12px; font-weight: 600; outline: none; cursor: pointer; letter-spacing: 0.3px;">
+                <option value="date">Date</option>
                 <option value="asc">Ascending</option>
                 <option value="desc">Descending</option>
               </select>
@@ -2707,7 +2708,7 @@
         currentLedgerId: null,
         workflowType: "default", // 'default' or 'specialized'
         _defaultLedgerEntries: [], // cache for original entries when switching workflows
-        dateSort: "asc", // 'asc' or 'desc' — sort ledger rows by date
+        dateSort: "date", // 'date', 'asc' or 'desc' — sort ledger rows by date
 
         editingEntry: {
           id: null,
@@ -2792,7 +2793,7 @@
           return filtered.slice().sort((a, b) => {
             const da = new Date(a.date || 0);
             const db = new Date(b.date || 0);
-            return this.dateSort === 'asc' ? da - db : db - da;
+            return (this.dateSort === 'asc' || this.dateSort === 'date') ? da - db : db - da;
           });
         },
 
