@@ -835,6 +835,12 @@
         flex-wrap: wrap;
       }
 
+      .active_user {
+        left: 20px !important;
+        top: 150px !important;
+        max-width: calc(100vw - 40px) !important;
+      }
+
       .header-title h1 {
         font-weight: 600 !important;
       }
@@ -1045,7 +1051,7 @@
   </div>
 
   <script>
-    const API_BASE_URL = "https://laurene-clearheaded-nonaromatically.ngrok-free.dev";
+    const API_BASE_URL = "";
     let isProcessing = false;
 
     marked.setOptions({
