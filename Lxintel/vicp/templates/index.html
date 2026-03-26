@@ -1449,13 +1449,11 @@
             </div>
 
             <table class="ledger-table" x-show="!loadingRuns && ledgerRuns.length > 0"
-              style="table-layout: auto; min-width: 2500px;">
+              style="table-layout: auto; min-width: 700px;">
               <thead style="position: sticky; top: 0; background: rgba(10, 10, 10, 0.98); z-index: 10;">
                 <tr>
-                  <th style="width: 200px;">User Name</th>
-                  <th style="width: 300px;">Source Filename</th>
-                  <th style="width: 120px;">Staff Code</th>
-                  <th style="width: 200px;">Sheet Name</th>
+                  <th style="width: 260px;">User Name</th>
+                  <th style="width: 360px;">Source Filename</th>
                   <th style="width: 180px;">Created At</th>
                 </tr>
               </thead>
@@ -1470,8 +1468,6 @@
                         <span x-text="run.source_filename"></span>
                       </div>
                     </td>
-                    <td style="font-size: 12px; color: #aaa;" x-text="run.staff_code"></td>
-                    <td style="font-size: 12px; color: #f1c40f;" x-text="run.sheet_name"></td>
                     <td style="font-size: 12px; color: #888;" x-text="new Date(run.created_at).toLocaleString()"></td>
                   </tr>
                 </template>
@@ -1484,56 +1480,95 @@
           <!-- Main Content Area -->
           <div class="glass-panel" style="display: flex; flex-direction: column; overflow: hidden;">
             <!-- Filter Bar -->
-            <div class="filter-bar">
-              <select class="filter-select" x-model="filters.status">
+            <div class="filter-bar" style="flex-wrap: nowrap; align-items: center; overflow-x: auto; gap: 8px;">
+              <select class="filter-select" x-model="filters.status" style="flex-shrink:0;">
                 <option value="">All Statuses</option>
                 <option value="pending">Pending Review</option>
                 <option value="approved">Approved</option>
                 <option value="edited">Edited</option>
                 <option value="deleted">Deleted</option>
               </select>
-              <select class="filter-select" x-model="filters.source">
+              <select class="filter-select" x-model="filters.source" style="flex-shrink:0;">
                 <option value="">All Sources</option>
                 <option value="generated">Generated</option>
                 <option value="manual">Manual</option>
               </select>
               <button @click="resetFilters()" class="text-xs"
-                style="background: rgba(241,196,15,0.15); color: #f1c40f; border: 1px solid rgba(241,196,15,0.4); padding: 7px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; letter-spacing: 0.5px;">
+                style="flex-shrink:0;
+                background: rgba(241,196,15,0.15); color: #f1c40f; border: 1px solid rgba(241,196,15,0.4); padding: 7px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; letter-spacing: 0.5px;">
                 Reset
               </button>
 
               <!-- Workflow Type Selector -->
               <select class="filter-select" x-model="workflowType"
-                style="background: #1a1a1a; border: 1px solid rgba(241,196,15,0.4); color: #f1c40f; padding: 6px 6px; border-radius: 6px; font-size: 12px; font-weight: 600; outline: none; cursor: pointer; letter-spacing: 0.3px;"
+                style="flex-shrink:0;
+                background: #1a1a1a; border: 1px solid rgba(241,196,15,0.4); color: #f1c40f; padding: 6px 6px; border-radius: 6px; font-size: 12px; font-weight: 600; outline: none; cursor: pointer; letter-spacing: 0.3px;"
                 :disabled="!currentLedgerId || loadingWorkflow">
                 <option value="default">Default Workflow</option>
                 <option value="specialized">Specialized Workflow</option>
               </select>
               <!-- Loading indicator for workflow fetch -->
               <span x-show="loadingWorkflow"
-                style="display:inline-flex; align-items:center; gap:6px; font-size:12px; color:#f1c40f;">
+                style="flex-shrink:0; display:inline-flex; align-items:center; gap:6px; font-size:12px; color:#f1c40f;">
                 <span class="spinner" style="width:14px; height:14px; border-width:2px;"></span>
                 Loading...
               </span>
 
               <!-- Date Sort Selector -->
               <select class="filter-select" x-model="dateSort"
-                style="background: #1a1a1a; border: 1px solid rgba(241,196,15,0.4); color: #f1c40f; padding: 6px 6px; border-radius: 6px; font-size: 12px; font-weight: 600; outline: none; cursor: pointer; letter-spacing: 0.3px;">
+                style="flex-shrink:0;
+                background: #1a1a1a; border: 1px solid rgba(241,196,15,0.4); color: #f1c40f; padding: 6px 6px; border-radius: 6px; font-size: 12px; font-weight: 600; outline: none; cursor: pointer; letter-spacing: 0.3px;">
                 <option value="asc">Ascending</option>
                 <option value="desc">Descending</option>
               </select>
-              <div style="margin-left: auto; display: flex; gap: 8px;">
+
+              <!-- Specialized Workflow Filters (dynamic dropdowns) -->
+              <template x-if="workflowType === 'specialized'">
+                <div style="display:flex; gap:8px; align-items:center; flex-shrink:0;">
+                  <select x-model="filters.staff_code" class="filter-select"
+                    style="background:#1a1a1a; border:1px solid rgba(241,196,15,0.4); color:#f1c40f; padding:6px 8px; border-radius:6px; font-size:12px; font-weight:600; outline:none; cursor:pointer;">
+                    <option value="">All Staff Codes</option>
+                    <template x-for="val in uniqueStaffCodes" :key="val">
+                      <option :value="val" x-text="val"></option>
+                    </template>
+                  </select>
+                  <select x-model="filters.assigned_role" class="filter-select"
+                    style="background:#1a1a1a; border:1px solid rgba(241,196,15,0.4); color:#f1c40f; padding:6px 8px; border-radius:6px; font-size:12px; font-weight:600; outline:none; cursor:pointer;">
+                    <option value="">All Roles</option>
+                    <template x-for="val in uniqueAssignedRoles" :key="val">
+                      <option :value="val" x-text="val"></option>
+                    </template>
+                  </select>
+                  <select x-model="filters.sheet_name" class="filter-select"
+                    style="background:#1a1a1a; border:1px solid rgba(241,196,15,0.4); color:#f1c40f; padding:6px 8px; border-radius:6px; font-size:12px; font-weight:600; outline:none; cursor:pointer;">
+                    <option value="">All Sheets</option>
+                    <template x-for="val in uniqueSheetNames" :key="val">
+                      <option :value="val" x-text="val"></option>
+                    </template>
+                  </select>
+                  <select x-model="filters.entry_type" class="filter-select"
+                    style="background:#1a1a1a; border:1px solid rgba(241,196,15,0.4); color:#f1c40f; padding:6px 8px; border-radius:6px; font-size:12px; font-weight:600; outline:none; cursor:pointer;">
+                    <option value="">All Entry Types</option>
+                    <template x-for="val in uniqueEntryTypes" :key="val">
+                      <option :value="val" x-text="val"></option>
+                    </template>
+                  </select>
+                </div>
+              </template>
+
+              <!-- Right-side actions: always on same row -->
+              <div style="margin-left: auto; display: flex; gap: 8px; flex-shrink:0;">
                 <button x-show="selectedEntries.length > 1" @click="showBulkModal = true"
-                  style="background: rgba(241,196,15,0.15); color: #f1c40f; border: 1px solid rgba(241,196,15,0.4); padding: 7px 16px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px; transition: all 0.2s;"
+                  style="background: rgba(241,196,15,0.15); color: #f1c40f; border: 1px solid rgba(241,196,15,0.4); padding: 7px 16px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px; transition: all 0.2s; white-space:nowrap;"
                   @mouseover="$el.style.background='rgba(241,196,15,0.22)'"
                   @mouseout="$el.style.background='rgba(241,196,15,0.15)'">
                   BULK APPROVE
                 </button>
                 <button @click="exportLedger()"
-                  style="background: rgba(46,204,113,0.15); color: #2ecc71; border: 1px solid rgba(46,204,113,0.4); padding: 7px 16px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px; transition: all 0.2s;"
+                  style="background: rgba(46,204,113,0.15); color: #2ecc71; border: 1px solid rgba(46,204,113,0.4); padding: 7px 16px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px; transition: all 0.2s; white-space:nowrap;"
                   :disabled="!currentLedgerId" @mouseover="$el.style.background='rgba(46,204,113,0.22)'"
                   @mouseout="$el.style.background='rgba(46,204,113,0.15)'">
-                  <span x-text="currentLedgerId ? 'EXPORT EXCEL' : 'EXPORT EXCEL'"></span>
+                  EXPORT EXCEL
                 </button>
               </div>
             </div>
@@ -1552,10 +1587,13 @@
                     <th style="width: 40px;"><input type="checkbox" @change="toggleAllSelection($event)"
                         style="cursor:pointer;"></th>
                     <th style="width: 105px;">Date</th>
-                    <th style="width: 120px;">Role</th>
+                    <th x-show="workflowType === 'default'" style="width: 120px;">Assigned Role</th>
                     <th style="width: 220px;">Generated Ledger Entry</th>
-                    <th x-show="workflowType === 'specialized'" style="width:120px;">Initials</th>
-                    <th x-show="workflowType === 'specialized'" style="width: 220px;">Original Text</th>
+                    <th x-show="workflowType === 'specialized'" style="width:120px;">Assigned Staff Code</th>
+                    <th x-show="workflowType === 'specialized'" style="width:120px;">Assigned Role</th>
+                    <th style="width:120px;">Sheet Name</th>
+                    <th style="width:120px;">Entry Type</th>
+                    <th x-show="workflowType === 'specialized'" style="width: 220px;">Original Memo</th>
                     <th style="width: 70px; text-align: center;">Hours</th>
                     <th style="width: 140px;">Category</th>
                     <th style="width: 80px; text-align: center;">Source</th>
@@ -1639,15 +1677,24 @@
                         <td><input type="checkbox" :value="entry.id" x-model="selectedEntries" style="cursor:pointer;">
                         </td>
                         <td style="font-size: 13px; color: #ccc; white-space: nowrap;" x-text="entry.date"></td>
-                        <td style="font-size: 13px; color: #ddd;" x-text="entry.role"></td>
+                        <td x-show="workflowType === 'default'" style="font-size: 13px; color: #ddd;"
+                          x-text="entry.assigned_role"></td>
                         <td style="font-size: 13px; color: #e0e0e0; vertical-align: middle;">
                           <div
                             style="display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; white-space: normal; overflow: hidden; text-overflow: ellipsis; line-height: 1.4;"
-                            :title="entry.generated_ledger_entry" x-text="entry.generated_ledger_entry"></div>
+                            :title="entry.description" x-text="entry.description"></div>
                         </td>
                         </td>
                         <td x-show="workflowType === 'specialized'"
-                          style="font-size: 13px; color: #f8f8f8; font-weight:600;" x-text="entry.initial || '—'">
+                          style="font-size: 13px; color: #f8f8f8; font-weight:600;"
+                          x-text="entry.assigned_staff_code || '—'">
+                        </td>
+                        <td x-show="workflowType === 'specialized'"
+                          style="font-size: 13px; color: #f8f8f8; font-weight:600;" x-text="entry.assigned_role || '—'">
+                        </td>
+                        <td style="font-size: 13px; color: #f8f8f8; font-weight:600;" x-text="entry.sheet_name || '—'">
+                        </td>
+                        <td style="font-size: 13px; color: #f8f8f8; font-weight:600;" x-text="entry.entry_type|| '—'">
                         </td>
                         <td x-show="workflowType === 'specialized'"
                           style="font-size: 13px; color: #e0e0e0; vertical-align: middle;">
@@ -2118,9 +2165,12 @@
           </div>
 
           <div class="col-span-1">
-            <label class="block text-xs font-bold text-[#f1c40f] mb-2 uppercase">Initials</label>
-            <input type="text" x-model="editingEntry.initial"
+            <label class="block text-xs font-bold text-[#f1c40f] mb-2 uppercase">Assigned Role</label>
+            <select x-model="editingEntry.assigned_role"
               class="login-form-group !mb-0 w-full bg-black border border-[#444] rounded p-2 text-white">
+              <option value="lead_attorney">Lead Attorney</option>
+              <option value="paralegal">Paralegal</option>
+            </select>
           </div>
 
           <div class="col-span-2">
@@ -2170,17 +2220,6 @@
             <input type="file" @change="uploadFile = $event.target.files[0]" required
               class="w-full bg-black border border-[#444] rounded p-2 text-white">
           </div>
-          <div>
-            <label class="block text-xs font-bold text-[#f1c40f] mb-2 uppercase">Staff Code</label>
-            <input type="text" x-model="uploadParams.staff_code" placeholder="e.g. KHO" required
-              class="w-full bg-black border border-[#444] rounded p-2 text-white">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-[#f1c40f] mb-2 uppercase">Sheet Name</label>
-            <input type="text" x-model="uploadParams.sheet_name" placeholder="Engel, Danna 232612"
-              class="w-full bg-black border border-[#444] rounded p-2 text-white">
-          </div>
-
           <div x-show="isGenerating" class="text-center p-4">
             <span class="spinner"></span>
             <p class="mt-2 text-[#f1c40f]">AI is processing the ledger...</p>
@@ -2260,7 +2299,6 @@
         popover.style.display = "none";
       }
     }
-
     // Close menu when clicking outside
     document.addEventListener("click", function (event) {
       const popover = document.getElementById("user-menu-popover");
@@ -2672,8 +2710,8 @@
         editingEntry: {
           id: null,
           date: "",
-          initial: "",
-          role: "",
+          assigned_role: "",
+          assigned_staff_code: "",
           description: "",
           hours: 0,
           category: ""
@@ -2698,16 +2736,56 @@
           status: "",
           source: "",
           confidence: "",
-          search: ""
+          search: "",
+          staff_code: "",
+          assigned_role: "",
+          sheet_name: "",
+          entry_type: ""
+        },
+
+        get uniqueStaffCodes() {
+          const vals = this.ledgerEntries.map(e => e.assigned_staff_code).filter(v => v && v !== '—');
+          return [...new Set(vals)].sort();
+        },
+
+        get uniqueAssignedRoles() {
+          const vals = this.ledgerEntries.map(e => e.assigned_role).filter(v => v && v !== '—');
+          return [...new Set(vals)].sort();
+        },
+
+        get uniqueSheetNames() {
+          const vals = this.ledgerEntries.map(e => e.sheet_name).filter(v => v && v !== '—');
+          return [...new Set(vals)].sort();
+        },
+
+        get uniqueEntryTypes() {
+          const vals = this.ledgerEntries.map(e => e.entry_type).filter(v => v && v !== '—');
+          return [...new Set(vals)].sort();
         },
 
         get filteredEntries() {
           const filtered = this.ledgerEntries.filter(e => {
-            if (this.filters.status && e.status !== this.filters.status) return false;
-            if (this.filters.source && e.source !== this.filters.source) return false;
+
+            if (this.filters.status && e.status !== this.filters.status)
+              return false;
+
+            if (this.filters.source && e.source !== this.filters.source)
+              return false;
+
+            if (this.workflowType === 'specialized') {
+              if (this.filters.staff_code && e.assigned_staff_code !== this.filters.staff_code)
+                return false;
+              if (this.filters.assigned_role && e.assigned_role !== this.filters.assigned_role)
+                return false;
+              if (this.filters.sheet_name && e.sheet_name !== this.filters.sheet_name)
+                return false;
+              if (this.filters.entry_type && e.entry_type !== this.filters.entry_type)
+                return false;
+            }
+
             return true;
           });
-          // Sort by date field
+
           return filtered.slice().sort((a, b) => {
             const da = new Date(a.date || 0);
             const db = new Date(b.date || 0);
@@ -2716,7 +2794,7 @@
         },
 
         resetFilters() {
-          this.filters = { status: "", source: "", confidence: "", search: "" };
+          this.filters = { status: "", source: "", confidence: "", search: "", staff_code: "", assigned_role: "", sheet_name: "", entry_type: "" };
         },
 
         init() {
@@ -2744,6 +2822,11 @@
                 this.fetchLedger();
               }
             } else {
+              // Clear specialized filters when leaving specialized mode
+              this.filters.staff_code = "";
+              this.filters.assigned_role = "";
+              this.filters.sheet_name = "";
+              this.filters.entry_type = "";
               // Restore default ledger entries from cache (or refetch if cache empty)
               if (this._defaultLedgerEntries.length > 0) {
                 this.ledgerEntries = [...this._defaultLedgerEntries];
@@ -3040,12 +3123,14 @@
               },
               body: JSON.stringify({
                 date: this.editingEntry.date,
-                initial: this.editingEntry.initial,
+                assigned_role: this.editingEntry.assigned_role,
                 description: this.editingEntry.description,
                 hours: parseFloat(this.editingEntry.hours),
                 category: this.editingEntry.category
               })
             });
+
+            console.log("Sending:", this.editingEntry.assigned_role);
 
             if (response.ok) {
               const index = this.ledgerEntries.findIndex(e => e.id === this.editingEntry.id);
@@ -3155,6 +3240,14 @@
               }
             });
 
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+              const data = await response.json();
+              if (data.error) {
+                alert("Please approve the entries before exporting.");
+                return;
+              }
+            }
             if (!response.ok) throw new Error("Failed to export ledger");
 
             const blob = await response.blob();
