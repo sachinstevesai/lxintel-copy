@@ -1480,7 +1480,8 @@
           <!-- Main Content Area -->
           <div class="glass-panel" style="display: flex; flex-direction: column; overflow: hidden;">
             <!-- Filter Bar -->
-            <div class="filter-bar" style="flex-wrap: nowrap; align-items: center; overflow-x: auto; gap: 8px;">
+            <div class="filter-bar"
+              style="flex-wrap: nowrap; align-items: center; overflow-x: auto; scrollbar-width: thin; scrollbar-color: #f1c40f73 #2c2c2c; gap: 8px;">
               <select class="filter-select" x-model="filters.status" style="flex-shrink:0;">
                 <option value="">All Statuses</option>
                 <option value="pending">Pending Review</option>
@@ -1805,7 +1806,7 @@
               @click.self="showBulkModal = false">
 
               <div class="glass-panel relative" style="width: 380px; max-width: 92%; padding: 24px 28px; border-radius: 12px; 
-              text-align: center; border: 1px solid rgba(241,196,15,0.45);
+              text-align: center; border: 1px solid #f1c40f73;
               box-shadow: 0 20px 70px rgba(0,0,0,0.7);">
 
                 <!-- Cross icon (top right) -->
