@@ -1,0 +1,1721 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email2AI — Registration Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap"
+        rel="stylesheet" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body,
+        html {
+            font-family: "Montserrat", sans-serif;
+            background-color: #111;
+            color: #f1c40f;
+            overflow: hidden;
+        }
+
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: url("https://static.vecteezy.com/system/resources/previews/007/596/744/non_2x/abstract-digital-glossy-particles-and-lines-connected-3d-illustration-on-black-background-free-photo.jpg");
+            background-size: cover;
+            background-position: center top 150px;
+            z-index: -2;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: -1;
+        }
+
+        /* ─── LOGIN ─── */
+        .login-page-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .login-page-content {
+            width: 100%;
+            max-width: 520px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .login-logo-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .login-logo-section img {
+            width: 72px;
+            height: 72px;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+        }
+
+        .login-page-content h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #f1c40f;
+            margin: 0 0 0.6rem 0;
+            letter-spacing: 2px;
+        }
+
+        .login-page-content>p {
+            font-size: 0.95rem;
+            color: #aaa;
+            margin: 0 0 1.5rem 0;
+        }
+
+        .login-form-card {
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .login-form-card h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #f1c40f;
+            margin: 0 0 1.75rem 0;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .login-form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .login-form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #f1c40f;
+            margin-bottom: 0.6rem;
+        }
+
+        .login-form-group input[type="email"],
+        .login-form-group input[type="text"] {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            font-size: 0.9rem;
+            background-color: #000;
+            color: #fff;
+            border: 1px solid #444;
+            border-radius: 6px;
+            font-family: "Montserrat", sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        .login-form-group input:focus {
+            outline: none;
+            border-color: #f1c40f;
+            box-shadow: 0 0 0 2px rgba(241, 196, 15, 0.1);
+        }
+
+        .login-form-group input::placeholder {
+            color: #666;
+        }
+
+        .login-email-status {
+            display: flex;
+            align-items: center;
+            margin-top: 0.6rem;
+            font-size: 0.82rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .login-email-status.visible {
+            opacity: 1;
+        }
+
+        .login-email-status .status-icon {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .login-email-status .status-icon.checking {
+            background-color: #3498db;
+            animation: pulse 1.5s infinite;
+        }
+
+        .login-email-status .status-icon.valid {
+            background-color: #2ecc71;
+        }
+
+        .login-email-status .status-icon.invalid {
+            background-color: #e74c3c;
+        }
+
+        .login-error-message {
+            color: #e74c3c;
+            background-color: rgba(231, 76, 60, 0.1);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            padding: 0.7rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.25rem;
+            font-size: 0.88rem;
+            text-align: center;
+        }
+
+        .login-success-message {
+            color: #2ecc71;
+            background-color: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            padding: 0.7rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.25rem;
+            font-size: 0.88rem;
+            text-align: center;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 0.85rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            background-color: #d4ac0d;
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .login-btn:hover:not(:disabled) {
+            background-color: #f1c40f;
+            box-shadow: 0 4px 12px rgba(241, 196, 15, 0.3);
+        }
+
+        .login-btn:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .login-btn-spinner {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        @keyframes slideFromRight {
+            from {
+                opacity: 0;
+                transform: translateX(40px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0)
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.6
+            }
+
+            50% {
+                opacity: 1
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* ─── MAIN APP ─── */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            height: 100svh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+        }
+
+        .app-header {
+            background: rgba(17, 17, 17, 0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 2px solid rgba(241, 196, 15, 0.2);
+            padding: 8px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex: 0 0 auto;
+            box-shadow: 0 4px 20px rgba(241, 196, 15, 0.15);
+            position: relative;
+            z-index: 500;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            height: 52px;
+            width: auto;
+            filter: drop-shadow(0 0 10px rgba(241, 196, 15, 0.3));
+        }
+
+        .header-title h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #f1c40f;
+            letter-spacing: 1px;
+            text-shadow: 0 0 20px rgba(241, 196, 15, 0.4);
+        }
+
+        .header-title p {
+            font-size: 12px;
+            color: #999;
+            margin-top: 3px;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .menu-icon-btn {
+            background: rgba(241, 196, 15, 0.15);
+            color: #f1c40f;
+            border: 1px solid rgba(241, 196, 15, 0.4);
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .menu-icon-btn:hover {
+            background: rgba(241, 196, 15, 0.25);
+            border-color: rgba(241, 196, 15, 0.6);
+        }
+
+        .popover {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: rgba(17, 17, 17, 0.98);
+            border: 2px solid rgba(241, 196, 15, 0.3);
+            border-radius: 12px;
+            padding: 8px;
+            min-width: 200px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            z-index: 2200;
+            display: none;
+        }
+
+        .popover.active {
+            display: block;
+        }
+
+        .popover-item {
+            padding: 11px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .popover-item:hover {
+            background: rgba(241, 196, 15, 0.15);
+        }
+
+        .popover-item.email-info {
+            cursor: default;
+            border-bottom: 1px solid rgba(241, 196, 15, 0.2);
+            margin-bottom: 4px;
+        }
+
+        .popover-item.email-info:hover {
+            background: transparent;
+        }
+
+        .popover-email {
+            color: #f1c40f;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .popover-status {
+            color: #999;
+            font-size: 11px;
+        }
+
+        .popover-item.logout-btn {
+            color: #e74c3c;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .popover-item.logout-btn:hover {
+            background: rgba(231, 76, 60, 0.15);
+        }
+
+        /* ─── MAIN CONTENT ─── */
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* ─── SIDEBAR: Users list ─── */
+        .sidebar {
+            width: 300px;
+            flex: 0 0 300px;
+            background: rgba(17, 17, 17, 0.97);
+            border-right: 1px solid rgba(241, 196, 15, 0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(241, 196, 15, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-header h2 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #f1c40f;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .search-box {
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(241, 196, 15, 0.1);
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 7px 11px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(241, 196, 15, 0.3);
+            border-radius: 6px;
+            color: #f1c40f;
+            font-family: "Montserrat", sans-serif;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: rgba(241, 196, 15, 0.6);
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .search-box input::placeholder {
+            color: #555;
+        }
+
+        .users-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 6px 0;
+        }
+
+        .users-list::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .users-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .users-list::-webkit-scrollbar-thumb {
+            background: rgba(241, 196, 15, 0.3);
+            border-radius: 3px;
+        }
+
+        .users-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(241, 196, 15, 0.5);
+        }
+
+        .user-item {
+            padding: 11px 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid rgba(241, 196, 15, 0.07);
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .user-item:hover {
+            background: rgba(241, 196, 15, 0.08);
+        }
+
+        .user-item.active {
+            background: rgba(241, 196, 15, 0.15);
+            border-left: 3px solid #f1c40f;
+        }
+
+        .user-item-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+
+        .user-item.active .user-item-name {
+            color: #f1c40f;
+        }
+
+        .user-item-email {
+            font-size: 11px;
+            color: #777;
+        }
+
+        .user-item-date {
+            font-size: 10px;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-empty {
+            padding: 22px;
+            color: #555;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .sidebar-loading {
+            padding: 18px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* ─── DETAIL / REGISTER PANEL ─── */
+        .detail-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: transparent;
+        }
+
+        .detail-empty {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 14px;
+            color: #555;
+        }
+
+        .detail-empty-icon {
+            font-size: 56px;
+            opacity: 0.3;
+            filter: grayscale(100%);
+        }
+
+        .detail-empty h2 {
+            font-size: 26px;
+            color: #f1c40f;
+            font-weight: 700;
+            opacity: 0.4;
+        }
+
+        .detail-empty p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .detail-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 28px 36px;
+        }
+
+        .detail-scroll::-webkit-scrollbar {
+            width: 7px;
+        }
+
+        .detail-scroll::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .detail-scroll::-webkit-scrollbar-thumb {
+            background: rgba(241, 196, 15, 0.3);
+            border-radius: 4px;
+        }
+
+        .detail-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(241, 196, 15, 0.5);
+        }
+
+        /* ─── REGISTER FORM CARD ─── */
+        .register-card {
+            background: rgba(17, 17, 17, 0.95);
+            border: 1px solid rgba(241, 196, 15, 0.2);
+            border-radius: 14px;
+            padding: 2.5rem 3rem;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+            max-width: 960px;
+            width: 100%;
+            margin: 0 auto;
+            animation: slideUp 0.4s ease;
+        }
+
+        .register-card h2 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: #f1c40f;
+            margin-bottom: 0.4rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .register-card .subtitle {
+            color: #777;
+            font-size: 0.85rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .form-row.single {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #f1c40f;
+        }
+
+        .form-group label .required {
+            color: #e74c3c;
+            margin-left: 2px;
+        }
+
+        .form-group label .type-hint {
+            color: #666;
+            font-weight: 400;
+            font-size: 0.75rem;
+            margin-left: 4px;
+        }
+
+        .form-group input {
+            padding: 0.75rem 1rem;
+            font-size: 0.88rem;
+            background: #000;
+            color: #fff;
+            border: 1px solid #3a3a3a;
+            border-radius: 7px;
+            font-family: "Montserrat", sans-serif;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #f1c40f;
+            box-shadow: 0 0 0 2px rgba(241, 196, 15, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #555;
+        }
+
+        .form-group input.optional {
+            border-color: #2a2a2a;
+        }
+
+        .form-divider {
+            border: none;
+            border-top: 1px solid rgba(241, 196, 15, 0.12);
+            margin: 1.5rem 0;
+        }
+
+        /* ─── INSTRUCTION / DOCUMENT SECTION ─── */
+        .instruction-section {
+            background: rgba(241, 196, 15, 0.05);
+            border: 1px solid rgba(241, 196, 15, 0.2);
+            border-radius: 10px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .instruction-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.75rem;
+        }
+
+        .instruction-header svg {
+            color: #f1c40f;
+            flex-shrink: 0;
+        }
+
+        .instruction-header span {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #f1c40f;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .instruction-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(231, 76, 60, 0.15);
+            border: 1px solid rgba(231, 76, 60, 0.4);
+            color: #e74c3c;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-bottom: 0.85rem;
+        }
+
+        .instruction-note {
+            font-size: 0.8rem;
+            color: #888;
+            line-height: 1.6;
+        }
+
+        /* ─── FILE UPLOAD ─── */
+        .file-upload-area {
+            border: 2px dashed rgba(241, 196, 15, 0.3);
+            border-radius: 8px;
+            padding: 1.2rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .file-upload-area:hover,
+        .file-upload-area.drag-over {
+            border-color: rgba(241, 196, 15, 0.6);
+            background: rgba(241, 196, 15, 0.05);
+        }
+
+        .file-upload-area input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .file-upload-icon {
+            font-size: 1.8rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .file-upload-text {
+            font-size: 0.82rem;
+            color: #888;
+        }
+
+        .file-upload-text strong {
+            color: #f1c40f;
+        }
+
+        .file-name-display {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #2ecc71;
+            font-weight: 600;
+            display: none;
+        }
+
+        /* ─── FORM ACTIONS ─── */
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.75rem;
+        }
+
+        .btn-primary {
+            flex: 1;
+            padding: 0.85rem;
+            font-size: 0.92rem;
+            font-weight: 700;
+            background: #d4ac0d;
+            color: #000;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: "Montserrat", sans-serif;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #f1c40f;
+            box-shadow: 0 4px 16px rgba(241, 196, 15, 0.35);
+        }
+
+        .btn-primary:disabled {
+            background: #555;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .btn-secondary {
+            padding: 0.85rem 1.5rem;
+            font-size: 0.88rem;
+            font-weight: 600;
+            background: transparent;
+            color: #f1c40f;
+            border: 1px solid rgba(241, 196, 15, 0.4);
+            border-radius: 7px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-family: "Montserrat", sans-serif;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(241, 196, 15, 0.1);
+            border-color: rgba(241, 196, 15, 0.7);
+        }
+
+        /* ─── USER DETAIL CARD ─── */
+        .user-detail-card {
+            background: rgba(17, 17, 17, 0.95);
+            border: 1px solid rgba(241, 196, 15, 0.2);
+            border-radius: 14px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+            max-width: 680px;
+            margin: 0 auto;
+            animation: slideUp 0.35s ease;
+        }
+
+        .user-detail-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 1.75rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid rgba(241, 196, 15, 0.15);
+        }
+
+        .user-avatar {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: rgba(241, 196, 15, 0.15);
+            border: 2px solid rgba(241, 196, 15, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #f1c40f;
+            flex-shrink: 0;
+        }
+
+        .user-detail-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #f1c40f;
+            margin-bottom: 0.25rem;
+        }
+
+        .user-detail-sub {
+            font-size: 0.82rem;
+            color: #888;
+        }
+
+        .detail-field-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .detail-field {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .detail-field-label {
+            font-size: 0.75rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .detail-field-value {
+            font-size: 0.9rem;
+            color: #e0e0e0;
+            font-weight: 500;
+        }
+
+        .detail-field-value.empty {
+            color: #444;
+            font-style: italic;
+        }
+
+        /* ─── RESPONSE BOX ─── */
+        #reg-response-box.response-success pre {
+            border-color: rgba(46, 204, 113, 0.3);
+            color: #b8f5d0;
+        }
+
+        #reg-response-box.response-error pre {
+            border-color: rgba(231, 76, 60, 0.3);
+            color: #f5c6c0;
+        }
+
+        /* ─── SPINNER ─── */
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(241, 196, 15, 0.2);
+            border-top: 3px solid #f1c40f;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .mini-spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(0, 0, 0, 0.25);
+            border-top: 2px solid #000;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            display: inline-block;
+        }
+
+        /* ─── TOAST ─── */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            max-width: 320px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.3s ease;
+            pointer-events: auto;
+            border-left: 4px solid;
+        }
+
+        .toast.success {
+            background: #1a2e1a;
+            color: #2ecc71;
+            border-color: #2ecc71;
+        }
+
+        .toast.error {
+            background: #2e1a1a;
+            color: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+        .toast.info {
+            background: #1a1a2e;
+            color: #3498db;
+            border-color: #3498db;
+        }
+
+        @media (max-width: 767px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        const API_BASE_URL = "";
+
+        function updateDisplay() {
+            const hasToken = localStorage.getItem("jwtEmail2AI");
+            const loginPage = document.querySelector(".login-page-wrapper");
+            const mainApp = document.getElementById("main-app-container");
+            if (hasToken) {
+                if (loginPage) loginPage.style.display = "none";
+                if (mainApp) { mainApp.style.display = "flex"; mainApp.style.visibility = "visible"; }
+            } else {
+                if (loginPage) { loginPage.style.display = "flex"; loginPage.style.visibility = "visible"; }
+                if (mainApp) { mainApp.style.display = "none"; mainApp.style.visibility = "hidden"; }
+            }
+        }
+        document.addEventListener("DOMContentLoaded", updateDisplay);
+        window.addEventListener("login-success", () => setTimeout(updateDisplay, 100));
+        window.addEventListener("logout-success", () => {
+            const mainApp = document.getElementById("main-app-container");
+            const loginPage = document.querySelector(".login-page-wrapper");
+            if (mainApp) { mainApp.style.display = "none"; mainApp.style.visibility = "hidden"; }
+            if (loginPage) { loginPage.style.display = "flex"; loginPage.style.visibility = "visible"; }
+        });
+    </script>
+
+    <div class="video-background"></div>
+    <div class="overlay"></div>
+
+    <!-- ═══════════════ TOAST CONTAINER ═══════════════ -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- ═══════════════ LOGIN PAGE ═══════════════ -->
+    <div class="login-page-wrapper" x-data="loginApp()" x-init="init()" x-show="!loggedIn">
+        <div class="login-page-content">
+            <div class="login-logo-section">
+                <img src="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
+                    alt="Email2AI" />
+                <h1>Email2AI</h1>
+                <p>Authorized Access Portal</p>
+            </div>
+            <div class="login-form-card">
+                <h2>Login</h2>
+                <div class="login-form-group">
+                    <label for="login-email">Email</label>
+                    <input id="login-email" type="email" placeholder="Enter your email" x-model="email"
+                        @input.debounce.500="verifyEmail()" @keydown.enter="emailValid && login()" />
+                    <div class="login-email-status" :class="email && email.includes('@') ? 'visible' : ''"
+                        x-show="email && email.includes('@')">
+                        <span class="status-icon"
+                            :class="emailChecking ? 'checking' : emailValid ? 'valid' : 'invalid'"></span>
+                        <span
+                            x-text="emailChecking ? 'Checking email...' : emailValid ? 'Email authorized' : 'Email not authorized'"></span>
+                    </div>
+                </div>
+                <div x-show="error" x-text="error" class="login-error-message"></div>
+                <button @click="login()" :disabled="!emailValid || !email" class="login-btn">
+                    <span x-show="!loggingIn">Login</span>
+                    <span x-show="loggingIn" class="login-btn-spinner">
+                        <span
+                            style="width:14px;height:14px;border:2px solid rgba(0,0,0,0.3);border-top-color:#000;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block;"></span>
+                        Logging in...
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ MAIN APP ═══════════════ -->
+    <div id="main-app-container" class="app-container" x-data="mainApp()" x-init="init()" x-show="isLoggedIn"
+        style="display:none">
+
+        <!-- HEADER -->
+        <div class="app-header">
+            <div class="header-left">
+                <img src="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
+                    alt="Email2AI" class="logo" />
+                <div class="header-title">
+                    <h1>Email2AI</h1>
+                    <p>User Registration Portal</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <!-- Refresh -->
+                <button onclick="loadUsers()" style="
+          background:rgba(241,196,15,0.15); color:#f1c40f;
+          border:1px solid rgba(241,196,15,0.4); padding:9px 16px; border-radius:8px;
+          font-size:13px; font-weight:600; cursor:pointer; transition:all 0.3s;
+          display:flex; align-items:center; gap:8px; font-family:'Montserrat',sans-serif;
+        " onmouseover="this.style.background='rgba(241,196,15,.25)'"
+                    onmouseout="this.style.background='rgba(241,196,15,.15)'">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="1 4 1 10 7 10" />
+                        <path d="M3.51 15a9 9 0 1 0 .49-3.15" />
+                    </svg>
+                    Refresh
+                </button>
+                <!-- User menu -->
+                <div style="position:relative">
+                    <button class="menu-icon-btn" onclick="toggleUserMenu()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="3" y1="12" x2="21" y2="12" />
+                            <line x1="3" y1="6" x2="21" y2="6" />
+                            <line x1="3" y1="18" x2="21" y2="18" />
+                        </svg>
+                    </button>
+                    <div class="popover" id="user-menu-popover">
+                        <div class="popover-item email-info">
+                            <span class="popover-email" x-text="userEmail"></span>
+                            <span class="popover-status">Logged in</span>
+                        </div>
+                        <div class="popover-item" style="color:#f1c40f;font-weight:600;cursor:pointer;"
+                            onclick="toggleUsersPanel(); toggleUserMenu();">
+                            <span style="display:flex;align-items:center;gap:8px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                    <circle cx="9" cy="7" r="4" />
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                </svg>
+                                Registered Users
+                            </span>
+                        </div>
+                        <div class="popover-item logout-btn" @click="logout(); toggleUserMenu()">Logout</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BODY -->
+        <div class="main-content">
+            <!-- DETAIL PANEL -->
+            <div class="detail-panel">
+
+                <!-- Loading -->
+                <div class="detail-empty" id="detail-loading" style="display:none">
+                    <div class="spinner"></div>
+                    <p style="color:#888;margin-top:14px;">Loading...</p>
+                </div>
+
+                <!-- Register Form — default view, full screen -->
+                <div class="detail-scroll" id="register-panel" style="display:block">
+                    <div class="register-card" style="max-width:860px;">
+                        <h2>Register User</h2>
+
+                        <!-- Form Fields -->
+                        <div class="form-row" style="margin-top:1.5rem;">
+                            <div class="form-group">
+                                <label for="reg-name">Name <span class="required">*</span></label>
+                                <input id="reg-name" type="text" placeholder="Full name" />
+                            </div>
+                            <div class="form-group">
+                                <label for="reg-birthdate">Birthdate Code <span class="required">*</span></label>
+                                <input id="reg-birthdate" type="text" placeholder="e.g. 19900101" />
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="reg-primary-email">Primary Email <span class="required">*</span></label>
+                                <input id="reg-primary-email" type="email" placeholder="primary@example.com" />
+                            </div>
+                            <div class="form-group">
+                                <label for="reg-secondary-email">Secondary Email</label>
+                                <input id="reg-secondary-email" type="email"
+                                    placeholder="secondary@example.com (optional)" class="optional" />
+                            </div>
+                        </div>
+
+                        <!-- Error / Success -->
+                        <div id="reg-error" class="login-error-message" style="display:none;margin-top:1rem;"></div>
+                        <div id="reg-success" class="login-success-message" style="display:none;margin-top:1rem;"></div>
+
+                        <!-- Submit -->
+                        <div class="form-actions" style="margin-top:1.75rem;">
+                            <button class="btn-primary" id="reg-submit-btn" onclick="submitRegistration()">
+                                Register User
+                            </button>
+                        </div>
+
+                        <!-- Instructions below form -->
+                        <div style="margin-top:2rem; padding-top:1.5rem; border-top:1px solid rgba(241,196,15,0.12);">
+                            <div style="display:flex;align-items:center;gap:8px;margin-bottom:0.75rem;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="#f1c40f" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <line x1="12" y1="8" x2="12" y2="12" />
+                                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                                </svg>
+
+                                <span
+                                    style="font-size:0.82rem;font-weight:700;color:#f1c40f;text-transform:uppercase;letter-spacing:0.8px;">
+                                    Instructions
+                                </span>
+                            </div>
+
+                            <div style="
+                                    background:rgba(241,196,15,0.06);
+                                    border:1px solid rgba(241,196,15,0.18);
+                                    color:#dcdcdc;
+                                    font-size:0.82rem;
+                                    padding:14px 18px;
+                                    border-radius:10px;
+                                    line-height:1.6;
+                                ">
+                                <ul style="margin:0; padding-left:18px;">
+                                    <li><b>Register First</b> – Register your account and note your Birth Code (MMDDYYYY
+                                        format).</li>
+
+                                    <li><b>Send Email Request</b> – Send your request to
+                                        <b>aihelperlxintel21@gmail.com</b>.
+                                    </li>
+                                    <li><b>Subject Format</b> – Start the subject with your Birth Code followed by the
+                                        prompt name.</li>
+                                    <li>Example: <b>12121970 Enhanced Medical Summary</b></li>
+                                    <li>Example: <b>12121970 Insurance Claim Summary</b></li>
+                                    <li>Example: <b>12121970 Demand Quality Assurance</b></li>
+                                    <li><b>Custom Prompt</b> – Use subject <b>BirthCode Custom</b> (Example: <b>12121970
+                                            Custom</b>) and include your custom prompt in the email body.</li>
+                                    <li><b>Attach Document</b> – Only one document attachment is allowed.</li>
+                                    <li><b>Send the Email</b> – After adding subject, Body, and
+                                        attachment, send the email.</li>
+                                    <li><b>Receive Result</b> – You will receive a reply email with a download link for
+                                        the generated summary file.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User detail view -->
+                <div class="detail-scroll" id="user-detail-panel" style="display:none">
+                    <div class="user-detail-card" id="user-detail-card">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ USERS SLIDE PANEL ═══════════════ -->
+    <div id="users-slide-overlay" onclick="toggleUsersPanel()" style="
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6);
+    z-index:1500; backdrop-filter:blur(4px);
+  "></div>
+    <div id="users-slide-panel" style="
+    display:none; position:fixed; top:0; right:0; height:100vh; width:340px;
+    background:rgba(17,17,17,0.98); border-left:1px solid rgba(241,196,15,0.2);
+    z-index:1600; flex-direction:column; overflow:hidden;
+    box-shadow:-8px 0 40px rgba(0,0,0,0.6); animation:slideFromRight 0.3s ease;
+  ">
+        <div
+            style="padding:16px 20px; border-bottom:1px solid rgba(241,196,15,0.15); display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+            <div>
+                <div style="font-size:14px;font-weight:700;color:#f1c40f;text-transform:uppercase;letter-spacing:1px;">
+                    Registered Users</div>
+                <div id="users-count" style="font-size:11px;color:#888;margin-top:2px;"></div>
+            </div>
+            <button onclick="toggleUsersPanel()"
+                style="background:none;border:none;color:#666;cursor:pointer;padding:4px;font-size:18px;line-height:1;">✕</button>
+        </div>
+        <div style="padding:10px 14px; border-bottom:1px solid rgba(241,196,15,0.1); flex-shrink:0;">
+            <input type="text" id="search-input" placeholder="Search users…" oninput="filterUsers(this.value)" style="
+        width:100%; padding:7px 11px; background:rgba(0,0,0,0.6);
+        border:1px solid rgba(241,196,15,0.3); border-radius:6px;
+        color:#f1c40f; font-family:'Montserrat',sans-serif; font-size:12px;
+        outline:none; transition:all 0.3s;
+      " onfocus="this.style.borderColor='rgba(241,196,15,0.6)'"
+                onblur="this.style.borderColor='rgba(241,196,15,0.3)'" />
+        </div>
+        <div class="users-list" id="users-list" style="flex:1; overflow-y:auto; padding:6px 0;">
+            <div class="sidebar-loading">
+                <div class="spinner" style="width:22px;height:22px;border-width:2px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ INSTRUCTIONS MODAL ═══════════════ -->
+    <div id="instructions-overlay" onclick="closeInstructionsModal()" style="
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7);
+    z-index:2000; backdrop-filter:blur(4px);
+  "></div>
+    <div id="instructions-modal" style="
+    display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+    background:#1a1a1a; border:1px solid rgba(241,196,15,0.3); border-radius:14px;
+    padding:2rem 2.5rem; max-width:480px; width:90%; z-index:2100;
+    box-shadow:0 20px 60px rgba(0,0,0,0.7); animation:slideUp 0.3s ease;
+  ">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="#f1c40f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <span
+                    style="font-size:1rem;font-weight:700;color:#f1c40f;text-transform:uppercase;letter-spacing:1px;">Instructions</span>
+            </div>
+            <button onclick="closeInstructionsModal()"
+                style="background:none;border:none;color:#666;cursor:pointer;font-size:18px;line-height:1;">✕</button>
+        </div>
+        <div style="
+      display:inline-flex; align-items:center; gap:8px;
+      background:rgba(231,76,60,0.12); border:1px solid rgba(231,76,60,0.35);
+      color:#e74c3c; font-size:0.82rem; font-weight:700;
+      padding:7px 14px; border-radius:20px; margin-bottom:1rem;
+    ">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            Attached document is compulsory
+        </div>
+        <p style="color:#999;font-size:0.85rem;line-height:1.7;margin:0;">
+            A valid supporting document must be attached before submitting a registration.
+            Ensure the document is in an accepted format and clearly legible before uploading.
+        </p>
+        <button onclick="closeInstructionsModal()" style="
+      margin-top:1.5rem; width:100%; padding:0.75rem; font-size:0.88rem; font-weight:700;
+      background:#d4ac0d; color:#000; border:none; border-radius:7px; cursor:pointer;
+      text-transform:uppercase; letter-spacing:0.5px; font-family:'Montserrat',sans-serif;
+      transition:all 0.3s;
+    " onmouseover="this.style.background='#f1c40f'" onmouseout="this.style.background='#d4ac0d'">Got it</button>
+    </div>
+
+    <script>
+        /* ─── USERS PANEL ─── */
+        function toggleUsersPanel() {
+            const overlay = document.getElementById("users-slide-overlay");
+            const panel = document.getElementById("users-slide-panel");
+            const isOpen = panel.style.display === "flex";
+            overlay.style.display = isOpen ? "none" : "block";
+            panel.style.display = isOpen ? "none" : "flex";
+            if (!isOpen) loadUsers();
+        }
+
+        /* ─── INSTRUCTIONS MODAL ─── */
+        function openInstructionsModal() {
+            document.getElementById("instructions-overlay").style.display = "block";
+            document.getElementById("instructions-modal").style.display = "block";
+        }
+        function closeInstructionsModal() {
+            document.getElementById("instructions-overlay").style.display = "none";
+            document.getElementById("instructions-modal").style.display = "none";
+        }
+
+        /* ─── GLOBALS ─── */
+        let allUsers = [];
+        let selectedUserId = null;
+
+        /* ─── TOAST ─── */
+        function showToast(msg, type = "info") {
+            const container = document.getElementById("toast-container");
+            const toast = document.createElement("div");
+            toast.className = `toast ${type}`;
+            toast.textContent = msg;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        /* ─── PANEL HELPERS ─── */
+        function showPanel(id) {
+            ["detail-loading", "register-panel", "user-detail-panel"].forEach(p => {
+                const el = document.getElementById(p);
+                if (el) el.style.display = p === id ? "block" : "none";
+            });
+        }
+
+        function showRegisterPanel() { showPanel("register-panel"); selectedUserId = null; highlightUser(null); clearRegForm(); }
+        function showLoadingPanel() { showPanel("detail-loading"); }
+
+        function clearRegForm() {
+            ["reg-name", "reg-birthdate", "reg-primary-email", "reg-secondary-email"].forEach(id => {
+                document.getElementById(id).value = "";
+            });
+            document.getElementById("reg-error").style.display = "none";
+            document.getElementById("reg-success").style.display = "none";
+            const respBox = document.getElementById("reg-response-box");
+            if (respBox) { respBox.style.display = "none"; respBox.className = ""; }
+            const respContent = document.getElementById("reg-response-content");
+            if (respContent) respContent.textContent = "";
+        }
+
+        /* ─── FILE UPLOAD ─── */
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) showFileName(file.name);
+        }
+
+        function handleFileDrop(e) {
+            e.preventDefault();
+            document.getElementById("file-upload-area").classList.remove("drag-over");
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                document.getElementById("doc-file-input").files = e.dataTransfer.files;
+                showFileName(file.name);
+            }
+        }
+
+        function showFileName(name) {
+            const el = document.getElementById("file-name-display");
+            el.textContent = "✓ " + name;
+            el.style.display = "block";
+        }
+
+        /* ─── USER MENU ─── */
+        function toggleUserMenu() {
+            document.getElementById("user-menu-popover").classList.toggle("active");
+        }
+        document.addEventListener("click", e => {
+            const pop = document.getElementById("user-menu-popover");
+            if (pop && !pop.parentElement.contains(e.target)) pop.classList.remove("active");
+        });
+
+        /* ─── HIGHLIGHT USER IN LIST ─── */
+        function highlightUser(id) {
+            document.querySelectorAll(".user-item").forEach(el => {
+                el.classList.toggle("active", el.dataset.id == id);
+            });
+        }
+
+        /* ─── LOAD USERS ─── */
+        async function loadUsers() {
+            const token = localStorage.getItem("jwtEmail2AI");
+            if (!token) return;
+            try {
+                const res = await fetch(`${API_BASE_URL}/Email2AI/users`, {
+                    headers: {
+                        "Authorization": "Bearer " + token,
+                        "ngrok-skip-browser-warning": "true"
+                    }
+                });
+                if (!res.ok) throw new Error("Failed to load users");
+                const data = await res.json();
+                allUsers = Array.isArray(data) ? data : (data.users || data.data || []);
+                renderUsers(allUsers);
+            } catch (err) {
+                console.error(err);
+                document.getElementById("users-list").innerHTML =
+                    `<div class="sidebar-empty">Could not load users.<br><small style="color:#555;">${err.message}</small></div>`;
+            }
+        }
+
+        function renderUsers(users) {
+            const list = document.getElementById("users-list");
+            document.getElementById("users-count").textContent = users.length + " users";
+            if (!users.length) {
+                list.innerHTML = `<div class="sidebar-empty">No users registered yet.</div>`;
+                return;
+            }
+            list.innerHTML = users.map(u => `
+        <div class="user-item" data-id="${u.id || u._id || u.primary_email}"
+          onclick="selectUser(this, ${JSON.stringify(JSON.stringify(u))})">
+          <div class="user-item-name">${escHtml(u.name || "Unnamed")}</div>
+          <div class="user-item-email">${escHtml(u.primary_email || "")}</div>
+          <div class="user-item-email">${escHtml(u.secondary_email || "")}</div>
+          <div class="user-item-date">${u.birthdate_code ? "DOB: " + escHtml(u.birthdate_code) : ""}</div>
+        </div>
+      `).join("");
+        }
+
+        function filterUsers(query) {
+            const q = query.toLowerCase();
+            const filtered = allUsers.filter(u =>
+                (u.name || "").toLowerCase().includes(q) ||
+                (u.primary_email || "").toLowerCase().includes(q)
+            );
+            renderUsers(filtered);
+        }
+
+        /* ─── SELECT USER ─── */
+        function selectUser(el, jsonStr) {
+            const user = JSON.parse(jsonStr);
+            selectedUserId = user.id || user._id || user.primary_email;
+            highlightUser(selectedUserId);
+            // Close panel
+            document.getElementById("users-slide-overlay").style.display = "none";
+            document.getElementById("users-slide-panel").style.display = "none";
+            showPanel("user-detail-panel");
+
+            const card = document.getElementById("user-detail-card");
+            const initials = (user.name || "?").split(" ").map(p => p[0]).join("").toUpperCase().slice(0, 2);
+
+            card.innerHTML = `
+        <div style="margin-bottom:1.5rem;">
+          <button onclick="showRegisterPanel()" style="
+            background:none; border:1px solid rgba(241,196,15,0.3); color:#f1c40f;
+            padding:6px 14px; border-radius:6px; font-size:12px; font-weight:600;
+            cursor:pointer; font-family:'Montserrat',sans-serif; display:inline-flex;
+            align-items:center; gap:6px; transition:all 0.2s;
+          " onmouseover="this.style.background='rgba(241,196,15,0.1)'" onmouseout="this.style.background='none'">
+            ← Back to Register
+          </button>
+        </div>
+        <div class="user-detail-header">
+          <div style="display:flex;align-items:center;gap:16px;">
+            <div class="user-avatar">${escHtml(initials)}</div>
+            <div>
+              <div class="user-detail-name">${escHtml(user.name || "—")}</div>
+              <div class="user-detail-sub">${escHtml(user.primary_email || "")}</div>
+            </div>
+          </div>
+        </div>
+        <div class="detail-field-grid">
+          <div class="detail-field">
+            <div class="detail-field-label">Name</div>
+            <div class="detail-field-value">${escHtml(user.name || "—")}</div>
+          </div>
+          <div class="detail-field">
+            <div class="detail-field-label">Birthdate Code</div>
+            <div class="detail-field-value">${escHtml(user.birthdate_code || "—")}</div>
+          </div>
+          <div class="detail-field">
+            <div class="detail-field-label">Primary Email</div>
+            <div class="detail-field-value">${escHtml(user.primary_email || "—")}</div>
+          </div>
+          <div class="detail-field">
+            <div class="detail-field-label">Secondary Email</div>
+            <div class="detail-field-value ${!user.secondary_email ? 'empty' : ''}">${escHtml(user.secondary_email || "Not provided")}</div>
+          </div>
+          ${Object.entries(user)
+                    .filter(([k]) => !["name", "birthdate_code", "primary_email", "secondary_email", "id", "_id"].includes(k))
+                    .map(([k, v]) => `
+              <div class="detail-field">
+                <div class="detail-field-label">${escHtml(k.replace(/_/g, " "))}</div>
+                <div class="detail-field-value">${escHtml(String(v ?? "—"))}</div>
+              </div>`).join("")}
+        </div>
+      `;
+        }
+
+        /* ─── REGISTER ─── */
+        async function submitRegistration() {
+            const name = document.getElementById("reg-name").value.trim();
+            const birthdate_code = document.getElementById("reg-birthdate").value.trim();
+            const primary_email = document.getElementById("reg-primary-email").value.trim();
+            const secondary_email = document.getElementById("reg-secondary-email").value.trim();
+            const errEl = document.getElementById("reg-error");
+            const sucEl = document.getElementById("reg-success");
+            const btn = document.getElementById("reg-submit-btn");
+
+            errEl.style.display = "none";
+            sucEl.style.display = "none";
+
+            // Validation
+            if (!name || !birthdate_code || !primary_email) {
+                errEl.textContent = "Please fill in all required fields (Name, Birthdate Code, Primary Email).";
+                errEl.style.display = "block"; return;
+            }
+            if (!primary_email.includes("@")) {
+                errEl.textContent = "Please enter a valid primary email address.";
+                errEl.style.display = "block"; return;
+            }
+
+            const token = localStorage.getItem("jwtEmail2AI");
+            btn.disabled = true;
+            btn.innerHTML = `<span style="display:inline-flex;align-items:center;gap:8px;"><span class="mini-spinner"></span>Registering...</span>`;
+
+            try {
+                const params = new URLSearchParams({ name, birthdate_code, primary_email });
+                if (secondary_email) params.append("secondary_email", secondary_email);
+
+                const res = await fetch(`${API_BASE_URL}/Email2AI/register?${params.toString()}`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer " + token,
+                        "ngrok-skip-browser-warning": "true"
+                    }
+                });
+
+                let responseData;
+                const contentType = res.headers.get("content-type") || "";
+                try {
+                    responseData = contentType.includes("application/json") ? await res.json() : await res.text();
+                } catch (_) { responseData = ""; }
+
+                if (!res.ok) {
+                    const isJson = typeof responseData === "object";
+                    const msg = isJson
+                        ? (responseData.detail || responseData.message || `Error ${res.status}`)
+                        : (`Error ${res.status}`);
+                    errEl.textContent = "Registration failed: " + msg;
+                    errEl.style.display = "block";
+                    showToast("Registration failed: " + msg, "error");
+                } else {
+                    // Clear all form fields first
+                    clearRegForm();
+
+                    // Show simple success message with birthdate code only
+                    sucEl.innerHTML = `✓ User registered successfully! &nbsp;&nbsp; <span style="color:#f1c40f;font-weight:700;">Birthdate code: "${escHtml(birthdate_code)}"</span>`;
+                    sucEl.style.display = "block";
+                    showToast("User registered successfully!", "success");
+                    loadUsers();
+
+                    // Auto-hide after 30 seconds
+                    setTimeout(() => { sucEl.style.display = "none"; }, 30000);
+                }
+            } catch (err) {
+                errEl.textContent = "Request failed: " + err.message;
+                errEl.style.display = "block";
+                showToast("Request failed: " + err.message, "error");
+                showToast("Request failed: " + err.message, "error");
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Register User";
+            }
+        }
+
+        /* ─── HELPERS ─── */
+        function escHtml(str) {
+            const d = document.createElement("div");
+            d.textContent = str;
+            return d.innerHTML;
+        }
+
+        /* ─── ALPINE: LOGIN APP ─── */
+        function loginApp() {
+            return {
+                email: "", emailValid: false, emailChecking: false, error: "", loggedIn: false, loggingIn: false,
+                init() {
+                    const token = localStorage.getItem("jwtEmail2AI");
+                    if (token) this.loggedIn = true;
+                    window.addEventListener("logout-success", () => {
+                        this.loggedIn = false; this.email = ""; this.emailValid = false; this.error = "";
+                    });
+                },
+                verifyEmail() {
+                    if (!this.email.includes("@")) { this.emailValid = false; this.error = ""; return; }
+                    this.emailChecking = true; this.error = "";
+                    fetch(`${API_BASE_URL}/Email2AI/verify-email?email=${encodeURIComponent(this.email)}`,
+                        { headers: { "ngrok-skip-browser-warning": "true" } })
+                        .then(r => r.json())
+                        .then(j => {
+                            this.emailValid = j.valid; this.emailChecking = false;
+                            if (!j.valid) this.error = "Access denied: Your email is not on the authorized list.";
+                        })
+                        .catch(() => {
+                            this.emailValid = false; this.emailChecking = false;
+                            this.error = "Access denied: Your email is not on the authorized list.";
+                        });
+                },
+                login() {
+                    if (!this.emailValid || !this.email) return;
+                    this.loggingIn = true;
+                    const body = new URLSearchParams({ username: this.email, password: "not-used-but-required" });
+                    fetch(`${API_BASE_URL}/Email2AI/login`, {
+                        method: "POST", headers: { "ngrok-skip-browser-warning": "true" }, body
+                    })
+                        .then(r => { if (!r.ok) throw new Error("Unauthorized email"); return r.json(); })
+                        .then(j => {
+                            localStorage.setItem("jwtEmail2AI", j.access_token);
+                            localStorage.setItem("email2AIEmail", this.email);
+                            this.loggedIn = true; this.error = ""; this.loggingIn = false;
+                            window.dispatchEvent(new CustomEvent("login-success"));
+                        })
+                        .catch(e => { this.error = e.message; this.loggingIn = false; });
+                }
+            };
+        }
+
+        /* ─── ALPINE: MAIN APP ─── */
+        function mainApp() {
+            return {
+                isLoggedIn: false, userEmail: "",
+                init() {
+                    const token = localStorage.getItem("jwtEmail2AI");
+                    const email = localStorage.getItem("email2AIEmail");
+                    if (token && email) { this.isLoggedIn = true; this.userEmail = email; }
+                    window.addEventListener("login-success", () => {
+                        this.isLoggedIn = true;
+                        this.userEmail = localStorage.getItem("email2AIEmail");
+                        setTimeout(loadUsers, 300);
+                    });
+                    window.addEventListener("logout-success", () => { this.isLoggedIn = false; this.userEmail = ""; });
+                    if (this.isLoggedIn) setTimeout(loadUsers, 300);
+                },
+                logout() {
+                    localStorage.removeItem("jwtEmail2AI");
+                    localStorage.removeItem("email2AIEmail");
+                    window.dispatchEvent(new Event("logout-success"));
+                    this.isLoggedIn = false; this.userEmail = "";
+                    setTimeout(() => location.reload(), 100);
+                }
+            };
+        }
+    </script>
+</body>
+
+</html>
