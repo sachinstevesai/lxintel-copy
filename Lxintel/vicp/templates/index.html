@@ -3007,6 +3007,7 @@
             const entry = this.ledgerEntries.find(e => e.id === id);
             if (entry) entry.status = 'approved';
             this.calculateStats();
+            await this.fetchLedger();
           } catch (e) { console.error(e); }
         },
 
@@ -3023,12 +3024,10 @@
               },
               body: JSON.stringify({ entry_ids: this.selectedEntries })
             });
-            this.ledgerEntries.forEach(e => {
-              if (this.selectedEntries.includes(e.id)) e.status = 'approved';
-            });
             this.selectedEntries = [];
             this.calculateStats();
             this.showBulkModal = false;
+            await this.fetchLedger();
           } catch (e) {
             console.error(e);
           } finally {
@@ -3103,6 +3102,7 @@
             this.calculateStats();
             this.showDeleteModal = false;
             this.deletingId = null;
+            await this.fetchLedger();
           } catch (e) {
             console.error(e);
           } finally {
@@ -3164,6 +3164,7 @@
               }
               this.showEditModal = false;
               this.calculateStats();
+              await this.fetchLedger();
             }
           } catch (e) {
             console.error(e);
