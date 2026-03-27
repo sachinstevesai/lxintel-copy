@@ -1595,8 +1595,8 @@
                     <th style="width: 220px;">Generated Ledger Entry</th>
                     <th x-show="workflowType === 'specialized'" style="width:120px;">Assigned Staff Code</th>
                     <th x-show="workflowType === 'specialized'" style="width:120px;">Assigned Role</th>
-                    <th style="width:120px;">Sheet Name</th>
-                    <th style="width:120px;">Entry Type</th>
+                    <th x-show="workflowType === 'specialized'" style="width:120px;">Sheet Name</th>
+                    <th x-show="workflowType === 'specialized'" style="width:120px;">Entry Type</th>
                     <th x-show="workflowType === 'specialized'" style="width: 220px;">Original Memo</th>
                     <th style="width: 70px; text-align: center;">Hours</th>
                     <th style="width: 140px;">Category</th>
@@ -1696,9 +1696,11 @@
                         <td x-show="workflowType === 'specialized'"
                           style="font-size: 13px; color: #f8f8f8; font-weight:600;" x-text="entry.assigned_role || '—'">
                         </td>
-                        <td style="font-size: 13px; color: #f8f8f8; font-weight:600;" x-text="entry.sheet_name || '—'">
+                        <td x-show="workflowType === 'specialized'"
+                          style="font-size: 13px; color: #f8f8f8; font-weight:600;" x-text="entry.sheet_name || '—'">
                         </td>
-                        <td style="font-size: 13px; color: #f8f8f8; font-weight:600;" x-text="entry.entry_type|| '—'">
+                        <td x-show="workflowType === 'specialized'"
+                          style="font-size: 13px; color: #f8f8f8; font-weight:600;" x-text="entry.entry_type|| '—'">
                         </td>
                         <td x-show="workflowType === 'specialized'"
                           style="font-size: 13px; color: #e0e0e0; vertical-align: middle;">
