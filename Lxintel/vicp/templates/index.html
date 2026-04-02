@@ -1489,9 +1489,10 @@
                       x-text="run.attorney_entries_generated"></td>
                     <td style="font-size: 12px; color: #ccc; text-align: center;"
                       x-text="run.total_paralegal_hours_requested"></td>
-                    <td
-                      style="font-size: 12px; color: #ccc; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
-                      :title="run.summary" x-text="run.summary"></td>
+                    <td style="font-size: 12px; color: #ccc; max-width: 200px;"
+                      :title="run.summary ? JSON.stringify(run.summary) : ''"
+                      x-html="run.summary ? Object.entries(run.summary).map(x => x[0] + ': ' + x[1]).join('<br/>') : ''">
+                    </td>
                     <td style="font-size: 12px; text-transform: capitalize; font-weight: 600;"
                       :style="run.status === 'success' ? 'color: #2ecc71;' : 'color: #e74c3c;'" x-text="run.status">
                     </td>
