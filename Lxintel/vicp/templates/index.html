@@ -1347,6 +1347,11 @@
           <span x-text="currentView === 'chat' ? 'View Ledger' : 'Back to Chat'"></span>
         </button>
 
+        <button class="new-chat-btn" @click="currentView = 'upload_ledger'" x-show="currentView === 'chat'"
+          style="display: flex; align-items: center; gap: 8px; background-color: #f1c40f; color: #111; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px;">
+          <span>View Summary ledger</span>
+        </button>
+
         <!-- NEW CHAT BUTTON -->
         <!-- NEW CHAT BUTTON -->
         <button class="new-chat-btn" onclick="startNewChat()"
@@ -1420,6 +1425,115 @@
       </div>
     </div>
 
+    <!-- NEW UPLOAD LEDGER VIEW -->
+    <div class="view-container" :class="{ 'active': currentView === 'upload_ledger' }"
+      style="padding: 24px; gap: 24px; overflow-y: auto;">
+      <div style="display: flex; flex-direction: column; gap: 24px;">
+
+        <!-- Ledger File History -->
+        <div class="glass-panel" style="display: flex; flex-direction: column; overflow: hidden; margin-bottom: 24px;">
+          <div class="filter-bar"
+            style="background: rgba(241, 196, 15, 0.05); border-bottom: 1px solid rgba(241, 196, 15, 0.1);">
+            <h3
+              style="color: #f1c40f; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">
+              Ledger File History</h3>
+            <button @click="showUploadFileModal = true"
+              style="margin-left: auto; background: rgba(241,196,15,0.15); color: #f1c40f; border: 1px solid rgba(241,196,15,0.4); padding: 7px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; letter-spacing: 0.5px;">
+              Upload file</button>
+          </div>
+          <div class="ledger-table-container" style="margin: 0; max-height: 240px; overflow-y: auto; overflow-x: auto;">
+            <div x-show="loadingUploadRuns" style="padding: 40px; text-align: center;">
+              <span class="spinner" style="width: 24px; height: 24px; border-width: 3px;"></span>
+              <p style="margin-top: 12px; color: #f1c40f; font-size: 12px;">Fetching file history...</p>
+            </div>
+
+            <div x-show="!loadingUploadRuns && uploadLedgerRuns.length === 0"
+              style="padding: 40px; text-align: center; color: #555;">
+              <p style="font-size: 13px;">No previous files found.</p>
+            </div>
+
+            <table class="ledger-table" x-show="!loadingUploadRuns && uploadLedgerRuns.length > 0"
+              style="table-layout: auto; min-width: 700px;">
+              <thead style="position: sticky; top: 0; background: rgba(10, 10, 10, 0.98); z-index: 10;">
+                <tr>
+                  <th style="width: 260px;">User Name</th>
+                  <th style="width: 360px;">Petition Filename</th>
+                  <th style="width: 180px;">Created At</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="run in uploadLedgerRuns" :key="run.run_id">
+                  <tr class="ledger-row" @click="selectUploadRun(run.run_id)"
+                    :style="currentUploadLedgerId === run.run_id ? 'background: rgba(241,196,15,0.12); border-left: 4px solid #f1c40f;' : 'cursor: pointer;'">
+                    <td style="font-size: 12px; color: #ccc; padding-left: 20px;" x-text="run.user_email"></td>
+                    <td style="font-size: 12px; color: #eee; font-weight: 500;">
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <span x-show="currentUploadLedgerId === run.run_id"
+                          style="color: #f1c40f; font-size: 10px;">▶</span>
+                        <span x-text="run.petition_filename"></span>
+                      </div>
+                    </td>
+                    <td style="font-size: 12px; color: #888;" x-text="new Date(run.created_at).toLocaleString()"></td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+          <!-- Section 2: Upload Ledger Table -->
+          <div class="glass-panel" style="display: flex; flex-direction: column; overflow: hidden;">
+            <!-- Filter Bar for Uploads (Only role filter as requested) -->
+            <div class="filter-bar" style="flex-wrap: nowrap; align-items: center; gap: 8px;">
+              <select x-model="uploadFilters.assigned_role" class="filter-select"
+                style="background:#1a1a1a; border:1px solid rgba(241,196,15,0.4); color:#f1c40f; padding:6px 8px; border-radius:6px; font-size:12px; font-weight:600; outline:none; cursor:pointer;">
+                <option value="">ALL</option>
+                <option value="paralegal">Paralegal</option>
+                <option value="lead_attorney">Lead Attorney</option>
+              </select>
+            </div>
+
+            <div class="ledger-table-container" style="margin: 0; max-height: 520px; overflow-x: auto;">
+              <div x-show="loadingUploadLedger" style="padding: 80px; text-align: center;">
+                <span class="spinner" style="width: 40px; height: 40px; border-width: 4px;"></span>
+                <p style="margin-top: 16px; color: #f1c40f; font-size: 14px;">Loading Entries...</p>
+              </div>
+
+              <table class="ledger-table" x-show="!loadingUploadLedger" style="table-layout: auto; min-width: 1000px;">
+                <thead>
+                  <tr>
+                    <th style="width: 60px;">#</th>
+                    <th style="width: 120px;">Assigned Role</th>
+                    <th style="width: 320px;">Task</th>
+                    <th style="width: 80px;">Hours</th>
+                    <th style="width: 220px;">Category</th>
+                    <th style="width: 180px;">Created At</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="(entry, index) in filteredUploadEntries" :key="entry.id">
+                    <tr class="ledger-row" style="background: transparent;">
+                      <td style="font-weight: 600; font-size: 13px; color: #f1c40f;" x-text="index + 1"></td>
+                      <td style="font-weight: 500; font-size: 12px; color: #ccc;" x-text="entry.assigned_role"></td>
+                      <td style="color: #fff; font-size: 13px;">
+                        <div x-html="entry.task ? entry.task.replace(/\\n/g, '<br/>') : ''"></div>
+                      </td>
+                      <td style="color: #f1c40f; font-weight: 600; font-size: 13px;" x-text="entry.hours"></td>
+                      <td style="color: #ccc; font-size: 12px;" x-text="entry.category"></td>
+                      <td style="font-size: 12px; color: #888;"
+                        x-text="entry.created_at ? new Date(entry.created_at).toLocaleString() : ''"></td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
     <!-- NEW LEDGER VIEW -->
     <div class="view-container" :class="{ 'active': currentView === 'ledger' }"
       style="padding: 24px; gap: 24px; overflow-y: auto;">
@@ -1487,7 +1601,7 @@
                 <option value="pending">Pending Review</option>
                 <option value="approved">Approved</option>
                 <option value="edited">Edited</option>
-                <option value="deleted">Deleted</option>
+                <!-- <option value="deleted">Deleted</option> -->
               </select>
               <select class="filter-select" x-model="filters.source" style="flex-shrink:0;">
                 <option value="">All Sources</option>
@@ -2260,6 +2374,49 @@
         </div>
       </div>
     </div>
+    <!-- UPLOAD FILE MODAL -->
+    <div class="modal-backdrop" :style="showUploadFileModal ? 'display: flex;' : 'display: none;'">
+      <div class="glass-panel modal-content" style="padding: 32px; max-width: 500px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <h2 style="color: #f1c40f; font-size: 20px; font-weight: 700;">Upload File</h2>
+          <button @click="showUploadFileModal = false" class="text-gray-500 text-2xl" type="button">×</button>
+        </div>
+
+        <form @submit.prevent="runUploadGeneration()" class="flex flex-col gap-6">
+          <div>
+            <label class="block text-xs font-bold text-[#f1c40f] mb-2 uppercase">Petition File (<span
+                style="color:#fff;text-transform:none">PDF</span>)</label>
+            <input type="file" @change="uploadPetitionFile = $event.target.files[0]" required
+              class="w-full bg-black border border-[#444] rounded p-2 text-white">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-[#f1c40f] mb-2 uppercase">Exhibits File (<span
+                style="color:#fff;text-transform:none">PDF</span>)</label>
+            <input type="file" @change="uploadExhibitsFile = $event.target.files[0]" required
+              class="w-full bg-black border border-[#444] rounded p-2 text-white">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-[#f1c40f] mb-2 uppercase">Paralegal Entries</label>
+            <input type="number" x-model="uploadParalegalEntries" required
+              class="w-full bg-black border border-[#444] rounded p-2 text-white">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-[#f1c40f] mb-2 uppercase">Total Paralegal Hours</label>
+            <input type="number" x-model="uploadTotalParalegalHours" required step="0.1"
+              class="w-full bg-black border border-[#444] rounded p-2 text-white">
+          </div>
+          <div x-show="isUploadGenerating" class="text-center p-4">
+            <span class="spinner"></span>
+            <p class="mt-2 text-[#f1c40f]">Uploading and regenerating...</p>
+          </div>
+
+          <button x-show="!isUploadGenerating" type="submit"
+            class="login-btn w-full !bg-[#f1c40f] !text-black !font-bold">UPLOAD</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
   </div>
 
   <script>
@@ -2723,6 +2880,21 @@
           category: ""
         },
 
+        uploadLedgerRuns: [],
+        uploadLedgerEntries: [],
+        loadingUploadRuns: false,
+        loadingUploadLedger: false,
+        currentUploadLedgerId: null,
+        showUploadFileModal: false,
+        uploadPetitionFile: null,
+        uploadExhibitsFile: null,
+        uploadParalegalEntries: 50,
+        uploadTotalParalegalHours: 180,
+        isUploadGenerating: false,
+        uploadFilters: {
+          assigned_role: ""
+        },
+
         uploadParams: {
           staff_code: "",
           sheet_name: ""
@@ -2803,6 +2975,104 @@
           });
         },
 
+        get filteredUploadEntries() {
+          if (!this.uploadFilters.assigned_role) {
+            return this.uploadLedgerEntries;
+          }
+          return this.uploadLedgerEntries.filter(e => e.assigned_role === this.uploadFilters.assigned_role);
+        },
+
+        async fetchUploadRuns() {
+          this.loadingUploadRuns = true;
+          try {
+            const response = await fetch(`${API_BASE_URL}/VICP_Attorney_Fees/ledger-summary-runs`, {
+              headers: {
+                "Authorization": `Bearer ${localStorage.getItem("jwtvicp")}`,
+                "ngrok-skip-browser-warning": "true"
+              }
+            });
+            if (response.ok) {
+              this.uploadLedgerRuns = await response.json();
+              if (this.uploadLedgerRuns.length > 0 && !this.currentUploadLedgerId) {
+                this.selectUploadRun(this.uploadLedgerRuns[0].run_id);
+              }
+            }
+          } catch (error) {
+            console.error("Failed to fetch upload runs:", error);
+          } finally {
+            this.loadingUploadRuns = false;
+          }
+        },
+
+        selectUploadRun(runId) {
+          if (this.currentUploadLedgerId === runId) return;
+          this.currentUploadLedgerId = runId;
+          this.fetchUploadEntries();
+        },
+
+        async fetchUploadEntries() {
+          if (!this.currentUploadLedgerId) {
+            this.uploadLedgerEntries = [];
+            return;
+          }
+          this.loadingUploadLedger = true;
+          try {
+            const response = await fetch(`${API_BASE_URL}/VICP_Attorney_Fees/ledger-summary-entries/${this.currentUploadLedgerId}`, {
+              headers: {
+                "Authorization": `Bearer ${localStorage.getItem("jwtvicp")}`,
+                "ngrok-skip-browser-warning": "true"
+              }
+            });
+            if (response.ok) {
+              this.uploadLedgerEntries = await response.json();
+            } else {
+              this.uploadLedgerEntries = [];
+            }
+          } catch (error) {
+            console.error("Failed to fetch upload entries:", error);
+            this.uploadLedgerEntries = [];
+          } finally {
+            this.loadingUploadLedger = false;
+          }
+        },
+
+        async runUploadGeneration() {
+          if (!this.uploadPetitionFile || !this.uploadExhibitsFile) {
+            alert("Please select both files.");
+            return;
+          }
+          this.isUploadGenerating = true;
+          const formData = new FormData();
+          formData.append('petition_file', this.uploadPetitionFile);
+          formData.append('exhibits_file', this.uploadExhibitsFile);
+          formData.append('paralegal_entries', this.uploadParalegalEntries);
+          formData.append('total_paralegal_hours', this.uploadTotalParalegalHours);
+
+          try {
+            const response = await fetch(`${API_BASE_URL}/VICP_Attorney_Fees/generate-summary-lead-paralegal`, {
+              method: 'POST',
+              headers: {
+                "Authorization": `Bearer ${localStorage.getItem("jwtvicp")}`,
+                "ngrok-skip-browser-warning": "true"
+              },
+              body: formData
+            });
+            if (response.ok) {
+              // successful
+              this.showUploadFileModal = false;
+              this.currentUploadLedgerId = null; // reset to fetch newest auto
+              await this.fetchUploadRuns();
+            } else {
+              alert("Upload failed. Validation error or server problem.");
+            }
+          } catch (error) {
+            console.error("Upload Generation Error:", error);
+            alert("Error connecting to server.");
+          } finally {
+            this.isUploadGenerating = false;
+          }
+        },
+
         resetFilters() {
           this.filters = { status: "", source: "", confidence: "", search: "", staff_code: "", assigned_role: "", sheet_name: "", entry_type: "" };
         },
@@ -2822,6 +3092,8 @@
                 this.fetchAudits();
                 this.fetchEditHistory();
               }
+            } else if (value === 'upload_ledger') {
+              this.fetchUploadRuns();
             }
           });
 
