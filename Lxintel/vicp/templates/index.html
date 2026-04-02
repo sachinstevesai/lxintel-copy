@@ -1453,19 +1453,28 @@
             </div>
 
             <table class="ledger-table" x-show="!loadingUploadRuns && uploadLedgerRuns.length > 0"
-              style="table-layout: auto; min-width: 700px;">
+              style="table-layout: auto; min-width: 1400px; display: block; overflow-x: auto;">
               <thead style="position: sticky; top: 0; background: rgba(10, 10, 10, 0.98); z-index: 10;">
                 <tr>
-                  <th style="width: 260px;">User Name</th>
-                  <th style="width: 360px;">Petition Filename</th>
-                  <th style="width: 180px;">Created At</th>
+                  <th style="width: 40px; min-width: 40px;">#</th>
+                  <th style="width: 140px; min-width: 140px;">User Name</th>
+                  <th style="width: 200px; min-width: 200px;">Petition Filename</th>
+                  <th style="width: 200px; min-width: 200px;">Exhibits Filename</th>
+                  <th style="width: 120px; min-width: 120px;">Req. Paralegal Entries</th>
+                  <th style="width: 120px; min-width: 120px;">Gen. Attorney Entries</th>
+                  <th style="width: 120px; min-width: 120px;">Req. Paralegal Hrs</th>
+                  <th style="width: 200px; min-width: 200px;">Summary</th>
+                  <th style="width: 80px; min-width: 80px;">Status</th>
+                  <th style="width: 140px; min-width: 140px;">Created At</th>
                 </tr>
               </thead>
               <tbody>
-                <template x-for="run in uploadLedgerRuns" :key="run.run_id">
+                <template x-for="(run, index) in uploadLedgerRuns" :key="run.run_id">
                   <tr class="ledger-row" @click="selectUploadRun(run.run_id)"
                     :style="currentUploadLedgerId === run.run_id ? 'background: rgba(241,196,15,0.12); border-left: 4px solid #f1c40f;' : 'cursor: pointer;'">
-                    <td style="font-size: 12px; color: #ccc; padding-left: 20px;" x-text="run.user_email"></td>
+                    <td style="font-weight: 600; font-size: 13px; color: #f1c40f; text-align: center;"
+                      x-text="index + 1"></td>
+                    <td style="font-size: 12px; color: #ccc;" x-text="run.user_email"></td>
                     <td style="font-size: 12px; color: #eee; font-weight: 500;">
                       <div style="display: flex; align-items: center; gap: 8px;">
                         <span x-show="currentUploadLedgerId === run.run_id"
@@ -1473,7 +1482,21 @@
                         <span x-text="run.petition_filename"></span>
                       </div>
                     </td>
-                    <td style="font-size: 12px; color: #888;" x-text="new Date(run.created_at).toLocaleString()"></td>
+                    <td style="font-size: 12px; color: #ccc;" x-text="run.exhibits_filename"></td>
+                    <td style="font-size: 12px; color: #ccc; text-align: center;"
+                      x-text="run.paralegal_entries_requested"></td>
+                    <td style="font-size: 12px; color: #ccc; text-align: center;"
+                      x-text="run.attorney_entries_generated"></td>
+                    <td style="font-size: 12px; color: #ccc; text-align: center;"
+                      x-text="run.total_paralegal_hours_requested"></td>
+                    <td
+                      style="font-size: 12px; color: #ccc; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+                      :title="run.summary" x-text="run.summary"></td>
+                    <td style="font-size: 12px; text-transform: capitalize; font-weight: 600;"
+                      :style="run.status === 'success' ? 'color: #2ecc71;' : 'color: #e74c3c;'" x-text="run.status">
+                    </td>
+                    <td style="font-size: 12px; color: #888;"
+                      x-text="run.created_at ? new Date(run.created_at).toLocaleString() : ''"></td>
                   </tr>
                 </template>
               </tbody>
@@ -1484,6 +1507,12 @@
         <div style="display: flex; flex-direction: column; gap: 24px;">
           <!-- Section 2: Upload Ledger Table -->
           <div class="glass-panel" style="display: flex; flex-direction: column; overflow: hidden;">
+            <div
+              style="padding: 12px 16px; border-bottom: 1px solid rgba(241, 196, 15, 0.1); background: rgba(241, 196, 15, 0.05);">
+              <h3
+                style="color: #f1c40f; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">
+                Generated file entries</h3>
+            </div>
             <!-- Filter Bar for Uploads (Only role filter as requested) -->
             <div class="filter-bar" style="flex-wrap: nowrap; align-items: center; gap: 8px;">
               <select x-model="uploadFilters.assigned_role" class="filter-select"
@@ -1969,7 +1998,7 @@
           </div>
 
           <!-- Ledger Audit Results Table -->
-          <div class="glass-panel" style="display: flex; flex-direction: column; overflow: hidden; margin-top: 24px;"
+          <!-- <div class="glass-panel" style="display: flex; flex-direction: column; overflow: hidden; margin-top: 24px;"
             x-show="currentLedgerId">
             <div class="filter-bar"
               style="background: rgba(241, 196, 15, 0.05); border-bottom: 1px solid rgba(241, 196, 15, 0.1);">
@@ -2047,7 +2076,7 @@
                 </tbody>
               </table>
             </div>
-          </div>
+          </div> -->
 
           <!-- Edit History Section (Modern Activity Log) -->
           <div class="glass-panel" style="display: flex; flex-direction: column; overflow: visible; margin-top: 24px;"
