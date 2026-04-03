@@ -1626,32 +1626,41 @@
             <!-- Filter Bar -->
             <div class="filter-bar"
               style="flex-wrap: nowrap; align-items: center; overflow-x: auto; scrollbar-width: thin; scrollbar-color: #f1c40f73 #2c2c2c; gap: 8px;">
-              <select class="filter-select" x-model="filters.status" style="flex-shrink:0;">
+              <select class="filter-select" x-model="filters.status" style="flex-shrink:0; cursor: pointer;">
                 <option value="">All Statuses</option>
                 <option value="pending">Pending Review</option>
                 <option value="approved">Approved</option>
                 <option value="edited">Edited</option>
                 <!-- <option value="deleted">Deleted</option> -->
               </select>
-              <select class="filter-select" x-model="filters.source" style="flex-shrink:0;">
-                <option value="">All Sources</option>
-                <option value="generated">Generated</option>
-                <option value="manual">Manual</option>
-              </select>
-              <button @click="resetFilters()" class="text-xs"
-                style="flex-shrink:0;
-                background: rgba(241,196,15,0.15); color: #f1c40f; border: 1px solid rgba(241,196,15,0.4); padding: 7px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; letter-spacing: 0.5px;">
+
+              <button @click="resetFilters()" class="filter-select text-xs"
+                style="flex-shrink:0; cursor: pointer; font-weight: 600; letter-spacing: 0.5px;">
                 Reset
               </button>
 
+              <!-- Date Sort Selector -->
+              <select class="filter-select" x-model="dateSort" style="flex-shrink:0; cursor: pointer;">
+                <option value="date">Date</option>
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+              </select>
+
+              <!-- this all roles shold show in default workflow also -->
+              <select class="filter-select" x-model="filters.assigned_role" style="flex-shrink:0; cursor: pointer;">
+                <option value="">All Roles</option>
+                <template x-for="val in uniqueAssignedRoles" :key="val">
+                  <option :value="val" x-text="val"></option>
+                </template>
+              </select>
+
               <!-- Workflow Type Selector -->
-              <select class="filter-select" x-model="workflowType"
-                style="flex-shrink:0;
-                background: #1a1a1a; border: 1px solid rgba(241,196,15,0.4); color: #f1c40f; padding: 6px 6px; border-radius: 6px; font-size: 12px; font-weight: 600; outline: none; cursor: pointer; letter-spacing: 0.3px;"
+              <select class="filter-select" x-model="workflowType" style="flex-shrink:0; cursor: pointer;"
                 :disabled="!currentLedgerId || loadingWorkflow">
                 <option value="default">Default Workflow</option>
                 <option value="specialized">Specialized Workflow</option>
               </select>
+
               <!-- Loading indicator for workflow fetch -->
               <span x-show="loadingWorkflow"
                 style="flex-shrink:0; display:inline-flex; align-items:center; gap:6px; font-size:12px; color:#f1c40f;">
@@ -1659,45 +1668,12 @@
                 Loading...
               </span>
 
-              <!-- Date Sort Selector -->
-              <select class="filter-select" x-model="dateSort"
-                style="flex-shrink:0;
-                background: #1a1a1a; border: 1px solid rgba(241,196,15,0.4); color: #f1c40f; padding: 6px 6px; border-radius: 6px; font-size: 12px; font-weight: 600; outline: none; cursor: pointer; letter-spacing: 0.3px;">
-                <option value="date">Date</option>
-                <option value="asc">Ascending</option>
-                <option value="desc">Descending</option>
-              </select>
-
-              <!-- this all roles shold show in default workflow also -->
-              <select x-model="filters.assigned_role" class="filter-select"
-                style="background:#1a1a1a; border:1px solid rgba(241,196,15,0.4); color:#f1c40f; padding:6px 8px; border-radius:6px; font-size:12px; font-weight:600; outline:none; cursor:pointer;">
-                <option value="">All Roles</option>
-                <template x-for="val in uniqueAssignedRoles" :key="val">
-                  <option :value="val" x-text="val"></option>
-                </template>
-              </select>
-
               <!-- Specialized Workflow Filters (dynamic dropdowns) -->
               <template x-if="workflowType === 'specialized'">
                 <div style="display:flex; gap:8px; align-items:center; flex-shrink:0;">
-                  <select x-model="filters.staff_code" class="filter-select"
-                    style="background:#1a1a1a; border:1px solid rgba(241,196,15,0.4); color:#f1c40f; padding:6px 8px; border-radius:6px; font-size:12px; font-weight:600; outline:none; cursor:pointer;">
-                    <option value="">All Staff Codes</option>
-                    <template x-for="val in uniqueStaffCodes" :key="val">
-                      <option :value="val" x-text="val"></option>
-                    </template>
-                  </select>
-                  <select x-model="filters.sheet_name" class="filter-select"
-                    style="background:#1a1a1a; border:1px solid rgba(241,196,15,0.4); color:#f1c40f; padding:6px 8px; border-radius:6px; font-size:12px; font-weight:600; outline:none; cursor:pointer;">
+                  <select class="filter-select" x-model="filters.sheet_name" style="flex-shrink:0; cursor: pointer;">
                     <option value="">All Sheets</option>
                     <template x-for="val in uniqueSheetNames" :key="val">
-                      <option :value="val" x-text="val"></option>
-                    </template>
-                  </select>
-                  <select x-model="filters.entry_type" class="filter-select"
-                    style="background:#1a1a1a; border:1px solid rgba(241,196,15,0.4); color:#f1c40f; padding:6px 8px; border-radius:6px; font-size:12px; font-weight:600; outline:none; cursor:pointer;">
-                    <option value="">All Entry Types</option>
-                    <template x-for="val in uniqueEntryTypes" :key="val">
                       <option :value="val" x-text="val"></option>
                     </template>
                   </select>
@@ -1764,8 +1740,7 @@
                   </template>
 
                   <!-- Empty state: entries exist but active Status filter returns nothing -->
-                  <template
-                    x-if="ledgerEntries.length > 0 && filteredEntries.length === 0 && filters.status !== '' && filters.source === ''">
+                  <template x-if="ledgerEntries.length > 0 && filteredEntries.length === 0 && filters.status !== ''">
                     <tr>
                       <td colspan="10" style="padding: 64px 24px; text-align: center; border: none;">
                         <div style="display: flex; flex-direction: column; align-items: center; gap: 14px;">
@@ -1775,39 +1750,6 @@
                               style="color:#f1c40f; font-weight:700;"
                               x-text="'&quot;' + filters.status.charAt(0).toUpperCase() + filters.status.slice(1) + '&quot;'"></span>.
                             Try selecting a different status or reset the filters.</p>
-                        </div>
-                      </td>
-                    </tr>
-                  </template>
-
-                  <!-- Empty state: entries exist but active Source filter returns nothing -->
-                  <template
-                    x-if="ledgerEntries.length > 0 && filteredEntries.length === 0 && filters.source !== '' && filters.status === ''">
-                    <tr>
-                      <td colspan="10" style="padding: 64px 24px; text-align: center; border: none;">
-                        <div style="display: flex; flex-direction: column; align-items: center; gap: 14px;">
-                          <p style="font-size: 15px; font-weight: 600; color: #888; margin: 0;">No Entries Match the
-                            Selected Source</p>
-                          <p style="font-size: 13px; color: #555; margin: 0;">There are no entries with source <span
-                              style="color:#f1c40f; font-weight:700;"
-                              x-text="'&quot;' + filters.source.charAt(0).toUpperCase() + filters.source.slice(1) + '&quot;'"></span>.
-                            Try selecting a different source or reset the filters.</p>
-                        </div>
-                      </td>
-                    </tr>
-                  </template>
-
-                  <!-- Empty state: both Status and Source filters active, no results -->
-                  <template
-                    x-if="ledgerEntries.length > 0 && filteredEntries.length === 0 && filters.status !== '' && filters.source !== ''">
-                    <tr>
-                      <td colspan="10" style="padding: 64px 24px; text-align: center; border: none;">
-                        <div style="display: flex; flex-direction: column; align-items: center; gap: 14px;">
-                          <p style="font-size: 15px; font-weight: 600; color: #888; margin: 0;">No Entries Match the
-                            Applied Filters</p>
-                          <p style="font-size: 13px; color: #555; margin: 0;">No entries found for the selected
-                            combination of Status and Source. Please adjust your filters or click <strong
-                              style="color:#f1c40f;">Reset</strong>.</p>
                         </div>
                       </td>
                     </tr>
@@ -2450,7 +2392,7 @@
   </div>
 
   <script>
-    const API_BASE_URL = "";
+    const API_BASE_URL = "https://attired-hitchily-stephane.ngrok-free.dev";
     let threadId = null;
     let isProcessing = false;
     let currentMessageToSave = ""; // Store message for saving as template
@@ -2942,13 +2884,10 @@
         // Filters
         filters: {
           status: "",
-          source: "",
           confidence: "",
           search: "",
-          staff_code: "",
           assigned_role: "",
-          sheet_name: "",
-          entry_type: ""
+          sheet_name: ""
         },
 
         get uniqueStaffCodes() {
@@ -2977,18 +2916,11 @@
             if (this.filters.status && e.status !== this.filters.status)
               return false;
 
-            if (this.filters.source && e.source !== this.filters.source)
-              return false;
-
             if (this.filters.assigned_role && e.assigned_role !== this.filters.assigned_role)
               return false;
 
             if (this.workflowType === 'specialized') {
-              if (this.filters.staff_code && e.assigned_staff_code !== this.filters.staff_code)
-                return false;
               if (this.filters.sheet_name && e.sheet_name !== this.filters.sheet_name)
-                return false;
-              if (this.filters.entry_type && e.entry_type !== this.filters.entry_type)
                 return false;
             }
 
@@ -3104,7 +3036,8 @@
         },
 
         resetFilters() {
-          this.filters = { status: "", source: "", confidence: "", search: "", staff_code: "", assigned_role: "", sheet_name: "", entry_type: "" };
+          this.filters = { status: "", confidence: "", search: "", assigned_role: "", sheet_name: "" };
+          this.workflowType = "default";
         },
 
         init() {
@@ -3135,10 +3068,8 @@
               }
             } else {
               // Clear specialized filters when leaving specialized mode
-              this.filters.staff_code = "";
               this.filters.assigned_role = "";
               this.filters.sheet_name = "";
-              this.filters.entry_type = "";
               // Restore default ledger entries from cache (or refetch if cache empty)
               if (this._defaultLedgerEntries.length > 0) {
                 this.ledgerEntries = [...this._defaultLedgerEntries];
