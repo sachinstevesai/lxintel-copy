@@ -2392,7 +2392,7 @@
   </div>
 
   <script>
-    const API_BASE_URL = "https://attired-hitchily-stephane.ngrok-free.dev";
+    const API_BASE_URL = "";
     let threadId = null;
     let isProcessing = false;
     let currentMessageToSave = ""; // Store message for saving as template
@@ -2486,6 +2486,10 @@
       const message = input.value.trim();
 
       if (!message) return;
+
+      // Guard: ensure token exists before hitting the API
+      const _chatToken = requireToken();
+      if (!_chatToken) return;
 
       isProcessing = true;
       const sendBtn = document.getElementById("send-btn");
@@ -2945,14 +2949,17 @@
         },
 
         async fetchUploadRuns() {
+          const token = requireToken();
+          if (!token) return;
           this.loadingUploadRuns = true;
           try {
             const response = await fetch(`${API_BASE_URL}/VICP_Attorney_Fees/ledger-summary-runs`, {
               headers: {
-                "Authorization": `Bearer ${localStorage.getItem("jwtvicp")}`,
+                "Authorization": `Bearer ${token}`,
                 "ngrok-skip-browser-warning": "true"
               }
             });
+            if (response.status === 401) { handle401(); return; }
             if (response.ok) {
               this.uploadLedgerRuns = await response.json();
               if (this.uploadLedgerRuns.length > 0 && !this.currentUploadLedgerId) {
@@ -2977,14 +2984,17 @@
             this.uploadLedgerEntries = [];
             return;
           }
+          const token = requireToken();
+          if (!token) return;
           this.loadingUploadLedger = true;
           try {
             const response = await fetch(`${API_BASE_URL}/VICP_Attorney_Fees/ledger-summary-entries/${this.currentUploadLedgerId}`, {
               headers: {
-                "Authorization": `Bearer ${localStorage.getItem("jwtvicp")}`,
+                "Authorization": `Bearer ${token}`,
                 "ngrok-skip-browser-warning": "true"
               }
             });
+            if (response.status === 401) { handle401(); return; }
             if (response.ok) {
               this.uploadLedgerEntries = await response.json();
             } else {
@@ -3003,6 +3013,8 @@
             alert("Please select both files.");
             return;
           }
+          const token = requireToken();
+          if (!token) return;
           this.isUploadGenerating = true;
           const formData = new FormData();
           formData.append('petition_file', this.uploadPetitionFile);
@@ -3014,18 +3026,19 @@
             const response = await fetch(`${API_BASE_URL}/VICP_Attorney_Fees/generate-summary-lead-paralegal`, {
               method: 'POST',
               headers: {
-                "Authorization": `Bearer ${localStorage.getItem("jwtvicp")}`,
+                "Authorization": `Bearer ${token}`,
                 "ngrok-skip-browser-warning": "true"
               },
               body: formData
             });
+            if (response.status === 401) { handle401(); return; }
             if (response.ok) {
               // successful
               this.showUploadFileModal = false;
               this.currentUploadLedgerId = null; // reset to fetch newest auto
               await this.fetchUploadRuns();
             } else {
-              alert("Upload failed. Validation error or server problem.");
+              alert("Upload failed.");
             }
           } catch (error) {
             console.error("Upload Generation Error:", error);
@@ -3087,14 +3100,17 @@
             this.auditEntries = [];
             return;
           }
+          const token = requireToken();
+          if (!token) return;
           this.loadingAudits = true;
           try {
             const response = await fetch(`${API_BASE_URL}/VICP_Attorney_Fees/ledger/${this.currentLedgerId}/audits`, {
               headers: {
-                "Authorization": `Bearer ${localStorage.getItem("jwtvicp")}`,
+                "Authorization": `Bearer ${token}`,
                 "ngrok-skip-browser-warning": "true"
               }
             });
+            if (response.status === 401) { handle401(); return; }
             if (response.ok) {
               const data = await response.json();
               this.auditEntries = Array.isArray(data) ? data : [];
@@ -3114,14 +3130,17 @@
             this.editHistory = { entries: [] };
             return;
           }
+          const token = requireToken();
+          if (!token) return;
           this.loadingHistory = true;
           try {
             const response = await fetch(`${API_BASE_URL}/VICP_Attorney_Fees/ledger/${this.currentLedgerId}/edit-history`, {
               headers: {
-                "Authorization": `Bearer ${localStorage.getItem("jwtvicp")}`,
+                "Authorization": `Bearer ${token}`,
                 "ngrok-skip-browser-warning": "true"
               }
             });
+            if (response.status === 401) { handle401(); return; }
             if (response.ok) {
               this.editHistory = await response.json();
             } else {
@@ -3136,14 +3155,17 @@
         },
 
         async fetchLedgerRuns() {
+          const token = requireToken();
+          if (!token) return;
           this.loadingRuns = true;
           try {
             const response = await fetch(`${API_BASE_URL}/VICP_Attorney_Fees/ledger/runs`, {
               headers: {
-                "Authorization": `Bearer ${localStorage.getItem("jwtvicp")}`,
+                "Authorization": `Bearer ${token}`,
                 "ngrok-skip-browser-warning": "true"
               }
             });
+            if (response.status === 401) { handle401(); return; }
             if (response.ok) {
               this.ledgerRuns = await response.json();
               // Auto-select latest run if none is active
@@ -3176,6 +3198,8 @@
         },
 
         async fetchLedger() {
+          const token = requireToken();
+          if (!token) return;
           this.loadingLedger = true;
           try {
             if (!this.currentLedgerId) {
@@ -3187,11 +3211,12 @@
 
             const response = await fetch(url, {
               headers: {
-                "Authorization": `Bearer ${localStorage.getItem("jwtvicp")}`,
+                "Authorization": `Bearer ${token}`,
                 "ngrok-skip-browser-warning": "true"
               }
             });
 
+            if (response.status === 401) { handle401(); return; }
             const data = await response.json();
             if (response.ok) {
               // API returns a flat array directly
@@ -3238,11 +3263,14 @@
         },
 
         async approveEntry(id) {
+          const token = requireToken();
+          if (!token) return;
           try {
-            await fetch(`${API_BASE_URL}/VICP_Attorney_Fees/ledger/entry/${id}/approve`, {
+            const res = await fetch(`${API_BASE_URL}/VICP_Attorney_Fees/ledger/entry/${id}/approve`, {
               method: 'PATCH',
-              headers: { "Authorization": `Bearer ${localStorage.getItem("jwtvicp")}` }
+              headers: { "Authorization": `Bearer ${token}` }
             });
+            if (res.status === 401) { handle401(); return; }
             const entry = this.ledgerEntries.find(e => e.id === id);
             if (entry) entry.status = 'approved';
             this.calculateStats();
@@ -3252,17 +3280,20 @@
 
         async bulkApprove() {
           if (this.selectedEntries.length === 0) return;
+          const token = requireToken();
+          if (!token) return;
           this.isBulkProcessing = true;
           try {
-            await fetch(`${API_BASE_URL}/VICP_Attorney_Fees/ledger/bulk-approve`, {
+            const bulkRes = await fetch(`${API_BASE_URL}/VICP_Attorney_Fees/ledger/bulk-approve`, {
               method: 'PATCH',
               headers: {
                 'Content-Type': 'application/json',
-                "Authorization": `Bearer ${localStorage.getItem("jwtvicp")}`,
+                "Authorization": `Bearer ${token}`,
                 "ngrok-skip-browser-warning": "true"
               },
               body: JSON.stringify({ entry_ids: this.selectedEntries })
             });
+            if (bulkRes.status === 401) { handle401(); return; }
             this.selectedEntries = [];
             this.calculateStats();
             this.showBulkModal = false;
@@ -3330,12 +3361,15 @@
           const id = this.deletingId;
           if (!id) return;
 
+          const token = requireToken();
+          if (!token) return;
           this.isDeleting = true;
           try {
-            await fetch(`${API_BASE_URL}/VICP_Attorney_Fees/ledger/entry/${id}`, {
+            const delRes = await fetch(`${API_BASE_URL}/VICP_Attorney_Fees/ledger/entry/${id}`, {
               method: 'DELETE',
-              headers: { "Authorization": `Bearer ${localStorage.getItem("jwtvicp")}` }
+              headers: { "Authorization": `Bearer ${token}` }
             });
+            if (delRes.status === 401) { handle401(); return; }
             const entry = this.ledgerEntries.find(e => e.id === id);
             if (entry) entry.status = 'deleted';
             this.calculateStats();
@@ -3356,13 +3390,15 @@
         },
 
         async updateEntry() {
+          const token = requireToken();
+          if (!token) return;
           this.isSaving = true;
           try {
             const response = await fetch(`${API_BASE_URL}/VICP_Attorney_Fees/ledger/entry/${this.editingEntry.id}`, {
               method: 'PATCH',
               headers: {
                 'Content-Type': 'application/json',
-                "Authorization": `Bearer ${localStorage.getItem("jwtvicp")}`
+                "Authorization": `Bearer ${token}`
               },
               body: JSON.stringify({
                 date: this.editingEntry.date,
@@ -3375,6 +3411,7 @@
 
             console.log("Sending:", this.editingEntry.assigned_role);
 
+            if (response.status === 401) { handle401(); return; }
             if (response.ok) {
               const index = this.ledgerEntries.findIndex(e => e.id === this.editingEntry.id);
               if (index !== -1) {
@@ -3418,6 +3455,8 @@
 
         async runGeneration() {
           if (!this.uploadFile) { alert("Please select an Excel file."); return; }
+          const token = requireToken();
+          if (!token) return;
 
           this.isGenerating = true;
           const formData = new FormData();
@@ -3432,11 +3471,12 @@
               method: 'POST',
               headers: {
                 "accept": "application/json",
-                "Authorization": `Bearer ${localStorage.getItem("jwtvicp")}`,
+                "Authorization": `Bearer ${token}`,
                 "ngrok-skip-browser-warning": "true"
               },
               body: formData
             });
+            if (response.status === 401) { handle401(); return; }
 
             const data = await response.json();
             if (response.ok) {
@@ -3474,15 +3514,18 @@
             alert("No ledger active to export. Please select or generate a ledger first.");
             return;
           }
+          const token = requireToken();
+          if (!token) return;
           const exportUrl = `${API_BASE_URL}/VICP_Attorney_Fees/ledger/${this.currentLedgerId}/export`;
 
           try {
             const response = await fetch(exportUrl, {
               headers: {
-                "Authorization": `Bearer ${localStorage.getItem("jwtvicp")}`,
+                "Authorization": `Bearer ${token}`,
                 "ngrok-skip-browser-warning": "true"
               }
             });
+            if (response.status === 401) { handle401(); return; }
 
             const contentType = response.headers.get("content-type");
             if (contentType && contentType.includes("application/json")) {
@@ -3551,12 +3594,35 @@
       setTimeout(checkAuthToken, 100);
     });
 
+    // ============ AUTH GUARD HELPERS ============
+
+    function requireToken() {
+      const token = localStorage.getItem("jwtvicp");
+      if (!token) {
+        alert("Your session has expired or you are not logged in. Please log in again.");
+        localStorage.removeItem("jwtvicp");
+        localStorage.removeItem("vicpEmail");
+        // Trigger UI redirect back to login
+        window.dispatchEvent(new CustomEvent("logout-success"));
+        return null;
+      }
+      return token;
+    }
+
+    function handle401() {
+      alert("Your session has expired. Please log in again.");
+      localStorage.removeItem("jwtvicp");
+      localStorage.removeItem("vicpEmail");
+      window.dispatchEvent(new CustomEvent("logout-success"));
+    }
+
     // ============ FEATURE 1: ACTIVE USERS COUNT ============
     async function loadActiveUsers() {
-      try {
-        const token = localStorage.getItem("jwtvicp");
-        if (!token) return;
+      // Guard: use central token checker (alerts + redirects if missing)
+      const token = requireToken();
+      if (!token) return;
 
+      try {
         const response = await fetch(
           `${API_BASE_URL}/VICP_Attorney_Fees/active-today`,
           {
