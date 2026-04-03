@@ -2309,7 +2309,7 @@
         <form @submit.prevent="runGeneration()" class="flex flex-col gap-6">
           <div>
             <label class="block text-xs font-bold text-[#f1c40f] mb-2 uppercase">File</label>
-            <input type="file" @change="uploadFile = $event.target.files[0]" required
+            <input type="file" @change="uploadFile = $event.target.files[0]" required accept=".xlsx,.xls"
               class="w-full bg-black border border-[#444] rounded p-2 text-white">
           </div>
           <div x-show="isGenerating" class="text-center p-4">
@@ -2358,13 +2358,13 @@
           <div>
             <label class="block text-xs font-bold text-[#f1c40f] mb-2 uppercase">Petition File (<span
                 style="color:#fff;text-transform:none">PDF</span>)</label>
-            <input type="file" @change="uploadPetitionFile = $event.target.files[0]" required
+            <input type="file" @change="uploadPetitionFile = $event.target.files[0]" required accept=".pdf,.doc,.docx"
               class="w-full bg-black border border-[#444] rounded p-2 text-white">
           </div>
           <div>
             <label class="block text-xs font-bold text-[#f1c40f] mb-2 uppercase">Exhibits File (<span
                 style="color:#fff;text-transform:none">PDF</span>)</label>
-            <input type="file" @change="uploadExhibitsFile = $event.target.files[0]" required
+            <input type="file" @change="uploadExhibitsFile = $event.target.files[0]" required accept=".pdf,.doc,.docx"
               class="w-full bg-black border border-[#444] rounded p-2 text-white">
           </div>
           <div>
