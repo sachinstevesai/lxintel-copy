@@ -744,8 +744,11 @@
   <script>
     function toggleActiveUsers() {
       const popover = document.getElementById("active-users-popover");
-      popover.style.display =
-        popover.style.display === "block" ? "none" : "block";
+      const isOpening = popover.style.display !== "block";
+      if (isOpening) {
+        loadActiveUsers();
+      }
+      popover.style.display = isOpening ? "block" : "none";
     }
 
     async function loadActiveUsers() {
@@ -864,6 +867,7 @@
           if (token && email) {
             this.isLoggedIn = true;
             this.userEmail = email;
+            loadActiveUsers();
           }
 
           window.addEventListener("login-success", () => {
