@@ -353,7 +353,7 @@
   <div class="overlay"></div>
 
   <!-- LOGIN PAGE CONTAINER -->
-  <div class="w-full max-w-[40rem] relative z-10" x-data="loginApp()" x-init="init()" x-show="!loggedIn">
+  <div class="w-full max-w-[40rem] relative z-10" x-data="loginApp()" x-show="!loggedIn">
     <!-- HEADER WITH LOGO AND TITLE -->
     <div class="header-text">
       <img src="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
@@ -408,7 +408,7 @@
   </div>
 
   <!-- UPLOAD PAGE CONTAINER -->
-  <div class="w-full max-w-[60rem] relative z-10 mt-24" x-data="caseApp()" x-init="init()" x-show="isLoggedIn">
+  <div class="w-full max-w-[60rem] relative z-10 mt-24" x-data="caseApp()" x-show="isLoggedIn">
     <!-- HEADER BAR -->
     <div class="header-bar">
       <div class="flex justify-between items-center header_bar_top">
@@ -598,7 +598,7 @@
   </div>
 
   <script>
-    const API_BASE_URL = "";
+    const API_BASE_URL = "https://attired-hitchily-stephane.ngrok-free.dev";
 
     // Shared state between login and upload
     const appState = {
