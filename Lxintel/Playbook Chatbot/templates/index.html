@@ -1051,7 +1051,7 @@
   </div>
 
   <script>
-    const API_BASE_URL = "https://laurene-clearheaded-nonaromatically.ngrok-free.dev";
+    const API_BASE_URL = "";
     let isProcessing = false;
 
     marked.setOptions({
@@ -1093,10 +1093,23 @@
       window.dispatchEvent(new Event("logout-success"));
     }
 
-    function startNewChat() {
+    async function startNewChat() {
       if (
         confirm("Start a new conversation? This will clear the current chat.")
       ) {
+        try {
+          const token = localStorage.getItem("jwtsopchatbot");
+          await fetch(`${API_BASE_URL}/Playbook_Chatbot/chat/clear`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
+          });
+        } catch (error) {
+          console.error("Failed to clear chat:", error);
+        }
+
         const messagesDiv = document.getElementById("chat-messages");
         messagesDiv.innerHTML = "";
         document.getElementById("message-input").value = "";
@@ -1669,6 +1682,7 @@ Below are some example questions to get you started:
         // Show welcome message if chat is empty
         if (messagesDiv && messagesDiv.children.length === 0) {
           addWelcomeMessage();
+          loadChatHistory();
         }
         // Always refresh active users when authenticated
         loadActiveUsers();
@@ -1693,6 +1707,36 @@ Below are some example questions to get you started:
         checkAuthToken();
       }, 100);
     });
+
+    // ============ FEATURE: CHAT HISTORY ============
+    async function loadChatHistory() {
+      try {
+        const token = localStorage.getItem("jwtsopchatbot");
+        if (!token) return;
+
+        const response = await fetch(
+          `${API_BASE_URL}/Playbook_Chatbot/chat/latest`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
+          },
+        );
+
+        const data = await response.json();
+
+        if (data.history && Array.isArray(data.history)) {
+          data.history.forEach((chat) => {
+            addMessage("user", chat.question);
+            addMessage("assistant", chat.answer);
+          });
+        }
+      } catch (error) {
+        console.error("Failed to load chat history:", error);
+      }
+    }
 
     // ============ FEATURE: ACTIVE USERS COUNT ============
     async function loadActiveUsers() {
