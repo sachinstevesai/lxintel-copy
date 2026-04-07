@@ -1051,7 +1051,7 @@
   </div>
 
   <script>
-    const API_BASE_URL = "";
+    const API_BASE_URL = "https://laurene-clearheaded-nonaromatically.ngrok-free.dev";
     let isProcessing = false;
 
     marked.setOptions({
@@ -1089,7 +1089,7 @@
 
     function logout() {
       localStorage.removeItem("jwtsopchatbot");
-      localStorage.removeItem("sopEmail");
+      localStorage.removeItem("playbookEmail");
       window.dispatchEvent(new Event("logout-success"));
     }
 
@@ -1541,7 +1541,7 @@ Below are some example questions to get you started:
         emailValid: null,
         emailChecking: false,
         error: "",
-        loggedIn: localStorage.getItem("jwt") ? true : false,
+        loggedIn: localStorage.getItem("jwtsopchatbot") ? true : false,
         loggingIn: false,
 
         verifyEmail() {
@@ -1604,7 +1604,7 @@ Below are some example questions to get you started:
             })
             .then((json) => {
               localStorage.setItem("jwtsopchatbot", json.access_token);
-              localStorage.setItem("sopEmail", this.email);
+              localStorage.setItem("playbookEmail", this.email);
               this.loggedIn = true;
               this.error = "";
               this.loggingIn = false;
@@ -1636,8 +1636,8 @@ Below are some example questions to get you started:
         },
 
         checkAuth() {
-          const token = localStorage.getItem("jwt");
-          const userEmail = localStorage.getItem("sopEmail");
+          const token = localStorage.getItem("jwtsopchatbot");
+          const userEmail = localStorage.getItem("playbookEmail");
           if (token && userEmail) {
             this.isLoggedIn = true;
             this.userEmail = userEmail;
@@ -1646,7 +1646,7 @@ Below are some example questions to get you started:
 
         logout() {
           localStorage.removeItem("jwtsopchatbot");
-          localStorage.removeItem("sopEmail");
+          localStorage.removeItem("playbookEmail");
           window.dispatchEvent(new Event("logout-success"));
         },
       };
