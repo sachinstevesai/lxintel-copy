@@ -164,6 +164,40 @@
             font-size: 0.9rem;
         }
 
+        .login-email-status {
+            display: flex;
+            align-items: center;
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .login-email-status.visible {
+            opacity: 1;
+        }
+
+        .login-email-status .status-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .login-email-status .status-icon.checking {
+            background-color: #3498db;
+            animation: pulse 1.5s infinite;
+        }
+
+        .login-email-status .status-icon.valid {
+            background-color: #2ecc71;
+        }
+
+        .login-email-status .status-icon.invalid {
+            background-color: #e74c3c;
+        }
+
         /* DASHBOARD STYLES */
         .dashboard-wrapper {
             display: none;
@@ -351,6 +385,20 @@
         @keyframes spin {
             to {
                 transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.6;
             }
         }
 
@@ -679,9 +727,16 @@
                 <form @submit.prevent="login()">
                     <div class="login-form-group">
                         <label>Email Address</label>
-                        <input type="email" x-model="email" placeholder="Enter your editor email" required />
+                        <input type="email" x-model="email" @input.debounce.500="verifyEmail()"
+                            placeholder="Enter your editor email" required />
+                        <div class="login-email-status" :class="{ visible: emailChecking || emailValid !== null }">
+                            <span class="status-icon"
+                                :class="emailChecking ? 'checking' : (emailValid ? 'valid' : 'invalid')"></span>
+                            <span
+                                x-text="emailChecking ? 'Checking...' : (emailValid ? 'Email verified' : 'Email not found')"></span>
+                        </div>
                     </div>
-                    <button type="submit" class="login-btn" :disabled="loggingIn">
+                    <button type="submit" class="login-btn" :disabled="emailValid !== true || loggingIn">
                         <template x-if="loggingIn">
                             <span><span class="spinner"></span>Logging in...</span>
                         </template>
@@ -819,21 +874,59 @@
 
         function logout() {
             localStorage.removeItem("jwteditorspanel");
-            localStorage.removeItem("sopEmail");
+            localStorage.removeItem("editorsEmail");
             window.location.reload();
         }
 
         function loginApp() {
             return {
                 email: "",
+                emailValid: null,
+                emailChecking: false,
                 error: "",
                 loggingIn: false,
+
+                verifyEmail() {
+                    if (!this.email) {
+                        this.emailValid = null;
+                        this.emailChecking = false;
+                        return;
+                    }
+
+                    this.emailChecking = true;
+                    this.error = "";
+                    fetch(`${API_BASE_URL}/Playbook_Chatbot/editor/verify-email?email=${encodeURIComponent(this.email)}`, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "ngrok-skip-browser-warning": "true",
+                        },
+                    })
+                        .then((res) => res.json())
+                        .then((json) => {
+                            this.emailValid = json.valid;
+                            this.emailChecking = false;
+                            if (!json.valid) {
+                                this.error = "Access denied: Your email is not on the authorized list.";
+                            }
+                        })
+                        .catch(() => {
+                            this.emailValid = false;
+                            this.emailChecking = false;
+                            this.error = "Error verifying email. Please try again.";
+                        });
+                },
 
                 isLoggedIn() {
                     return !!localStorage.getItem("jwteditorspanel");
                 },
 
                 login() {
+                    if (!this.emailValid) {
+                        this.error = "Email not authorized";
+                        return;
+                    }
+
                     if (!this.email || !this.email.includes("@")) {
                         this.error = "Please enter a valid email";
                         return;
@@ -859,7 +952,7 @@
                         })
                         .then((json) => {
                             localStorage.setItem("jwteditorspanel", json.access_token);
-                            localStorage.setItem("sopEmail", this.email);
+                            localStorage.setItem("editorsEmail", this.email);
                             window.location.reload();
                         })
                         .catch((err) => {
@@ -873,7 +966,7 @@
         // Auth toggle logic
         function checkAuth() {
             const token = localStorage.getItem("jwteditorspanel");
-            const email = localStorage.getItem("sopEmail");
+            const email = localStorage.getItem("editorsEmail");
             const loginWrapper = document.getElementById("login-page-wrapper");
             const dashboardWrapper = document.getElementById("dashboard-wrapper");
 
