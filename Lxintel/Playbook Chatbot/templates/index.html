@@ -1262,7 +1262,14 @@
         hideTypingIndicator();
         isProcessing = false;
         sendBtn.disabled = false;
-        sendBtn.textContent = "Send";
+        const baseText = sendBtn.dataset.originalTranslationText || "Send";
+        if (window.currentLang === 'en') {
+          sendBtn.textContent = baseText;
+        } else {
+          Translator.translate(baseText, window.currentLang).then(txt => {
+            sendBtn.textContent = txt;
+          });
+        }
         scrollToBottom();
       }
     }
