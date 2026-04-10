@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FAA MedCert Case Builder</title>
+    <link rel="icon" type="image/webp"
+        href="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body,
+        html {
+            font-family: "Montserrat", sans-serif;
+            background-color: #111;
+            color: #f1c40f;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: url("https://static.vecteezy.com/system/resources/previews/007/596/744/non_2x/abstract-digital-glossy-particles-and-lines-connected-3d-illustration-on-black-background-free-photo.jpg");
+            background-size: cover;
+            background-position: center top 150px;
+            z-index: -2;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: -1;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        .app-header {
+            background: rgba(17, 17, 17, 0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 2px solid rgba(241, 196, 15, 0.2);
+            padding: 20px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 20px rgba(241, 196, 15, 0.15);
+            position: relative;
+            z-index: 50;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            height: 56px;
+            width: auto;
+            filter: drop-shadow(0 0 10px rgba(241, 196, 15, 0.3));
+        }
+
+        .header-title h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #f1c40f;
+            letter-spacing: 1px;
+            text-shadow: 0 0 20px rgba(241, 196, 15, 0.4);
+        }
+
+        .header-title p {
+            font-size: 13px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        #active-users-popover::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #active-users-popover::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        #active-users-popover::-webkit-scrollbar-thumb {
+            background: rgba(241, 196, 15, 0.4);
+            border-radius: 4px;
+        }
+
+        #active-users-popover::-webkit-scrollbar-thumb:hover {
+            background: rgba(241, 196, 15, 0.6);
+        }
+
+        .ledger-table-container::-webkit-scrollbar,
+        .view-container::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        .ledger-table-container::-webkit-scrollbar-track,
+        .view-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+
+        .ledger-table-container::-webkit-scrollbar-thumb,
+        .view-container::-webkit-scrollbar-thumb {
+            background: rgba(241, 196, 15, 0.4);
+            border-radius: 5px;
+            border: 2px solid rgba(17, 17, 17, 0.9);
+        }
+
+        .ledger-table-container::-webkit-scrollbar-thumb:hover,
+        .view-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(241, 196, 15, 0.7);
+        }
+
+        .spinner {
+            border: 3px solid rgba(0, 0, 0, 0.3);
+            border-top-color: #000;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-header {
+                padding: 16px 20px;
+            }
+
+            .header-title h1 {
+                font-size: 18px;
+            }
+
+            .header-title p {
+                display: none;
+            }
+
+            .logo {
+                height: 44px;
+            }
+        }
+
+        /* LOGIN PAGE STYLES */
+        .login-page-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .login-page-content {
+            width: 100%;
+            max-width: 600px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .login-logo-section {
+            margin-bottom: 3rem;
+        }
+
+        .login-page-content h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #f1c40f;
+            margin: 0 0 1rem 0;
+            letter-spacing: 2px;
+        }
+
+        .login-page-content>p {
+            font-size: 1rem;
+            color: #aaa;
+            margin: 0 0 2rem 0;
+        }
+
+        .login-form-card {
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .login-form-card h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #f1c40f;
+            margin: 0 0 2rem 0;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .login-form-group {
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .login-form-group label {
+            display: block;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #f1c40f;
+            margin-bottom: 0.75rem;
+        }
+
+        .login-form-group input[type="email"] {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            font-size: 0.95rem;
+            background-color: #000;
+            color: #fff;
+            border: 1px solid #444;
+            border-radius: 6px;
+            font-family: "Montserrat", sans-serif;
+            transition: border-color 0.3s ease;
+        }
+
+        .login-form-group input[type="email"]:focus {
+            outline: none;
+            border-color: #f1c40f;
+            box-shadow: 0 0 0 2px rgba(241, 196, 15, 0.1);
+        }
+
+        .login-form-group input[type="email"]::placeholder {
+            color: #666;
+        }
+
+        .login-email-status {
+            display: flex;
+            align-items: center;
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .login-email-status.visible {
+            opacity: 1;
+        }
+
+        .login-email-status .status-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .login-email-status .status-icon.checking {
+            background-color: #3498db;
+            animation: pulse 1.5s infinite;
+        }
+
+        .login-email-status .status-icon.valid {
+            background-color: #2ecc71;
+        }
+
+        .login-email-status .status-icon.invalid {
+            background-color: #e74c3c;
+        }
+
+        .login-error-message {
+            color: #e74c3c;
+            background-color: rgba(231, 76, 60, 0.1);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 0.875rem;
+            font-size: 1rem;
+            font-weight: 700;
+            background-color: #d4ac0d;
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .login-btn:hover:not(:disabled) {
+            background-color: #f1c40f;
+            box-shadow: 0 4px 12px rgba(241, 196, 15, 0.3);
+        }
+
+        .login-btn:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .login-btn-spinner {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.6;
+            }
+        }
+
+        .active_user {
+            position: fixed;
+            top: 80px;
+            left: 350px;
+            background-color: rgb(26, 26, 26);
+            border: 1px solid rgba(241, 196, 15, 0.4);
+            border-radius: 8px;
+            padding: 12px;
+            min-width: auto;
+            max-height: 400px;
+            display: none;
+            z-index: 2100;
+            box-shadow: rgba(0, 0, 0, 0.5) 0px 4px 20px;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 768px) {
+            .active_user {
+                top: 120px;
+                left: 105px;
+            }
+
+            div#user-menu-popover {
+                top: 120px !important;
+            }
+        }
+
+        /* --- LEDGER UI STYLES --- */
+        .view-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(241, 196, 15, 0.2);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            flex-shrink: 0;
+        }
+
+        .ledger-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            color: #e0e0e0;
+        }
+
+        .ledger-table-container {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .ledger-table th {
+            padding: 11px 14px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+            background: rgba(0, 0, 0, 0.5);
+            border-bottom: 2px solid rgba(241, 196, 15, 0.25);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .ledger-table td {
+            padding: 11px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        .ledger-row {
+            transition: background 0.15s;
+        }
+
+        .ledger-row:hover {
+            background: rgba(241, 196, 15, 0.06);
+        }
+
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+
+        .modal-content {
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="video-background"></div>
+    <div class="overlay"></div>
+
+    <!-- Login Page -->
+    <div id="login-page-wrapper" class="login-page-wrapper" x-data="loginApp()">
+        <div class="login-page-content">
+            <div class="login-logo-section">
+                <h1>FAA MedCert Case Builder</h1>
+                <p>Professional Medical Certification Analysis Platform</p>
+            </div>
+            <div class="login-form-card">
+                <h2>LOGIN</h2>
+                <div x-show="error" class="login-error-message" x-text="error"></div>
+                <form @submit.prevent="login()">
+                    <div class="login-form-group">
+                        <label for="login-email">Email Address</label>
+                        <input type="email" id="login-email" x-model="email" @input.debounce.500="verifyEmail()"
+                            @keydown.enter="emailValid && login()" placeholder="Enter your email" required />
+                        <div class="login-email-status" :class="{ visible: emailChecking || emailValid !== null }">
+                            <span class="status-icon"
+                                :class="emailChecking ? 'checking' : (emailValid ? 'valid' : 'invalid')"></span>
+                            <span
+                                x-text="emailChecking ? 'Checking...' : (emailValid ? 'Email verified' : 'Email not found')"></span>
+                        </div>
+                    </div>
+                    <button type="submit" class="login-btn" :disabled="emailValid !== true || loggingIn">
+                        <span x-show="!loggingIn">LOGIN</span>
+                        <span x-show="loggingIn" class="login-btn-spinner">
+                            <span class="spinner"></span>
+                            Logging in...
+                        </span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="main-app-wrapper" class="app-container" x-data="medcertApp()" style="display: none">
+
+        <div class="app-header">
+            <div class="header-left">
+                <img src="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
+                    alt="Ramos Law" class="logo" />
+                <div class="header-title">
+                    <h1>FAA MedCert Case Builder</h1>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <p>AI-Powered Case Analysis</p>
+                        <!-- Active Users Count -->
+                        <button id="active-users-btn" style="
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                  background: none;
+                  border: none;
+                  cursor: pointer;
+                  padding: 4px 10px;
+                  border-radius: 6px;
+                  transition: all 0.3s;
+                  color: #f1c40f;
+                  font-size: 12px;
+                  font-weight: 600;
+                " onclick="toggleActiveUsersPopover()" title="Active users on this tool">
+                            <span style="
+                  display: inline-block;
+                  width: 8px;
+                  height: 8px;
+                  background: #2ecc71;
+                  border-radius: 50%;
+                  box-shadow: 0 0 8px #2ecc71;
+                "></span>
+                            <span id="active-count">0</span>
+                            <span style="margin-left: 4px;">Users</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right" style="display: flex; align-items: center; gap: 16px;">
+                <!-- MENU ICON -->
+                <button style="background: none; border: none; cursor: pointer; padding: 8px; position: relative;"
+                    onclick="toggleUserMenu()" title="User menu">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f1c40f" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="4" y1="6" x2="20" y2="6"></line>
+                        <line x1="4" y1="12" x2="20" y2="12"></line>
+                        <line x1="4" y1="18" x2="20" y2="18"></line>
+                    </svg>
+                </button>
+
+                <!-- USER MENU POPOVER -->
+                <div id="user-menu-popover" style="
+              position: absolute;
+              top: 70px;
+              right: 20px;
+              background-color: #222;
+              border: 1px solid #444;
+              border-radius: 8px;
+              padding: 12px;
+              min-width: 200px;
+              display: none;
+              z-index: 1000;
+              box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            ">
+                    <div
+                        style="padding: 8px 12px; border-bottom: 1px solid #444; margin-bottom: 8px; color: #bbb; font-size: 13px;">
+                        <span x-text="userEmail"></span>
+                    </div>
+                    <button onclick="logoutApp()" style="
+                width: 100%;
+                padding: 10px 12px;
+                background-color: #e74c3c;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 14px;
+              ">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Users Popover -->
+        <div id="active-users-popover" class="active_user">
+            <div style="
+          padding: 8px 0;
+          margin-bottom: 8px;
+          border-bottom: 1px solid rgba(241, 196, 15, 0.3);
+          color: #f1c40f;
+          font-size: 12px;
+          font-weight: 600;
+        ">Active Users</div>
+            <div id="active-users-list" style="color: #aaa; font-size: 13px;">
+                <div style="padding: 8px 0; color: #666;">Loading...</div>
+            </div>
+        </div>
+
+        <div class="view-container" style="padding: 24px; gap: 24px; overflow-y: auto;">
+            <div style="display: flex; flex-direction: column; gap: 24px;">
+
+                <!-- Section 1: Medcert Upload History -->
+                <div class="glass-panel"
+                    style="display: flex; flex-direction: column; overflow: hidden; margin-bottom: 24px;">
+                    <div class="filter-bar"
+                        style="background: rgba(241, 196, 15, 0.05); border-bottom: 1px solid rgba(241, 196, 15, 0.1);">
+                        <h3
+                            style="color: #f1c40f; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">
+                            MedCert Run History
+                        </h3>
+                        <button @click="openUploadModal()"
+                            style="margin-left: auto; background: rgba(241,196,15,0.15); color: #f1c40f; border: 1px solid rgba(241,196,15,0.4); padding: 7px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; letter-spacing: 0.5px;">
+                            UPLOAD ZIP
+                        </button>
+                    </div>
+                    <div class="ledger-table-container"
+                        style="margin: 0; max-height: 300px; overflow-y: auto; overflow-x: auto;">
+                        <div x-show="loadingRuns" style="padding: 40px; text-align: center;">
+                            <span class="spinner" style="width: 24px; height: 24px; border-width: 3px;"></span>
+                            <p style="margin-top: 12px; color: #f1c40f; font-size: 12px;">Fetching run history...</p>
+                        </div>
+
+                        <div x-show="!loadingRuns && runs.length === 0"
+                            style="padding: 40px; text-align: center; color: #555;">
+                            <p style="font-size: 13px;">No previous runs found.</p>
+                        </div>
+
+                        <table class="ledger-table" x-show="!loadingRuns && runs.length > 0"
+                            style="table-layout: auto; min-width: 600px;">
+                            <thead style="position: sticky; top: 0; background: rgba(10, 10, 10, 0.98); z-index: 10;">
+                                <tr>
+                                    <th style="width: 60px;">ID</th>
+                                    <th style="width: 200px;">User Email</th>
+                                    <th style="width: 250px;">Zip Filename</th>
+                                    <th style="width: 180px;">Created At</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template x-for="run in runs" :key="run.id">
+                                    <tr class="ledger-row" @click="selectRun(run.id)"
+                                        :style="currentRunId === run.id ? 'background: rgba(241,196,15,0.12); border-left: 4px solid #f1c40f;' : 'cursor: pointer;'">
+                                        <td style="font-size: 12px; color: #ccc; padding-left: 14px; font-weight: bold;"
+                                            x-text="run.id"></td>
+                                        <td style="font-size: 12px; color: #ccc;" x-text="run.user_email"></td>
+                                        <td style="font-size: 12px; color: #eee; font-weight: 500;">
+                                            <div style="display: flex; align-items: center; gap: 8px;">
+                                                <span x-show="currentRunId === run.id"
+                                                    style="color: #f1c40f; font-size: 10px;">▶</span>
+                                                <span x-text="run.zip_filename"></span>
+                                            </div>
+                                        </td>
+                                        <td style="font-size: 12px; color: #888;"
+                                            x-text="new Date(run.created_at).toLocaleString()"></td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Section 2: Run Details Area -->
+                <div class="glass-panel" style="display: flex; flex-direction: column; overflow: hidden;">
+                    <div
+                        style="padding: 12px 16px; border-bottom: 1px solid rgba(241, 196, 15, 0.1); background: rgba(241, 196, 15, 0.05);">
+                        <h3
+                            style="color: #f1c40f; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">
+                            Run Details
+                        </h3>
+                    </div>
+                    <!-- Details Container without filters or select options -->
+                    <div class="ledger-table-container" style="margin: 0; min-height: 200px; padding: 24px;">
+                        <div x-show="!currentRunId" style="text-align: center; color: #555; padding: 40px 0;">
+                            <p style="font-size: 14px; font-weight: 600;">Select a run to view details.</p>
+                        </div>
+                        <div x-show="currentRunId" style="text-align: center; color: #aaa; padding: 40px 0;">
+                            <p style="font-size: 14px; font-style: italic;">Details for run ID <span
+                                    x-text="currentRunId" class="text-[#f1c40f] font-bold"></span> will be provided by
+                                the API later.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- UPLOAD ZIP MODAL -->
+        <div class="modal-backdrop" :style="showUploadModal ? 'display: flex;' : 'display: none;'">
+            <div class="glass-panel modal-content" style="padding: 32px; max-width: 500px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <h2 style="color: #f1c40f; font-size: 20px; font-weight: 700;">Upload Zip Archive</h2>
+                    <button @click="showUploadModal = false" class="text-gray-500 text-2xl">×</button>
+                </div>
+
+                <form @submit.prevent="runUploadGeneration()" class="flex flex-col gap-6">
+                    <div>
+                        <label class="block text-xs font-bold text-[#f1c40f] mb-2 uppercase">Zip File Archive</label>
+                        <input type="file" @change="uploadArchiveFile = $event.target.files[0]" required accept=".zip"
+                            class="w-full bg-black border border-[#444] rounded p-2 text-white">
+                    </div>
+                    <div x-show="isUploadGenerating" class="text-center p-4">
+                        <span class="spinner"></span>
+                        <p class="mt-2 text-[#f1c40f]">Uploading and regenerating...</p>
+                    </div>
+
+                    <button x-show="!isUploadGenerating" type="submit"
+                        class="login-btn w-full !bg-[#f1c40f] !text-black !font-bold">UPLOAD ZIP</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = "https://laurene-clearheaded-nonaromatically.ngrok-free.dev";
+
+        function toggleUserMenu() {
+            const popover = document.getElementById("user-menu-popover");
+            if (popover.style.display === "none" || popover.style.display === "") {
+                popover.style.display = "block";
+            } else {
+                popover.style.display = "none";
+            }
+        }
+
+        document.addEventListener("click", function (event) {
+            const popover = document.getElementById("user-menu-popover");
+            const menuBtn = event.target.closest("button[onclick='toggleUserMenu()']");
+            if (!menuBtn && popover && !popover.contains(event.target)) {
+                popover.style.display = "none";
+            }
+        });
+
+        function logoutApp() {
+            localStorage.removeItem("jwtmedcert");
+            localStorage.removeItem("medcertEmail");
+            window.dispatchEvent(new Event("logout-success"));
+            document.getElementById("user-menu-popover").style.display = "none";
+        }
+
+        // Alpine.js Components
+        function loginApp() {
+            return {
+                email: "",
+                emailValid: null,
+                emailChecking: false,
+                error: "",
+                loggedIn: localStorage.getItem("jwtmedcert") ? true : false,
+                loggingIn: false,
+
+                verifyEmail() {
+                    if (!this.email) {
+                        this.emailValid = null;
+                        this.emailChecking = false;
+                        return;
+                    }
+
+                    this.emailChecking = true;
+                    this.error = "";
+                    fetch(
+                        `${API_BASE_URL}/FAA_MedCert_Case_Builder/verify-email?email=${encodeURIComponent(this.email)}`,
+                        {
+                            method: "GET",
+                            headers: {
+                                "ngrok-skip-browser-warning": "true"
+                            }
+                        }
+                    )
+                        .then((res) => res.json())
+                        .then((json) => {
+                            this.emailValid = json.valid !== undefined ? json.valid : true; // Assuming valid if true based on empty response body or simple return in typical cases, matching VICP logic
+                            this.emailChecking = false;
+                        })
+                        .catch(() => {
+                            this.emailValid = false;
+                            this.emailChecking = false;
+                            this.error = "Failed to verify email.";
+                        });
+                },
+
+                login() {
+                    if (!this.email) {
+                        this.error = "Please enter a valid email";
+                        return;
+                    }
+
+                    this.loggingIn = true;
+
+                    const data = new URLSearchParams();
+                    data.append("username", this.email);
+                    data.append("password", "0");
+
+                    fetch(`${API_BASE_URL}/FAA_MedCert_Case_Builder/login`, {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            "ngrok-skip-browser-warning": "true"
+                        },
+                        body: data,
+                    })
+                        .then((res) => {
+                            if (!res.ok) throw new Error("Unauthorized email");
+                            return res.json();
+                        })
+                        .then((json) => {
+                            localStorage.setItem("jwtmedcert", json.access_token);
+                            localStorage.setItem("medcertEmail", this.email);
+                            this.loggedIn = true;
+                            this.error = "";
+                            this.loggingIn = false;
+                            window.dispatchEvent(
+                                new CustomEvent("login-success", {
+                                    detail: { email: this.email },
+                                })
+                            );
+                        })
+                        .catch((err) => {
+                            this.error = "Invalid credentials";
+                            this.loggingIn = false;
+                        });
+                },
+            };
+        }
+
+        function medcertApp() {
+            return {
+                isLoggedIn: false,
+                userEmail: "",
+                runs: [],
+                loadingRuns: false,
+                currentRunId: null,
+
+                showUploadModal: false,
+                uploadArchiveFile: null,
+                isUploadGenerating: false,
+
+                init() {
+                    this.checkAuth();
+                    window.addEventListener("login-success", (e) => {
+                        this.userEmail = e.detail.email;
+                        this.isLoggedIn = true;
+                        this.fetchRuns();
+                    });
+
+                    if (this.isLoggedIn) {
+                        this.fetchRuns();
+                    }
+                },
+
+                checkAuth() {
+                    const token = localStorage.getItem("jwtmedcert");
+                    const userEmail = localStorage.getItem("medcertEmail");
+                    if (token && userEmail) {
+                        this.isLoggedIn = true;
+                        this.userEmail = userEmail;
+                    }
+                },
+
+                async fetchRuns() {
+                    const token = requireToken();
+                    if (!token) return;
+                    this.loadingRuns = true;
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/FAA_MedCert_Case_Builder/medcert-history`, {
+                            headers: {
+                                "Authorization": `Bearer ${token}`,
+                                "ngrok-skip-browser-warning": "true"
+                            }
+                        });
+                        if (response.status === 401) { handle401(); return; }
+                        if (response.ok) {
+                            this.runs = await response.json();
+                        } else {
+                            this.runs = [];
+                        }
+                    } catch (error) {
+                        console.error("Failed to fetch runs:", error);
+                        this.runs = [];
+                    } finally {
+                        this.loadingRuns = false;
+                    }
+                },
+
+                selectRun(runId) {
+                    if (this.currentRunId === runId) return;
+                    this.currentRunId = runId;
+                },
+
+                openUploadModal() {
+                    this.showUploadModal = true;
+                },
+
+                async runUploadGeneration() {
+                    if (!this.uploadArchiveFile) {
+                        alert("Please select a zip file.");
+                        return;
+                    }
+                    const token = requireToken();
+                    if (!token) return;
+
+                    this.isUploadGenerating = true;
+                    const formData = new FormData();
+                    formData.append('file', this.uploadArchiveFile);
+
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/FAA_MedCert_Case_Builder/upload-zip`, {
+                            method: 'POST',
+                            headers: {
+                                "Authorization": `Bearer ${token}`,
+                                "ngrok-skip-browser-warning": "true"
+                            },
+                            body: formData
+                        });
+                        if (response.status === 401) { handle401(); return; }
+                        if (response.ok) {
+                            const data = await response.json();
+                            this.showUploadModal = false;
+                            this.currentRunId = null;
+                            await this.fetchRuns();
+                        } else {
+                            alert("Upload failed.");
+                        }
+                    } catch (error) {
+                        console.error("Upload Generation Error:", error);
+                        alert("Error connecting to server.");
+                    } finally {
+                        this.isUploadGenerating = false;
+                    }
+                }
+            };
+        }
+    </script>
+
+    <script>
+        function checkAuthToken() {
+            const token = localStorage.getItem("jwtmedcert");
+            const loginPageWrapper = document.getElementById("login-page-wrapper");
+            const mainAppWrapper = document.getElementById("main-app-wrapper");
+
+            if (token) {
+                loginPageWrapper.style.display = "none";
+                mainAppWrapper.style.display = "flex";
+                loadActiveUsers();
+            } else {
+                loginPageWrapper.style.display = "flex";
+                mainAppWrapper.style.display = "none";
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", checkAuthToken);
+
+        window.addEventListener("logout-success", () => {
+            setTimeout(checkAuthToken, 100);
+        });
+
+        window.addEventListener("login-success", () => {
+            setTimeout(checkAuthToken, 100);
+        });
+
+        function requireToken() {
+            const token = localStorage.getItem("jwtmedcert");
+            if (!token) {
+                alert("Your session has expired or you are not logged in. Please log in again.");
+                localStorage.removeItem("jwtmedcert");
+                localStorage.removeItem("medcertEmail");
+                window.dispatchEvent(new CustomEvent("logout-success"));
+                return null;
+            }
+            return token;
+        }
+
+        function handle401() {
+            alert("Your session has expired. Please log in again.");
+            localStorage.removeItem("jwtmedcert");
+            localStorage.removeItem("medcertEmail");
+            window.dispatchEvent(new CustomEvent("logout-success"));
+        }
+
+        async function loadActiveUsers() {
+            const token = requireToken();
+            if (!token) return;
+
+            try {
+                const response = await fetch(
+                    `${API_BASE_URL}/FAA_MedCert_Case_Builder/active-today`,
+                    {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${token}`,
+                            "ngrok-skip-browser-warning": "true"
+                        }
+                    }
+                );
+
+                const data = await response.json();
+
+                if (Array.isArray(data)) {
+                    const count = data.length;
+                    const countElement = document.getElementById("active-count");
+                    if (countElement) {
+                        countElement.textContent = count;
+                    }
+
+                    const usersList = document.getElementById("active-users-list");
+                    if (usersList) {
+                        if (count === 0) {
+                            usersList.innerHTML = '<div style="padding: 8px 0; color: #666;">No active users</div>';
+                        } else {
+                            usersList.innerHTML = data.map(user => `
+                  <div style="
+                    padding: 10px 8px;
+                    border-bottom: 1px solid rgba(241, 196, 15, 0.2);
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    gap: 16px;
+                  ">
+                    <span style="color: #f1c40f; font-weight: 500; flex: 1;">${user.email}</span>
+                    <span style="color: #aaa; font-size: 12px; white-space: nowrap; flex-shrink: 0;">${formatLastActive(user.last_active)}</span>
+                  </div>
+                `).join("");
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to load active users:", error);
+            }
+        }
+
+        function formatLastActive(dateStr) {
+            try {
+                const date = new Date(dateStr);
+                const now = new Date();
+                const diffMs = now - date;
+                const diffMins = Math.floor(diffMs / 60000);
+                const diffHours = Math.floor(diffMs / 3600000);
+                const diffDays = Math.floor(diffMs / 86400000);
+
+                if (diffMins < 1) return "just now";
+                if (diffMins < 60) return `${diffMins}m ago`;
+                if (diffHours < 24) return `${diffHours}h ago`;
+                if (diffDays < 7) return `${diffDays}d ago`;
+
+                return date.toLocaleDateString();
+            } catch (e) {
+                return dateStr;
+            }
+        }
+
+        function toggleActiveUsersPopover() {
+            const popover = document.getElementById("active-users-popover");
+            if (popover.style.display === "none" || popover.style.display === "") {
+                popover.style.display = "block";
+                loadActiveUsers();
+            } else {
+                popover.style.display = "none";
+            }
+        }
+
+        document.addEventListener("click", function (event) {
+            const popover = document.getElementById("active-users-popover");
+            const btn = document.getElementById("active-users-btn");
+            if (!btn.contains(event.target) && !popover.contains(event.target)) {
+                popover.style.display = "none";
+            }
+        });
+
+    </script>
+</body>
+
+</html>
