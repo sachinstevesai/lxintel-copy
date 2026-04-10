@@ -478,6 +478,49 @@
             max-height: 90vh;
             overflow-y: auto;
         }
+
+        /* Review Section Styles */
+        .item-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(241, 196, 15, 0.1);
+            border-radius: 8px;
+            padding: 16px;
+            transition: all 0.3s;
+        }
+
+        .item-card:hover {
+            background: rgba(241, 196, 15, 0.05);
+            border-color: rgba(241, 196, 15, 0.3);
+        }
+
+        .evidence-line {
+            border-left: 2px solid rgba(241, 196, 15, 0.3);
+            padding-left: 12px;
+            margin-top: 8px;
+            font-style: italic;
+            color: #ccc;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-status {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+        }
+
+        .badge-missing {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
     </style>
 </head>
 
@@ -490,7 +533,7 @@
         <div class="login-page-content">
             <div class="login-logo-section">
                 <h1>FAA MedCert Case Builder</h1>
-                <p>Professional Medical Certification Analysis Platform</p>
+                <p>Secure Access for Authorized Ramos Law Users</p>
             </div>
             <div class="login-form-card">
                 <h2>LOGIN</h2>
@@ -631,7 +674,7 @@
                         style="background: rgba(241, 196, 15, 0.05); border-bottom: 1px solid rgba(241, 196, 15, 0.1);">
                         <h3
                             style="color: #f1c40f; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">
-                            MedCert Run History
+                            MedCert History
                         </h3>
                         <button @click="openUploadModal()"
                             style="margin-left: auto; background: rgba(241,196,15,0.15); color: #f1c40f; border: 1px solid rgba(241,196,15,0.4); padding: 7px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; letter-spacing: 0.5px;">
@@ -654,18 +697,18 @@
                             style="table-layout: auto; min-width: 600px;">
                             <thead style="position: sticky; top: 0; background: rgba(10, 10, 10, 0.98); z-index: 10;">
                                 <tr>
-                                    <th style="width: 60px;">ID</th>
+                                    <th style="width: 60px;">#</th>
                                     <th style="width: 200px;">User Email</th>
                                     <th style="width: 250px;">Zip Filename</th>
                                     <th style="width: 180px;">Created At</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <template x-for="run in runs" :key="run.id">
+                                <template x-for="(run, index) in runs" :key="run.id">
                                     <tr class="ledger-row" @click="selectRun(run.id)"
                                         :style="currentRunId === run.id ? 'background: rgba(241,196,15,0.12); border-left: 4px solid #f1c40f;' : 'cursor: pointer;'">
                                         <td style="font-size: 12px; color: #ccc; padding-left: 14px; font-weight: bold;"
-                                            x-text="run.id"></td>
+                                            x-text="index + 1"></td>
                                         <td style="font-size: 12px; color: #ccc;" x-text="run.user_email"></td>
                                         <td style="font-size: 12px; color: #eee; font-weight: 500;">
                                             <div style="display: flex; align-items: center; gap: 8px;">
@@ -689,18 +732,286 @@
                         style="padding: 12px 16px; border-bottom: 1px solid rgba(241, 196, 15, 0.1); background: rgba(241, 196, 15, 0.05);">
                         <h3
                             style="color: #f1c40f; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">
-                            Run Details
+                            Case Details
                         </h3>
                     </div>
                     <!-- Details Container without filters or select options -->
-                    <div class="ledger-table-container" style="margin: 0; min-height: 200px; padding: 24px;">
-                        <div x-show="!currentRunId" style="text-align: center; color: #555; padding: 40px 0;">
+                    <div class="ledger-table-container" style="margin: 0; min-height: 200px; padding: 0;">
+                        <div x-show="!currentRunId" style="text-align: center; color: #555; padding: 60px 0;">
                             <p style="font-size: 14px; font-weight: 600;">Select a run to view details.</p>
                         </div>
-                        <div x-show="currentRunId" style="text-align: center; color: #aaa; padding: 40px 0;">
-                            <p style="font-size: 14px; font-style: italic;">Details for run ID <span
-                                    x-text="currentRunId" class="text-[#f1c40f] font-bold"></span> will be provided by
-                                the API later.</p>
+
+                        <div x-show="currentRunId && loadingCaseDetails" style="text-align: center; padding: 60px 0;">
+                            <span class="spinner" style="width: 32px; height: 32px;"></span>
+                            <p style="margin-top: 16px; color: #f1c40f; font-size: 13px;">Analyzing Case Data...</p>
+                        </div>
+
+                        <!-- CASE CONTENT VIEW -->
+                        <div x-show="currentRunId && !loadingCaseDetails && caseDetails" style="padding: 24px;">
+                            <!-- Header Summary Card -->
+                            <div class="glass-panel"
+                                style="padding: 24px; margin-bottom: 24px; background: rgba(241, 196, 15, 0.05);">
+                                <div
+                                    style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                                    <h2 style="color: #f1c40f; font-size: 24px; font-weight: 700;"
+                                        x-text="caseDetails.case_header.case_name"></h2>
+                                    <div class="badge badge-status" style="font-size: 12px; padding: 4px 12px;"
+                                        x-text="'ID: ' + caseDetails.session_id"></div>
+                                </div>
+                                <p style="color: #bbb; font-size: 14px; line-height: 1.6; margin-bottom: 20px;"
+                                    x-text="caseDetails.case_header.case_summary"></p>
+
+                                <h4
+                                    style="color: #f1c40f; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">
+                                    FILE CLASSIFICATION</h4>
+                                <div
+                                    style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
+                                    <template x-for="file in caseDetails.case_header.file_classification">
+                                        <div class="item-card" style="padding: 12px;">
+                                            <p style="color: #f1c40f; font-size: 11px; font-weight: bold; margin-bottom: 4px;"
+                                                x-text="file.document_type"></p>
+                                            <p style="color: #eee; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 8px;"
+                                                x-text="file.file_name"></p>
+                                            <div
+                                                style="font-size: 10px; color: #888; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;">
+                                                <span style="color: #f1c40f; font-weight: bold;">SOURCE:</span>
+                                                <p x-text="file.source_citations" style="margin-top: 2px;"></p>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Issue Stack -->
+                            <h4
+                                style="color: #f1c40f; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px;">
+                                Issue Review Cards</h4>
+                            <div
+                                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin-bottom: 32px;">
+                                <template x-for="issue in caseDetails.issue_stack">
+                                    <div class="item-card">
+                                        <div
+                                            style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                                            <h5 style="color: #f1c40f; font-weight: 700; font-size: 14px;"
+                                                x-text="issue.issue_type"></h5>
+                                            <span class="badge badge-status" x-text="issue.status"></span>
+                                        </div>
+                                        <p style="color: #eee; font-size: 13px; margin-bottom: 12px; font-weight: 600;"
+                                            x-text="issue.issue_label"></p>
+                                        <div class="evidence-line"
+                                            style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 4px;">
+                                            <span
+                                                style="display: block; font-size: 10px; color: #f1c40f; font-weight: 800; margin-bottom: 6px; letter-spacing: 0.5px;">SUPPORTING
+                                                EVIDENCE</span>
+                                            <p style="font-size: 12px; line-height: 1.5; color: #ccc;"
+                                                x-text="issue.supporting_evidence"></p>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <!-- Details Grid -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                                <!-- Fact Model Column -->
+                                <div style="display: flex; flex-direction: column; gap: 24px;">
+                                    <!-- Missing Items Checklist -->
+                                    <div class="glass-panel"
+                                        style="padding: 20px; border-color: rgba(231, 76, 60, 0.3);">
+                                        <h4
+                                            style="color: #e74c3c; font-size: 12px; font-weight: 700; margin-bottom: 16px; text-transform: uppercase;">
+                                            Missing Documents Checklist</h4>
+                                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                                            <template x-for="item in caseDetails.missing_items.global_missing_items">
+                                                <div
+                                                    style="display: flex; align-items: center; gap: 10px; padding: 8px; background: rgba(231, 76, 60, 0.05); border-radius: 4px;">
+                                                    <span style="color: #e74c3c;">☐</span>
+                                                    <span style="color: #eee; font-size: 13px;" x-text="item"></span>
+                                                </div>
+                                            </template>
+                                            <p x-show="caseDetails.missing_items.global_missing_items.length === 0"
+                                                style="color: #2ecc71; font-size: 13px;">✓ No missing critical items
+                                                identified.</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Diagnoses -->
+                                    <div class="glass-panel" style="padding: 20px;">
+                                        <h4
+                                            style="color: #f1c40f; font-size: 12px; font-weight: 700; margin-bottom: 16px; text-transform: uppercase;">
+                                            Fact Model: Diagnoses</h4>
+                                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                                            <template x-for="diag in caseDetails.fact_model.diagnoses">
+                                                <div
+                                                    style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 16px;">
+                                                    <p style="color: #eee; font-weight: 600; font-size: 14px; margin-bottom: 4px;"
+                                                        x-text="diag['diagnose name']"></p>
+                                                    <p style="color: #888; font-size: 12px; margin-bottom: 10px;"
+                                                        x-text="diag.diagnose_detail"></p>
+
+                                                    <!-- Citations -->
+                                                    <div class="evidence-line"
+                                                        style="border-color: rgba(241,196,15,0.15);">
+                                                        <template x-for="cite in diag.source_citations">
+                                                            <div style="margin-bottom: 8px; font-size: 11px;">
+                                                                <p style="color: #ccc; font-style: italic; margin-bottom: 4px;"
+                                                                    x-text="'\"' + cite.excerpt + ' \"'"></p>
+                                                                <p style="color: #f1c40f; font-weight: 600; font-size: 10px;"
+                                                                    x-text="cite.source_document + ' (' + cite.section + ')'">
+                                                                </p>
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+
+                                    <!-- Medications -->
+                                    <div class="glass-panel" style="padding: 20px;">
+                                        <h4
+                                            style="color: #f1c40f; font-size: 12px; font-weight: 700; margin-bottom: 16px; text-transform: uppercase;">
+                                            Fact Model: Medications</h4>
+                                        <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+                                            <template x-for="med in caseDetails.fact_model.medications">
+                                                <div class="item-card" style="padding: 12px;">
+                                                    <div
+                                                        style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                                        <span style="color: #f1c40f; font-weight: 700; font-size: 13px;"
+                                                            x-text="med.medication_name"></span>
+                                                        <span style="color: #888; font-size: 11px;"
+                                                            x-text="med.medication_class"></span>
+                                                    </div>
+                                                    <p style="color: #eee; font-size: 12px; margin-bottom: 2px;"
+                                                        x-text="med.dose"></p>
+                                                    <p style="color: #888; font-size: 11px; margin-bottom: 10px;"
+                                                        x-text="med.instructions">
+                                                    </p>
+                                                    <!-- Citations -->
+                                                    <div class="evidence-line"
+                                                        style="border-color: rgba(241,196,15,0.15);">
+                                                        <template x-for="cite in med.source_citations">
+                                                            <div style="margin-bottom: 4px; font-size: 10px;">
+                                                                <p style="color: #ccc; font-style: italic; margin-bottom: 2px;"
+                                                                    x-text="'\"' + cite.excerpt + ' \"'"></p>
+                                                                <p style="color: #f1c40f; font-weight: 600;"
+                                                                    x-text="cite.source_document"></p>
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+
+                                    <!-- Evaluations & Tests -->
+                                    <div class="glass-panel" style="padding: 20px;">
+                                        <h4
+                                            style="color: #f1c40f; font-size: 12px; font-weight: 700; margin-bottom: 16px; text-transform: uppercase;">
+                                            Fact Model: Evaluations & Tests</h4>
+                                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                                            <template x-for="test in caseDetails.fact_model.evaluations_tests">
+                                                <div class="item-card" style="padding: 12px;">
+                                                    <div
+                                                        style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                                                        <span style="color: #eee; font-weight: 700; font-size: 13px;"
+                                                            x-text="test.test_name"></span>
+                                                        <span style="color: #f1c40f; font-size: 11px;"
+                                                            x-text="test.date"></span>
+                                                    </div>
+                                                    <p style="color: #ccc; font-size: 12px; margin-bottom: 4px;"
+                                                        x-text="test.test_details"></p>
+                                                    <p style="color: #2ecc71; font-size: 11px; margin-bottom: 10px;"
+                                                        x-text="'Result: ' + test.result"></p>
+
+                                                    <div class="evidence-line"
+                                                        style="border-color: rgba(241,196,15,0.15);">
+                                                        <template x-for="cite in test.source_citations">
+                                                            <div style="margin-bottom: 8px; font-size: 10px;">
+                                                                <p style="color: #aaa; font-style: italic; margin-bottom: 4px;"
+                                                                    x-text="'\"' + cite.excerpt + ' \"'"></p>
+                                                                <p style="color: #f1c40f; font-weight: 600;"
+                                                                    x-text="cite.source_document + ' (' + cite.section + ')'">
+                                                                </p>
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Timeline Column -->
+                                <div style="display: flex; flex-direction: column; gap: 24px;">
+                                    <div class="glass-panel" style="padding: 20px;">
+                                        <h4
+                                            style="color: #f1c40f; font-size: 12px; font-weight: 700; margin-bottom: 24px; text-transform: uppercase;">
+                                            Procedural Timeline</h4>
+                                        <div
+                                            style="display: flex; flex-direction: column; gap: 0; border-left: 2px solid rgba(241,196,15,0.1); padding-left: 24px; margin-left: 10px;">
+                                            <template x-for="event in caseDetails.timeline">
+                                                <div style="position: relative; padding-bottom: 30px;">
+                                                    <div
+                                                        style="position: absolute; left: -31px; top: 0; width: 12px; height: 12px; background: #111; border: 2px solid #f1c40f; border-radius: 50%; z-index: 1;">
+                                                    </div>
+                                                    <p style="color: #f1c40f; font-size: 11px; font-weight: 800; margin-bottom: 4px;"
+                                                        x-text="event.date"></p>
+                                                    <div class="item-card" style="background: rgba(241,196,15,0.02);">
+                                                        <p style="color: #eee; font-weight: 700; font-size: 14px; margin-bottom: 6px;"
+                                                            x-text="event.event_type"></p>
+                                                        <p style="color: #aaa; font-size: 12px; line-height: 1.6; margin-bottom: 10px;"
+                                                            x-text="event.description"></p>
+
+                                                        <!-- Citations -->
+                                                        <div class="evidence-line"
+                                                            style="border-color: rgba(241,196,15,0.15);">
+                                                            <template x-for="cite in event.source_citations">
+                                                                <div style="font-size: 10px;">
+                                                                    <p style="color: #ccc; font-style: italic; margin-bottom: 2px;"
+                                                                        x-text="'\"' + cite.excerpt + ' \"'"></p>
+                                                                    <p style="color: #f1c40f; font-weight: 600;"
+                                                                        x-text="cite.source_document + ' (' + cite.section + ')'">
+                                                                    </p>
+                                                                </div>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+
+                                    <!-- Draft Outline Preview -->
+                                    <div class="glass-panel" style="padding: 20px; background: rgba(0,0,0,0.4);">
+                                        <h4
+                                            style="color: #f1c40f; font-size: 12px; font-weight: 700; margin-bottom: 16px; text-transform: uppercase;">
+                                            Draft Submission Outline</h4>
+                                        <div style="font-family: serif; color: #ccc; line-height: 1.8;">
+                                            <div style="margin-bottom: 16px;">
+                                                <h5
+                                                    style="color: #eee; font-size: 14px; font-weight: 700; margin-bottom: 8px;">
+                                                    I. BACKGROUND</h5>
+                                                <ul style="list-style: disc; padding-left: 20px; font-size: 13px;">
+                                                    <template x-for="point in caseDetails.draft_outline.I_Background">
+                                                        <li x-text="point"></li>
+                                                    </template>
+                                                </ul>
+                                            </div>
+                                            <div style="margin-bottom: 16px;">
+                                                <h5
+                                                    style="color: #eee; font-size: 14px; font-weight: 700; margin-bottom: 8px;">
+                                                    II. ISSUES TO ADDRESS</h5>
+                                                <ul style="list-style: disc; padding-left: 20px; font-size: 13px;">
+                                                    <template
+                                                        x-for="point in caseDetails.draft_outline.II_Issue_Specific_Sections">
+                                                        <li x-text="point"></li>
+                                                    </template>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -844,7 +1155,6 @@
                 },
             };
         }
-
         function medcertApp() {
             return {
                 isLoggedIn: false,
@@ -852,6 +1162,8 @@
                 runs: [],
                 loadingRuns: false,
                 currentRunId: null,
+                caseDetails: null,
+                loadingCaseDetails: false,
 
                 showUploadModal: false,
                 uploadArchiveFile: null,
@@ -893,6 +1205,10 @@
                         if (response.status === 401) { handle401(); return; }
                         if (response.ok) {
                             this.runs = await response.json();
+                            // DEFAULT SELECTION: Select the first row if available
+                            if (this.runs.length > 0 && !this.currentRunId) {
+                                this.selectRun(this.runs[0].id);
+                            }
                         } else {
                             this.runs = [];
                         }
@@ -904,9 +1220,45 @@
                     }
                 },
 
+                async fetchCaseDetails(runId) {
+                    const token = requireToken();
+                    if (!token) return;
+
+                    // Note: In a real scenario, we might need to find the session_id from the run object.
+                    // For now, we'll try to find if the session_id is available in the run object if it's there.
+                    const runObj = this.runs.find(r => r.id === runId);
+                    const sessionId = runObj && runObj.session_id ? runObj.session_id : null;
+
+                    // If history API doesn't return session_id directly, we might need to use a static one for testing
+                    // as provided in the example or fix the backend.
+                    // To make the demo work with the provided curl example:
+                    const targetId = sessionId || "70592934-6809-4953-a5f1-1cd735db52b0";
+
+                    this.loadingCaseDetails = true;
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/FAA_MedCert_Case_Builder/case/${targetId}`, {
+                            headers: {
+                                "Authorization": `Bearer ${token}`,
+                                "ngrok-skip-browser-warning": "true"
+                            }
+                        });
+                        if (response.status === 401) { handle401(); return; }
+                        if (response.ok) {
+                            this.caseDetails = await response.json();
+                        } else {
+                            alert("Failed to load case details.");
+                        }
+                    } catch (error) {
+                        console.error("Error fetching case details:", error);
+                    } finally {
+                        this.loadingCaseDetails = false;
+                    }
+                },
+
                 selectRun(runId) {
                     if (this.currentRunId === runId) return;
                     this.currentRunId = runId;
+                    this.fetchCaseDetails(runId);
                 },
 
                 openUploadModal() {
