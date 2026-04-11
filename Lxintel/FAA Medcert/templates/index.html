@@ -504,6 +504,59 @@
             .responsive-header>div {
                 text-align: left !important;
             }
+
+            /* Section 1: filter bar on mobile */
+            .filter-bar {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 8px !important;
+                padding: 12px !important;
+            }
+
+            .filter-bar button {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+
+            /* Section 1 & 2: view container padding */
+            .view-container {
+                overflow-y: auto !important;
+            }
+
+            /* Section 2: session/email row stacks vertically */
+            .session-email-row {
+                flex-direction: column !important;
+                gap: 4px !important;
+            }
+
+            /* Section 2: case header badge aligns left  */
+            .case-header-badge-col {
+                text-align: left !important;
+            }
+
+            /* Section 2: case details inner padding */
+            .case-details-inner {
+                padding: 12px !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+
+            /* Section 1: reduce table container height on very small screens */
+            .ledger-table-container {
+                max-height: 220px !important;
+            }
+
+            /* Section 2: reduce font in case header */
+            .case-header-name {
+                font-size: 18px !important;
+            }
+
+            /* Modal full-width on very small screens */
+            .modal-content {
+                width: 96% !important;
+                padding: 20px !important;
+            }
         }
 
         .responsive-header {
@@ -808,7 +861,8 @@
                             <span class="spinner" style="width: 32px; height: 32px;"></span>
                             <p style="margin-top: 16px; color: #f1c40f; font-size: 13px;">Analyzing Case Data...</p>
                         </div> <!-- CASE CONTENT VIEW -->
-                        <div x-show="currentRunId && !loadingCaseDetails && caseDetails" style="padding: 24px;">
+                        <div x-show="currentRunId && !loadingCaseDetails && caseDetails" style="padding: 24px;"
+                            class="case-details-inner">
 
                             <!-- 1. Case Header & Airman Info -->
                             <div class="glass-panel"
@@ -816,15 +870,16 @@
                                 <div class="responsive-header" style="margin-bottom: 20px;">
                                     <div>
                                         <h2 style="color: #f1c40f; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;"
-                                            x-text="caseDetails.case_header.case_name"></h2>
-                                        <div style="display: flex; gap: 12px; margin-top: 4px;">
+                                            class="case-header-name" x-text="caseDetails.case_header.case_name"></h2>
+                                        <div style="display: flex; gap: 12px; margin-top: 4px;"
+                                            class="session-email-row">
                                             <p style="color: #888; font-size: 11px; font-weight: 600; text-transform: uppercase;"
                                                 x-text="'Session: ' + (caseDetails.session_id || 'N/A')"></p>
                                             <p style="color: #666; font-size: 11px; font-weight: 600; text-transform: uppercase;"
                                                 x-text="'Email: ' + (caseDetails.user_email || 'N/A')"></p>
                                         </div>
                                     </div>
-                                    <div style="text-align: right;">
+                                    <div style="text-align: right;" class="case-header-badge-col">
                                         <div class="badge badge-status" style="font-size: 11px; padding: 4px 12px;"
                                             x-text="caseDetails.procedural_stage.current_procedural_stage"></div>
                                         <p style="color: #666; font-size: 10px; margin-top: 6px;"
@@ -1626,7 +1681,7 @@
     </div>
 
     <script>
-        const API_BASE_URL = "https://laurene-clearheaded-nonaromatically.ngrok-free.dev";
+        const API_BASE_URL = "";
 
         function toggleUserMenu() {
             const popover = document.getElementById("user-menu-popover");
