@@ -1597,20 +1597,23 @@
         <template x-teleport="body">
             <div class="modal-backdrop" :style="showUploadModal ? 'display: flex;' : 'display: none;'">
                 <div class="glass-panel modal-content" style="padding: 32px; max-width: 500px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                         <h2 style="color: #f1c40f; font-size: 20px; font-weight: 700;">Upload Zip Archive</h2>
                         <button @click="showUploadModal = false" class="text-gray-500 text-2xl">×</button>
                     </div>
 
                     <form @submit.prevent="runUploadGeneration()" class="flex flex-col gap-6">
                         <div>
-                            <label class="block text-xs font-bold text-[#f1c40f] mb-2 uppercase">Zip File Archive</label>
-                            <input type="file" @change="uploadArchiveFile = $event.target.files[0]" required accept=".zip"
-                                class="w-full bg-black border border-[#444] rounded p-2 text-white">
+                            <label class="block text-xs font-bold text-[#f1c40f] mb-2 uppercase">Zip File
+                                Archive</label>
+                            <input type="file" @change="uploadArchiveFile = $event.target.files[0]" required
+                                accept=".zip" class="w-full bg-black border border-[#444] rounded p-2 text-white">
                         </div>
                         <div x-show="isUploadGenerating" class="text-center p-4">
                             <span class="spinner"></span>
-                            <p class="mt-2 text-[#f1c40f]">Uploading and regenerating...</p>
+                            <p class="mt-2 text-[#f1c40f]" x-text="uploadStepMessage"></p>
+                            <p style="color: #666; font-size: 10px; margin-top: 4px;" x-text="uploadStepDetail"></p>
                         </div>
 
                         <button x-show="!isUploadGenerating" type="submit"
@@ -1623,7 +1626,7 @@
     </div>
 
     <script>
-        const API_BASE_URL = "https://attired-hitchily-stephane.ngrok-free.dev";
+        const API_BASE_URL = "https://laurene-clearheaded-nonaromatically.ngrok-free.dev";
 
         function toggleUserMenu() {
             const popover = document.getElementById("user-menu-popover");
@@ -1745,6 +1748,8 @@
                 showUploadModal: false,
                 uploadArchiveFile: null,
                 isUploadGenerating: false,
+                uploadStepMessage: '',
+                uploadStepDetail: '',
 
                 init() {
                     this.checkAuth();
@@ -1851,32 +1856,94 @@
                     if (!token) return;
 
                     this.isUploadGenerating = true;
-                    const formData = new FormData();
-                    formData.append('file', this.uploadArchiveFile);
 
                     try {
-                        const response = await fetch(`${API_BASE_URL}/FAA_MedCert_Case_Builder/upload/zip`, {
+                        // Step 1: Upload the zip file
+                        this.uploadStepMessage = 'Step 1/5 — Uploading zip archive...';
+                        this.uploadStepDetail = 'Uploading and extracting documents...';
+                        const uploadForm = new FormData();
+                        uploadForm.append('file', this.uploadArchiveFile);
+                        const uploadRes = await fetch(`${API_BASE_URL}/FAA_MedCert_Case_Builder/zip/upload`, {
                             method: 'POST',
-                            headers: {
-                                "Authorization": `Bearer ${token}`,
-                                "ngrok-skip-browser-warning": "true"
-                            },
-                            body: formData
+                            headers: { "Authorization": `Bearer ${token}`, "ngrok-skip-browser-warning": "true" },
+                            body: uploadForm
                         });
-                        if (response.status === 401) { handle401(); return; }
-                        if (response.ok) {
-                            const data = await response.json();
-                            this.showUploadModal = false;
-                            this.currentRunId = null;
-                            await this.fetchRuns();
-                        } else {
-                            alert("Upload failed.");
-                        }
+                        if (uploadRes.status === 401) { handle401(); return; }
+                        if (!uploadRes.ok) { alert("Upload failed."); return; }
+                        const uploadData = await uploadRes.json();
+                        const sessionId = uploadData.session_id;
+
+                        // Step 2: Process the zip
+                        this.uploadStepMessage = 'Step 2/5 — Processing documents...';
+                        this.uploadStepDetail = 'Parsing and extracting document content...';
+                        const processForm = new FormData();
+                        processForm.append('session_id', sessionId);
+                        const processRes = await fetch(`${API_BASE_URL}/FAA_MedCert_Case_Builder/zip/process`, {
+                            method: 'POST',
+                            headers: { "Authorization": `Bearer ${token}`, "ngrok-skip-browser-warning": "true" },
+                            body: processForm
+                        });
+                        if (processRes.status === 401) { handle401(); return; }
+                        if (!processRes.ok) { alert("Processing failed."); return; }
+                        const processData = await processRes.json();
+                        const processSessionId = processData.session_id;
+
+                        // Step 3: Redact the zip
+                        this.uploadStepMessage = 'Step 3/5 — Redacting sensitive information...';
+                        this.uploadStepDetail = 'Removing PHI and personal identifiers...';
+                        const redactForm = new FormData();
+                        redactForm.append('session_id', processSessionId);
+                        const redactRes = await fetch(`${API_BASE_URL}/FAA_MedCert_Case_Builder/zip/redact`, {
+                            method: 'POST',
+                            headers: { "Authorization": `Bearer ${token}`, "ngrok-skip-browser-warning": "true" },
+                            body: redactForm
+                        });
+                        if (redactRes.status === 401) { handle401(); return; }
+                        if (!redactRes.ok) { alert("Redaction failed."); return; }
+                        const redactData = await redactRes.json();
+                        const redactSessionId = redactData.session_id;
+
+                        // Step 4: Index the zip
+                        this.uploadStepMessage = 'Step 4/5 — Indexing documents...';
+                        this.uploadStepDetail = 'Building search index for AI analysis...';
+                        const indexForm = new FormData();
+                        indexForm.append('session_id', redactSessionId);
+                        const indexRes = await fetch(`${API_BASE_URL}/FAA_MedCert_Case_Builder/zip/index`, {
+                            method: 'POST',
+                            headers: { "Authorization": `Bearer ${token}`, "ngrok-skip-browser-warning": "true" },
+                            body: indexForm
+                        });
+                        if (indexRes.status === 401) { handle401(); return; }
+                        if (!indexRes.ok) { alert("Indexing failed."); return; }
+                        const indexData = await indexRes.json();
+                        const indexSessionId = indexData.session_id;
+
+                        // Step 5: LLM Generate
+                        this.uploadStepMessage = 'Step 5/5 — Generating AI case analysis...';
+                        this.uploadStepDetail = 'Running LLM on indexed documents, this may take a moment...';
+                        const llmForm = new FormData();
+                        llmForm.append('session_id', indexSessionId);
+                        const llmRes = await fetch(`${API_BASE_URL}/FAA_MedCert_Case_Builder/zip/llm-generate`, {
+                            method: 'POST',
+                            headers: { "Authorization": `Bearer ${token}`, "ngrok-skip-browser-warning": "true" },
+                            body: llmForm
+                        });
+                        if (llmRes.status === 401) { handle401(); return; }
+                        if (!llmRes.ok) { alert("LLM generation failed."); return; }
+
+                        // All steps done — close modal and refresh data
+                        this.showUploadModal = false;
+                        this.currentRunId = null;
+                        this.uploadArchiveFile = null;
+                        await this.fetchRuns();
+
                     } catch (error) {
-                        console.error("Upload Generation Error:", error);
-                        alert("Error connecting to server.");
+                        console.error("Upload Pipeline Error:", error);
+                        alert("Error during processing pipeline. Check console for details.");
                     } finally {
                         this.isUploadGenerating = false;
+                        this.uploadStepMessage = '';
+                        this.uploadStepDetail = '';
                     }
                 },
             };
