@@ -931,7 +931,8 @@
                                             <p style="color: #f1c40f; font-size: 10px; font-weight: 700; margin-bottom: 6px;"
                                                 x-text="'FILE NAMES (' + (caseDetails.case_header.document_set_summary.total_files || 0) + ' TOTAL)'">
                                             </p>
-                                            <div style="max-height: 120px; overflow-y: auto; padding-right: 8px;">
+                                            <div
+                                                style="max-height: 120px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(241, 196, 15, 0.4) rgba(241, 196, 15, 0.1); padding-right: 8px;">
                                                 <template
                                                     x-for="fname in (caseDetails.case_header.document_set_summary.file_names || [])"
                                                     :key="fname">
@@ -1623,7 +1624,7 @@
         <h4 style="color: #f1c40f; font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 16px;">
             Draft Preview Shell</h4>
         <div
-            style="font-family: serif; color: #888; font-size: 11px; line-height: 1.6; max-height: 300px; overflow-y: auto; padding-right: 12px; margin-bottom: 24px;">
+            style="font-family: serif; color: #888; font-size: 11px; line-height: 1.6; max-height: 300px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(241, 196, 15, 0.4) rgba(241, 196, 15, 0.1); padding-right: 12px; margin-bottom: 24px;">
             <template x-for="(content, section) in (caseDetails.draft_outline || {})" :key="section">
                 <div style="margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
                     <p style="color: #ccc; font-weight: 800; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;"
