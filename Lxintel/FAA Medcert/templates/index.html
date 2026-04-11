@@ -54,8 +54,6 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            position: relative;
-            z-index: 1;
         }
 
         .app-header {
@@ -1595,34 +1593,33 @@
             </template>
         </div>
 
-    </div>
-    </div>
+        <!-- UPLOAD ZIP MODAL (teleported to body to avoid stacking context issues) -->
+        <template x-teleport="body">
+            <div class="modal-backdrop" :style="showUploadModal ? 'display: flex;' : 'display: none;'">
+                <div class="glass-panel modal-content" style="padding: 32px; max-width: 500px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h2 style="color: #f1c40f; font-size: 20px; font-weight: 700;">Upload Zip Archive</h2>
+                        <button @click="showUploadModal = false" class="text-gray-500 text-2xl">×</button>
+                    </div>
 
-    </div>
-    <!-- UPLOAD ZIP MODAL -->
-    <div class="modal-backdrop" :style="showUploadModal ? 'display: flex;' : 'display: none;'">
-        <div class="glass-panel modal-content" style="padding: 32px; max-width: 500px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <h2 style="color: #f1c40f; font-size: 20px; font-weight: 700;">Upload Zip Archive</h2>
-                <button @click="showUploadModal = false" class="text-gray-500 text-2xl">×</button>
+                    <form @submit.prevent="runUploadGeneration()" class="flex flex-col gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-[#f1c40f] mb-2 uppercase">Zip File Archive</label>
+                            <input type="file" @change="uploadArchiveFile = $event.target.files[0]" required accept=".zip"
+                                class="w-full bg-black border border-[#444] rounded p-2 text-white">
+                        </div>
+                        <div x-show="isUploadGenerating" class="text-center p-4">
+                            <span class="spinner"></span>
+                            <p class="mt-2 text-[#f1c40f]">Uploading and regenerating...</p>
+                        </div>
+
+                        <button x-show="!isUploadGenerating" type="submit"
+                            class="login-btn w-full !bg-[#f1c40f] !text-black !font-bold">UPLOAD ZIP</button>
+                    </form>
+                </div>
             </div>
+        </template>
 
-            <form @submit.prevent="runUploadGeneration()" class="flex flex-col gap-6">
-                <div>
-                    <label class="block text-xs font-bold text-[#f1c40f] mb-2 uppercase">Zip File Archive</label>
-                    <input type="file" @change="uploadArchiveFile = $event.target.files[0]" required accept=".zip"
-                        class="w-full bg-black border border-[#444] rounded p-2 text-white">
-                </div>
-                <div x-show="isUploadGenerating" class="text-center p-4">
-                    <span class="spinner"></span>
-                    <p class="mt-2 text-[#f1c40f]">Uploading and regenerating...</p>
-                </div>
-
-                <button x-show="!isUploadGenerating" type="submit"
-                    class="login-btn w-full !bg-[#f1c40f] !text-black !font-bold">UPLOAD ZIP</button>
-            </form>
-        </div>
-    </div>
     </div>
 
     <script>
