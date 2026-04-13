@@ -868,6 +868,142 @@
     div#user-menu-popover {
       top: 120px !important;
     }
+
+    /* NAFI Case Screen button */
+    .nafi-case-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background-color: transparent;
+      color: #f1c40f;
+      border: 1.5px solid rgba(241, 196, 15, 0.6);
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: "Montserrat", sans-serif;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nafi-case-btn:hover {
+      background-color: rgba(241, 196, 15, 0.12);
+      border-color: #f1c40f;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(241, 196, 15, 0.25);
+    }
+
+    /* NAFI response card */
+    .nafi-response-card {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(241, 196, 15, 0.2);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .nafi-response-card.nafi-more-info {
+      border-color: rgba(241, 196, 15, 0.5);
+      background: rgba(241, 196, 15, 0.06);
+    }
+
+    .nafi-response-card.nafi-likely {
+      border-color: rgba(231, 76, 60, 0.5);
+      background: rgba(231, 76, 60, 0.06);
+    }
+
+    .nafi-response-card.nafi-not {
+      border-color: rgba(46, 204, 113, 0.5);
+      background: rgba(46, 204, 113, 0.06);
+    }
+
+    .nafi-card-header {
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 15px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .nafi-more-info .nafi-card-header { background: rgba(241, 196, 15, 0.15); color: #f1c40f; }
+    .nafi-likely .nafi-card-header    { background: rgba(231, 76, 60, 0.15);  color: #e74c3c; }
+    .nafi-not .nafi-card-header       { background: rgba(46, 204, 113, 0.15); color: #2ecc71; }
+
+    .nafi-card-body {
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .nafi-field-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .nafi-field-label {
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      padding-top: 2px;
+      min-width: 90px;
+    }
+
+    .nafi-more-info .nafi-field-label { color: #f1c40f; }
+    .nafi-likely .nafi-field-label    { color: #e74c3c; }
+    .nafi-not .nafi-field-label       { color: #2ecc71; }
+
+    .nafi-field-value { color: #e0e0e0; }
+
+    .nafi-questions-section {
+      margin-top: 6px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(241, 196, 15, 0.2);
+    }
+
+    .nafi-questions-title {
+      font-weight: 700;
+      color: #f1c40f;
+      font-size: 13px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nafi-question-item {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      padding: 6px 0;
+      color: #ddd;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .nafi-question-num {
+      font-weight: 700;
+      color: #f1c40f;
+      min-width: 20px;
+    }
+
+    .nafi-mode-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(241, 196, 15, 0.2);
+      color: #f1c40f;
+      border: 1px solid rgba(241, 196, 15, 0.4);
+      vertical-align: middle;
+      margin-left: 6px;
+    }
   </style>
 
   <script>
@@ -1037,6 +1173,16 @@
           <option value="es">Spanish</option>
         </select>
 
+        <!-- NAFI CASE SCREEN BUTTON -->
+        <button class="nafi-case-btn" onclick="startNafiChat()" title="Open NAFI Case Screen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 12h6M9 16h6M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+            <polyline points="13 2 13 9 20 9"></polyline>
+          </svg>
+          <span data-i18n="nafiCaseScreen">NAFI Case Screen</span>
+        </button>
+
         <!-- NEW CHAT BUTTON -->
         <button class="new-chat-btn" onclick="startNewChat()" style="
               display: flex;
@@ -1122,7 +1268,7 @@
       <div class="input-wrapper">
         <textarea id="message-input" data-i18n-placeholder="typeMessage" placeholder="Type your message here..."
           onkeydown="handleKeyPress(event)"></textarea>
-        <button class="send-btn" onclick="sendMessage()" id="send-btn" data-i18n="send">
+        <button class="send-btn" onclick="currentMode === 'nafi' ? sendNafiMessage() : sendMessage()" id="send-btn" data-i18n="send">
           Send
         </button>
       </div>
@@ -1147,6 +1293,12 @@
     const API_BASE_URL = "https://attired-hitchily-stephane.ngrok-free.dev";
     let isProcessing = false;
 
+    // ---- NAFI mode state ----
+    let currentMode = 'chat'; // 'chat' | 'nafi'
+    let nafiLastIntakeDescription = ''; // original intake description for follow-up payload
+    let nafiAwaitingFollowUp = false;  // true when we received next_questions and waiting for user answers
+    // -------------------------
+
     marked.setOptions({
       gfm: true,
       breaks: true,
@@ -1156,7 +1308,11 @@
     function handleKeyPress(event) {
       if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
-        sendMessage();
+        if (currentMode === 'nafi') {
+          sendNafiMessage();
+        } else {
+          sendMessage();
+        }
       }
     }
 
@@ -1187,9 +1343,14 @@
     }
 
     async function startNewChat() {
-      if (
-        confirm("Start a new conversation? This will clear the current chat.")
-      ) {
+      const confirmMsg = await Translator.translate("Start a new conversation? This will clear the current chat.", window.currentLang);
+      if (confirm(confirmMsg)) {
+        // Reset NAFI mode back to normal chat
+        currentMode = 'chat';
+        nafiLastIntakeDescription = '';
+        nafiAwaitingFollowUp = false;
+        document.getElementById('message-input').placeholder = await Translator.translate('Type your message here...', window.currentLang);
+
         try {
           const token = localStorage.getItem("jwtsopchatbot");
           await fetch(`${API_BASE_URL}/Playbook_Chatbot/chat/clear`, {
@@ -1780,6 +1941,230 @@ Below are some example questions to get you started:
         },
       };
     }
+  </script>
+
+  <script>
+    // ============ NAFI CASE SCREEN ============
+
+    async function startNafiChat() {
+      currentMode = 'nafi';
+      nafiLastIntakeDescription = '';
+      nafiAwaitingFollowUp = false;
+
+      const messagesDiv = document.getElementById('chat-messages');
+      messagesDiv.innerHTML = '';
+      document.getElementById('message-input').value = '';
+
+      // Update placeholder to guide user
+      const input = document.getElementById('message-input');
+      input.placeholder = await Translator.translate('Enter your case detail...', window.currentLang);
+
+      // Show NAFI welcome message
+      await addNafiWelcomeMessage();
+    }
+
+    async function addNafiWelcomeMessage() {
+      const messagesDiv = document.getElementById('chat-messages');
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'message-wrapper assistant';
+
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'message assistant welcome translateable-message';
+      messageDiv.dataset.originalContent = 'Enter your case detail.';
+
+      const inner = document.createElement('div');
+      inner.className = 'welcome-content message-body';
+      inner.textContent = await Translator.translate('Enter your case detail.', window.currentLang);
+
+      messageDiv.appendChild(inner);
+      wrapper.appendChild(messageDiv);
+      messagesDiv.appendChild(wrapper);
+      scrollToBottom();
+    }
+
+    async function sendNafiMessage() {
+      if (isProcessing) return;
+
+      const input = document.getElementById('message-input');
+      const message = input.value.trim();
+      if (!message) return;
+
+      isProcessing = true;
+      const sendBtn = document.getElementById('send-btn');
+      sendBtn.disabled = true;
+      sendBtn.innerHTML = '<span class="spinner"></span>';
+
+      addMessage('user', message);
+      input.value = '';
+      showTypingIndicator();
+
+      let payload;
+      if (nafiAwaitingFollowUp) {
+        // Follow-up answer: send original intake + followup_answers
+        payload = {
+          intake_description: nafiLastIntakeDescription,
+          followup_answers: [message]
+        };
+      } else {
+        // First message
+        nafiLastIntakeDescription = message;
+        payload = { intake_description: message };
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/Playbook_Chatbot/chat/nafi`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('jwtsopchatbot')}`,
+            'ngrok-skip-browser-warning': 'true'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+        await renderNafiResponse(data);
+
+      } catch (error) {
+        addMessage('assistant', 'Error: ' + error.message);
+        nafiAwaitingFollowUp = false;
+      } finally {
+        hideTypingIndicator();
+        isProcessing = false;
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = `<span data-i18n="send">${await Translator.translate('Send', window.currentLang)}</span>`;
+        scrollToBottom();
+      }
+    }
+
+    async function renderNafiResponse(data) {
+      const result = data.result || '';
+      const confidence = data.confidence || '';
+      const why = data.why || '';
+      const nextQuestions = data.next_questions || [];
+      const hasQuestions = nextQuestions.length > 0;
+
+      // Determine card type
+      let cardClass = 'nafi-more-info';
+      let icon = '⚠️';
+      let headerLabel = await Translator.translate(result, window.currentLang);
+
+      if (result === 'Likely NAFI') {
+        cardClass = 'nafi-likely';
+        icon = '🚫';
+      } else if (result === 'Not NAFI') {
+        cardClass = 'nafi-not';
+        icon = '✅';
+      } else {
+        // More Information Needed
+        cardClass = 'nafi-more-info';
+        icon = '⚠️';
+      }
+
+      // Set follow-up state
+      nafiAwaitingFollowUp = hasQuestions;
+      if (hasQuestions) {
+        document.getElementById('message-input').placeholder = await Translator.translate('Type your answers to the questions above...', window.currentLang);
+      } else {
+        document.getElementById('message-input').placeholder = await Translator.translate('Enter your case detail...', window.currentLang);
+      }
+
+      // Build the card HTML
+      const messagesDiv = document.getElementById('chat-messages');
+      const emptyState = messagesDiv.querySelector('.empty-state');
+      if (emptyState) emptyState.remove();
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'message-wrapper assistant';
+
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'message assistant';
+      messageDiv.style.padding = '0';
+      messageDiv.style.background = 'transparent';
+      messageDiv.style.border = 'none';
+      messageDiv.style.boxShadow = 'none';
+      messageDiv.style.maxWidth = '85%';
+
+      // Card wrapper
+      const card = document.createElement('div');
+      card.className = `nafi-response-card ${cardClass}`;
+
+      // Header
+      const header = document.createElement('div');
+      header.className = 'nafi-card-header';
+      header.innerHTML = `<span>${icon}</span><span>${headerLabel}</span>`;
+      card.appendChild(header);
+
+      // Body
+      const body = document.createElement('div');
+      body.className = 'nafi-card-body';
+
+      // Result row
+      const resultRow = document.createElement('div');
+      resultRow.className = 'nafi-field-row';
+      resultRow.innerHTML = `
+        <span class="nafi-field-label" data-i18n="resultLabel">${await Translator.translate('Result:', window.currentLang)}</span>
+        <span class="nafi-field-value translateable-message" data-original-content="${result}">
+          <span class="message-body">${await Translator.translate(result, window.currentLang)}</span>
+        </span>`;
+      body.appendChild(resultRow);
+
+      // Confidence row
+      const confRow = document.createElement('div');
+      confRow.className = 'nafi-field-row';
+      confRow.innerHTML = `
+        <span class="nafi-field-label" data-i18n="confidenceLabel">${await Translator.translate('Confidence:', window.currentLang)}</span>
+        <span class="nafi-field-value translateable-message" data-original-content="${confidence}">
+          <span class="message-body">${await Translator.translate(confidence, window.currentLang)}</span>
+        </span>`;
+      body.appendChild(confRow);
+
+      // Why row
+      const whyRow = document.createElement('div');
+      whyRow.className = 'nafi-field-row';
+      whyRow.innerHTML = `
+        <span class="nafi-field-label" data-i18n="whyLabel">${await Translator.translate('Why:', window.currentLang)}</span>
+        <span class="nafi-field-value translateable-message" data-original-content="${why.replace(/"/g, '&quot;')}">
+          <span class="message-body">${await Translator.translate(why, window.currentLang)}</span>
+        </span>`;
+      body.appendChild(whyRow);
+
+      // Next Questions (only when result === 'More Information Needed')
+      if (result === 'More Information Needed' && hasQuestions) {
+        const qSection = document.createElement('div');
+        qSection.className = 'nafi-questions-section';
+
+        const qTitle = document.createElement('div');
+        qTitle.className = 'nafi-questions-title';
+        qTitle.textContent = await Translator.translate('Follow-up Questions:', window.currentLang);
+        qSection.appendChild(qTitle);
+
+        for (const q of nextQuestions) {
+          const idx = nextQuestions.indexOf(q);
+          const qItem = document.createElement('div');
+          qItem.className = 'nafi-question-item';
+          const translatedQ = await Translator.translate(q, window.currentLang);
+          qItem.innerHTML = `
+            <span class="nafi-question-num">${idx + 1}.</span>
+            <span class="translateable-message" data-original-content="${q.replace(/"/g, '&quot;')}">
+              <span class="message-body">${translatedQ}</span>
+            </span>`;
+          qSection.appendChild(qItem);
+        }
+
+        body.appendChild(qSection);
+      }
+
+      card.appendChild(body);
+      messageDiv.appendChild(card);
+      wrapper.appendChild(messageDiv);
+      messagesDiv.appendChild(wrapper);
+      scrollToBottom();
+    }
+
+    // ============ END NAFI CASE SCREEN ============
+
   </script>
 
   <script>
