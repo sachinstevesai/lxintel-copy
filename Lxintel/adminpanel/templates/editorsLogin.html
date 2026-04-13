@@ -858,6 +858,7 @@
                             <th>Filename</th>
                             <th>Size (KB)</th>
                             <th>Last Modified</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody id="files-tbody">
@@ -870,7 +871,7 @@
 
 
     <script>
-        const API_BASE_URL = "";
+        const API_BASE_URL = "https://attired-hitchily-stephane.ngrok-free.dev";
 
         function logout() {
             localStorage.removeItem("jwteditorspanel");
@@ -1095,21 +1096,58 @@
                 <td>${file.filename}</td>
                 <td>${file.size_kb.toFixed(2)}</td>
                 <td>${date}</td>
+                <td><button class="delete-file-btn" onclick="deleteFile('${file.filename}')" style="background: #e74c3c; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.3s;" onmouseover="this.style.background='#c0392b'; this.style.transform='scale(1.05)';" onmouseout="this.style.background='#e74c3c'; this.style.transform='scale(1)';">🗑</button></td>
             `;
                         tbody.appendChild(tr);
                     });
                     table.style.display = 'table';
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 40px;">No files found</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;">No files found</td></tr>';
                     table.style.display = 'table';
                 }
             } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 40px; color: #e74c3c;">Error: ${err.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 40px; color: #e74c3c;">Error: ${err.message}</td></tr>`;
                 table.style.display = 'table';
             } finally {
                 loading.style.display = 'none';
             }
         }
+
+        // Delete file function
+        async function deleteFile(filename) {
+            if (!confirm(`Are you sure you want to delete "${filename}"?`)) {
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem("jwteditorspanel");
+                if (!token) {
+                    alert("Not authenticated. Please login again.");
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE_URL}/Playbook_Chatbot/editor/file/${encodeURIComponent(filename)}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "ngrok-skip-browser-warning": "true"
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.detail || errorData.message || "Delete failed");
+                }
+
+                alert("File deleted successfully!");
+                // Refresh the files list
+                fetchFiles();
+
+            } catch (error) {
+                alert(`Error deleting file: ${error.message}`);
+            }
+        }
+
         let lastPlaybookUploadedFile = null;
         let lastPlaybookUploadedDepartment = null;
 
