@@ -926,12 +926,23 @@
       gap: 10px;
       font-weight: 700;
       font-size: 15px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    .nafi-more-info .nafi-card-header { background: rgba(241, 196, 15, 0.15); color: #f1c40f; }
-    .nafi-likely .nafi-card-header    { background: rgba(231, 76, 60, 0.15);  color: #e74c3c; }
-    .nafi-not .nafi-card-header       { background: rgba(46, 204, 113, 0.15); color: #2ecc71; }
+    .nafi-more-info .nafi-card-header {
+      background: rgba(241, 196, 15, 0.15);
+      color: #f1c40f;
+    }
+
+    .nafi-likely .nafi-card-header {
+      background: rgba(231, 76, 60, 0.15);
+      color: #e74c3c;
+    }
+
+    .nafi-not .nafi-card-header {
+      background: rgba(46, 204, 113, 0.15);
+      color: #2ecc71;
+    }
 
     .nafi-card-body {
       padding: 14px 18px;
@@ -956,11 +967,21 @@
       min-width: 90px;
     }
 
-    .nafi-more-info .nafi-field-label { color: #f1c40f; }
-    .nafi-likely .nafi-field-label    { color: #e74c3c; }
-    .nafi-not .nafi-field-label       { color: #2ecc71; }
+    .nafi-more-info .nafi-field-label {
+      color: #f1c40f;
+    }
 
-    .nafi-field-value { color: #e0e0e0; }
+    .nafi-likely .nafi-field-label {
+      color: #e74c3c;
+    }
+
+    .nafi-not .nafi-field-label {
+      color: #2ecc71;
+    }
+
+    .nafi-field-value {
+      color: #e0e0e0;
+    }
 
     .nafi-questions-section {
       margin-top: 6px;
@@ -983,7 +1004,7 @@
       align-items: flex-start;
       padding: 6px 0;
       color: #ddd;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .nafi-question-num {
@@ -1268,7 +1289,8 @@
       <div class="input-wrapper">
         <textarea id="message-input" data-i18n-placeholder="typeMessage" placeholder="Type your message here..."
           onkeydown="handleKeyPress(event)"></textarea>
-        <button class="send-btn" onclick="currentMode === 'nafi' ? sendNafiMessage() : sendMessage()" id="send-btn" data-i18n="send">
+        <button class="send-btn" onclick="currentMode === 'nafi' ? sendNafiMessage() : sendMessage()" id="send-btn"
+          data-i18n="send">
           Send
         </button>
       </div>
@@ -1290,7 +1312,7 @@
   </div>
 
   <script>
-    const API_BASE_URL = "https://attired-hitchily-stephane.ngrok-free.dev";
+    const API_BASE_URL = "";
     let isProcessing = false;
 
     // ---- NAFI mode state ----
@@ -2044,6 +2066,7 @@ Below are some example questions to get you started:
       const why = data.why || '';
       const nextQuestions = data.next_questions || [];
       const hasQuestions = nextQuestions.length > 0;
+      const prompt_log_id = data.prompt_log_id || null;
 
       // Determine card type
       let cardClass = 'nafi-more-info';
@@ -2089,6 +2112,7 @@ Below are some example questions to get you started:
       // Card wrapper
       const card = document.createElement('div');
       card.className = `nafi-response-card ${cardClass}`;
+      card.style.position = 'relative'; // Anchor feedback buttons internally
 
       // Header
       const header = document.createElement('div');
@@ -2099,6 +2123,9 @@ Below are some example questions to get you started:
       // Body
       const body = document.createElement('div');
       body.className = 'nafi-card-body';
+      if (prompt_log_id) {
+        body.style.paddingBottom = '40px'; // Space for buttons inside the card
+      }
 
       // Result row
       const resultRow = document.createElement('div');
@@ -2157,6 +2184,50 @@ Below are some example questions to get you started:
       }
 
       card.appendChild(body);
+
+      // Add feedback buttons if prompt_log_id is present
+      if (prompt_log_id) {
+        const fb = document.createElement("div");
+        fb.className = "feedback-buttons";
+        fb.style.position = "absolute";
+        fb.style.bottom = "8px";
+        fb.style.left = "18px"; // Match card body horizontal padding
+
+        const upBtn = document.createElement("button");
+        upBtn.className = "feedback-btn";
+        upBtn.title = await Translator.translate("Helpful", window.currentLang);
+        upBtn.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1 21h4V9H1v12zM23 10c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 2 7.59 8.59C7.22 8.95 7 9.45 7 10v8c0 1.1.9 2 2 2h7c.83 0 1.54-.5 1.84-1.22L23 12.5c.11-.33.16-.68.16-1z"/>
+            </svg>
+          `;
+
+        const downBtn = document.createElement("button");
+        downBtn.className = "feedback-btn";
+        downBtn.title = await Translator.translate("Not helpful", window.currentLang);
+        downBtn.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M23 3h-4v12h4V3zM1 14c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 22l6.58-6.59c.37-.36.59-.86.59-1.41V6c0-1.1-.9-2-2-2H7c-.83 0-1.54.5-1.84 1.22L1 11.5C.89 11.83.84 12.18.84 12.5c0 .33.05.68.16 1z"/>
+            </svg>
+          `;
+
+        upBtn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          if (upBtn.classList.contains("disabled")) return;
+          sendFeedback(prompt_log_id, "up", upBtn, downBtn);
+        });
+
+        downBtn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          if (downBtn.classList.contains("disabled")) return;
+          sendFeedback(prompt_log_id, "down", upBtn, downBtn);
+        });
+
+        fb.appendChild(upBtn);
+        fb.appendChild(downBtn);
+        card.appendChild(fb); // Attach inside the card
+      }
+
       messageDiv.appendChild(card);
       wrapper.appendChild(messageDiv);
       messagesDiv.appendChild(wrapper);
