@@ -1389,6 +1389,13 @@
         el.placeholder = await Translator.translate(el.dataset.originalTranslationPlaceholder, lang);
       });
 
+      document.querySelectorAll('[data-i18n-title]').forEach(async (el) => {
+        if (el.dataset.originalTranslationTitle === undefined) {
+          el.dataset.originalTranslationTitle = el.title;
+        }
+        el.title = await Translator.translate(el.dataset.originalTranslationTitle, lang);
+      });
+
       document.querySelectorAll('.translateable-message').forEach(async (msg) => {
         const raw = msg.dataset.originalContent;
         if (!raw) return;
@@ -1629,7 +1636,7 @@
               ">
             <span x-text="userEmail"></span>
           </div>
-          <button onclick="logout()" style="
+          <button onclick="logout()" data-i18n="logout" style="
                 width: 100%;
                 padding: 10px 12px;
                 background-color: #e74c3c;
@@ -1649,11 +1656,11 @@
     <div class="chat-container">
       <!-- GENERAL AI HEADER -->
       <div id="general-ai-header" class="general-ai-header" style="display: none;">
-        <div class="header-msg">Enter your general case details</div>
+        <div class="header-msg" data-i18n="enterGeneralDetails">Enter your general case details</div>
         <div class="model-selector-container">
           <select id="model-selector" onchange="handleModelChange(this.value)">
-            <option value="default">Default Model</option>
-            <option value="latest">Latest Model</option>
+            <option value="default" data-i18n="defaultModel">Default Model</option>
+            <option value="latest" data-i18n="latestModel">Latest Model</option>
           </select>
         </div>
       </div>
@@ -1666,7 +1673,8 @@
       <div id="file-upload-tray" class="file-upload-tray"></div>
 
       <div class="input-wrapper" id="input-wrapper">
-        <label for="file-input" class="upload-btn" title="Upload files">
+        <label id="upload-btn-label" for="file-input" class="upload-btn" title="Upload files"
+          data-i18n-title="uploadFiles" style="display: none;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -1686,13 +1694,14 @@
     <!-- MODEL SECURITY MODAL -->
     <div id="model-security-modal">
       <div class="modal-content">
-        <div class="modal-header">Enter Security Code</div>
+        <div class="modal-header" data-i18n="enterSecurityCode">Enter Security Code</div>
         <div class="modal-body">
-          <input type="number" id="security-code-input" placeholder="Enter number here">
+          <input type="number" id="security-code-input" placeholder="Enter number here"
+            data-i18n-placeholder="enterNumberHere">
         </div>
         <div class="modal-footer">
-          <button class="close-modal-btn" onclick="closeSecurityModal()">Cancel</button>
-          <button class="save-modal-btn" onclick="saveSecurityCode()">Save</button>
+          <button class="close-modal-btn" onclick="closeSecurityModal()" data-i18n="cancel">Cancel</button>
+          <button class="save-modal-btn" onclick="saveSecurityCode()" data-i18n="save">Save</button>
         </div>
       </div>
     </div>
@@ -1713,7 +1722,7 @@
   </div>
 
   <script>
-    const API_BASE_URL = "https://attired-hitchily-stephane.ngrok-free.dev";
+    const API_BASE_URL = "";
     let isProcessing = false;
 
     // ---- NAFI mode state ----
@@ -2410,6 +2419,7 @@ Below are some example questions to get you started:
       const newChatBtn = document.getElementById('new-chat-btn-header');
       const langSel = document.getElementById('lang-selector');
       const menuBtn = document.getElementById('user-menu-btn');
+      const uploadBtn = document.getElementById('upload-btn-label');
 
       if (currentMode === 'nafi') {
         if (backBtn) backBtn.style.display = 'flex';
@@ -2418,6 +2428,7 @@ Below are some example questions to get you started:
         if (newChatBtn) newChatBtn.style.display = 'none';
         if (langSel) langSel.style.display = 'none';
         if (menuBtn) menuBtn.style.display = 'none';
+        if (uploadBtn) uploadBtn.style.display = 'none';
       } else if (currentMode === 'general_ai') {
         if (backBtn) backBtn.style.display = 'flex';
         if (newChatBtn) newChatBtn.style.display = 'flex';
@@ -2425,6 +2436,7 @@ Below are some example questions to get you started:
         if (genAiBtn) genAiBtn.style.display = 'none';
         if (langSel) langSel.style.display = 'none';
         if (menuBtn) menuBtn.style.display = 'none';
+        if (uploadBtn) uploadBtn.style.display = 'flex';
       } else {
         if (backBtn) backBtn.style.display = 'none';
         if (nafiBtn) nafiBtn.style.display = 'flex';
@@ -2432,6 +2444,7 @@ Below are some example questions to get you started:
         if (newChatBtn) newChatBtn.style.display = 'flex';
         if (langSel) langSel.style.display = 'block';
         if (menuBtn) menuBtn.style.display = 'block';
+        if (uploadBtn) uploadBtn.style.display = 'none';
       }
     }
 
@@ -2493,6 +2506,7 @@ Below are some example questions to get you started:
       inputWrapper.addEventListener('drop', (e) => {
         e.preventDefault();
         inputWrapper.classList.remove('drag-over');
+        if (currentMode !== 'general_ai') return;
         handleFiles(e.dataTransfer.files);
       });
     }
