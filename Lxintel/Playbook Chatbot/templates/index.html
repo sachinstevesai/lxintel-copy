@@ -46,6 +46,8 @@
       align-items: center;
       justify-content: space-between;
       box-shadow: 0 4px 20px rgba(241, 196, 15, 0.15);
+      position: relative;
+      z-index: 2000;
     }
 
     .header-left {
@@ -1340,7 +1342,7 @@
         </button>
 
         <!-- MENU ICON -->
-        <button id="user-menu-btn" style="
+        <button style="
               background: none;
               border: none;
               cursor: pointer;
@@ -1378,7 +1380,7 @@
               ">
             <span x-text="userEmail"></span>
           </div>
-          <button onclick="logout()" data-i18n="logout" style="
+          <button onclick="logout()" style="
                 width: 100%;
                 padding: 10px 12px;
                 background-color: #e74c3c;
@@ -2132,7 +2134,7 @@ Below are some example questions to get you started:
 
       // Update placeholder to guide user
       const input = document.getElementById('message-input');
-      input.placeholder = await Translator.translate('Enter your case detail...', window.currentLang);
+      input.placeholder = await Translator.translate('Enter your NAFI case details...', window.currentLang);
 
       // Show NAFI welcome message
       await addNafiWelcomeMessage();
@@ -2146,11 +2148,11 @@ Below are some example questions to get you started:
 
       const messageDiv = document.createElement('div');
       messageDiv.className = 'message assistant welcome translateable-message';
-      messageDiv.dataset.originalContent = 'Enter your case detail.';
+      messageDiv.dataset.originalContent = 'Enter your NAFI case details';
 
       const inner = document.createElement('div');
       inner.className = 'welcome-content message-body';
-      inner.textContent = await Translator.translate('Enter your case detail.', window.currentLang);
+      inner.textContent = await Translator.translate('Enter your NAFI case details', window.currentLang);
 
       messageDiv.appendChild(inner);
       wrapper.appendChild(messageDiv);
@@ -2243,7 +2245,7 @@ Below are some example questions to get you started:
       if (hasQuestions) {
         document.getElementById('message-input').placeholder = await Translator.translate('Type your answers to the questions above...', window.currentLang);
       } else {
-        document.getElementById('message-input').placeholder = await Translator.translate('Enter your case detail...', window.currentLang);
+        document.getElementById('message-input').placeholder = await Translator.translate('Enter your NAFI case details...', window.currentLang);
       }
 
       // Build the card HTML
