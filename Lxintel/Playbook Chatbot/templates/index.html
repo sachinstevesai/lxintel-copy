@@ -952,11 +952,18 @@
       }
 
       .model-selector-container {
-        width: 100%;
+        width: auto;
       }
 
       .model-selector-container select {
-        width: 100%;
+        width: auto;
+        min-width: 180px;
+        max-width: 100%;
+        padding: 10px 32px 10px 12px !important;
+        height: 42px !important;
+        font-size: 14px !important;
+        border-radius: 8px !important;
+        background-color: rgba(0, 0, 0, 0.4) !important;
       }
 
       .file-upload-tray {
@@ -1153,13 +1160,24 @@
     }
 
     .model-selector-container select {
-      background: #222;
+      appearance: none;
+      -webkit-appearance: none;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1.5px solid rgba(241, 196, 15, 0.4);
       color: #f1c40f;
-      border: 1px solid #444;
-      padding: 5px 10px;
-      border-radius: 6px;
-      font-size: 13px;
+      padding: 10px 32px 10px 14px;
+      font-size: 14px;
+      border-radius: 8px;
       cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23f1c40f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 16px;
+    }
+
+    .model-selector-container select option {
+      background-color: #222;
+      color: white;
     }
 
     /* File Upload Tray */
@@ -2470,6 +2488,7 @@ Below are some example questions to get you started:
       } else {
         generalAiModel = 'default';
         generalAiResponseId = null; // reset context on model change
+        startGeneralAiChat();
       }
     }
 
@@ -2491,6 +2510,7 @@ Below are some example questions to get you started:
       generalAiResponseId = null; // reset context on model change
       document.getElementById('model-security-modal').style.display = 'none';
       document.getElementById('model-selector').value = 'latest';
+      startGeneralAiChat();
     }
 
     // Drag and Drop
