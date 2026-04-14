@@ -943,6 +943,26 @@
         border-radius: 10px !important;
         letter-spacing: 0.5px !important;
       }
+
+      .general-ai-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+        padding: 12px !important;
+      }
+
+      .model-selector-container {
+        width: 100%;
+      }
+
+      .model-selector-container select {
+        width: 100%;
+      }
+
+      .file-upload-tray {
+        gap: 6px !important;
+        padding: 8px !important;
+      }
     }
 
     @media (max-width: 480px) {
@@ -1095,6 +1115,205 @@
       margin-bottom: 8px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+    }
+
+    .nafi-question-item {
+      padding: 6px 12px;
+      margin-bottom: 6px;
+      background: rgba(241, 196, 15, 0.08);
+      border: 1px solid rgba(241, 196, 15, 0.2);
+      border-radius: 6px;
+      color: #e0e0e0;
+      font-size: 13px;
+    }
+
+    /* GENERAL AI BOT STYLES */
+    .general-ai-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 15px;
+      background: rgba(241, 196, 15, 0.1);
+      border: 1px solid rgba(241, 196, 15, 0.2);
+      border-radius: 12px;
+      margin-bottom: 20px;
+      margin-top: 20px;
+      animation: slideDown 0.3s ease-out;
+    }
+
+    .general-ai-header .header-msg {
+      font-weight: 600;
+      color: #f1c40f;
+    }
+
+    .model-selector-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .model-selector-container select {
+      background: #222;
+      color: #f1c40f;
+      border: 1px solid #444;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    /* File Upload Tray */
+    .file-upload-tray {
+      display: none;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px dashed rgba(241, 196, 15, 0.3);
+      border-radius: 12px;
+    }
+
+    .file-upload-tray.active {
+      display: flex;
+    }
+
+    .file-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(241, 196, 15, 0.15);
+      border: 1px solid rgba(241, 196, 15, 0.3);
+      padding: 6px 12px;
+      border-radius: 20px;
+      color: #f1c40f;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .file-pill .remove-file {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.3);
+      color: #f1c40f;
+      transition: all 0.2s;
+    }
+
+    .file-pill .remove-file:hover {
+      background: #e74c3c;
+      color: white;
+    }
+
+    /* Drag over state for input wrapper */
+    .input-wrapper.drag-over {
+      border-color: #f1c40f;
+      background: rgba(241, 196, 15, 0.05);
+      box-shadow: 0 0 15px rgba(241, 196, 15, 0.2);
+    }
+
+    /* Modal Styles */
+    #model-security-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 5000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: #1a1a1a;
+      border: 1px solid rgba(241, 196, 15, 0.3);
+      border-radius: 16px;
+      padding: 24px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+      animation: modalScale 0.3s ease-out;
+    }
+
+    @keyframes modalScale {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .modal-header {
+      color: #f1c40f;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .modal-body input {
+      width: 100%;
+      background: #000;
+      border: 1px solid #444;
+      color: #f1c40f;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 12px;
+    }
+
+    .modal-footer button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .save-modal-btn {
+      background: #f1c40f;
+      color: #000;
+      border: none;
+    }
+
+    .close-modal-btn {
+      background: transparent;
+      color: #777;
+      border: 1px solid #444;
+    }
+
+    .upload-btn {
+      background: rgba(241, 196, 15, 0.1);
+      border: 1px solid rgba(241, 196, 15, 0.3);
+      color: #f1c40f;
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .upload-btn:hover {
+      background: rgba(241, 196, 15, 0.2);
+      transform: translateY(-2px);
     }
 
     .nafi-question-item {
@@ -1307,7 +1526,37 @@
               cursor: pointer;
               font-size: 14px;
             " title="Return to chat">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
           <span data-i18n="backToChat">Back to Chat</span>
+        </button>
+
+        <!-- GENERAL AI CHATBOT BUTTON -->
+        <button id="general-ai-btn-header" class="new-chat-btn" onclick="startGeneralAiChat()" style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              background-color: #f1c40f;
+              color: #111;
+              border: none;
+              padding: 10px 16px;
+              border-radius: 6px;
+              font-weight: 600;
+              cursor: pointer;
+              font-size: 14px;
+            " title="Open General AI Chatbot">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+            </path>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          </svg>
+          <span data-i18n="generalAiChatbot">GENERAL AI CHATBOT</span>
         </button>
 
         <!-- NAFI CASE SCREEN BUTTON (Hidden in NAFI mode) -->
@@ -1342,7 +1591,7 @@
         </button>
 
         <!-- MENU ICON -->
-        <button style="
+        <button id="user-menu-btn" style="
               background: none;
               border: none;
               cursor: pointer;
@@ -1398,17 +1647,53 @@
     </div>
 
     <div class="chat-container">
+      <!-- GENERAL AI HEADER -->
+      <div id="general-ai-header" class="general-ai-header" style="display: none;">
+        <div class="header-msg">Enter your general case details</div>
+        <div class="model-selector-container">
+          <select id="model-selector" onchange="handleModelChange(this.value)">
+            <option value="default">Default Model</option>
+            <option value="latest">Latest Model</option>
+          </select>
+        </div>
+      </div>
+
       <div class="chat-messages" id="chat-messages"></div>
     </div>
 
     <div class="input-container">
-      <div class="input-wrapper">
+      <!-- FILE UPLOAD TRAY -->
+      <div id="file-upload-tray" class="file-upload-tray"></div>
+
+      <div class="input-wrapper" id="input-wrapper">
+        <label for="file-input" class="upload-btn" title="Upload files">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </label>
+        <input type="file" id="file-input" multiple style="display: none"
+          onchange="handleFiles(this.files); this.value=''">
         <textarea id="message-input" data-i18n-placeholder="typeMessage" placeholder="Type your message here..."
           onkeydown="handleKeyPress(event)"></textarea>
-        <button class="send-btn" onclick="currentMode === 'nafi' ? sendNafiMessage() : sendMessage()" id="send-btn"
-          data-i18n="send">
+        <button class="send-btn" onclick="handleSendBtnClick()" id="send-btn" data-i18n="send">
           Send
         </button>
+      </div>
+    </div>
+
+    <!-- MODEL SECURITY MODAL -->
+    <div id="model-security-modal">
+      <div class="modal-content">
+        <div class="modal-header">Enter Security Code</div>
+        <div class="modal-body">
+          <input type="number" id="security-code-input" placeholder="Enter number here">
+        </div>
+        <div class="modal-footer">
+          <button class="close-modal-btn" onclick="closeSecurityModal()">Cancel</button>
+          <button class="save-modal-btn" onclick="saveSecurityCode()">Save</button>
+        </div>
       </div>
     </div>
     <!-- Active Users Popover (Outside header) -->
@@ -1432,9 +1717,14 @@
     let isProcessing = false;
 
     // ---- NAFI mode state ----
-    let currentMode = 'chat'; // 'chat' | 'nafi'
-    let nafiLastIntakeDescription = ''; // original intake description for follow-up payload
-    let nafiAwaitingFollowUp = false;  // true when we received next_questions and waiting for user answers
+    let currentMode = 'chat'; // 'chat' | 'nafi' | 'general_ai'
+    let nafiLastIntakeDescription = '';
+    let nafiAwaitingFollowUp = false;
+
+    // ---- GENERAL AI mode state ----
+    let generalAiResponseId = null;
+    let selectedFiles = [];
+    let generalAiModel = 'default';
     // -------------------------
 
     marked.setOptions({
@@ -1446,11 +1736,17 @@
     function handleKeyPress(event) {
       if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
-        if (currentMode === 'nafi') {
-          sendNafiMessage();
-        } else {
-          sendMessage();
-        }
+        handleSendBtnClick();
+      }
+    }
+
+    function handleSendBtnClick() {
+      if (currentMode === 'nafi') {
+        sendNafiMessage();
+      } else if (currentMode === 'general_ai') {
+        sendGeneralAiMessage();
+      } else {
+        sendMessage();
       }
     }
 
@@ -1481,33 +1777,34 @@
     }
 
     async function startNewChat() {
-      const confirmMsg = await Translator.translate("Start a new conversation? This will clear the current chat.", window.currentLang);
-      if (confirm(confirmMsg)) {
-        // Reset NAFI mode back to normal chat
-        currentMode = 'chat';
-        updateHeaderUI();
-        nafiLastIntakeDescription = '';
-        nafiAwaitingFollowUp = false;
-        document.getElementById('message-input').placeholder = await Translator.translate('Type your message here...', window.currentLang);
+      if (confirm(await Translator.translate('Are you sure you want to start a new chat?', window.currentLang))) {
+        if (currentMode === 'nafi') {
+          startNafiChat();
+        } else if (currentMode === 'general_ai') {
+          generalAiResponseId = null;
+          selectedFiles = [];
+          updateFileTrayUI();
+          startGeneralAiChat();
+        } else {
+          try {
+            const token = localStorage.getItem("jwtsopchatbot");
+            await fetch(`${API_BASE_URL}/Playbook_Chatbot/chat/clear`, {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "ngrok-skip-browser-warning": "true",
+              },
+            });
+          } catch (error) {
+            console.error("Failed to clear chat:", error);
+          }
 
-        try {
-          const token = localStorage.getItem("jwtsopchatbot");
-          await fetch(`${API_BASE_URL}/Playbook_Chatbot/chat/clear`, {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "ngrok-skip-browser-warning": "true",
-            },
-          });
-        } catch (error) {
-          console.error("Failed to clear chat:", error);
+          const messagesDiv = document.getElementById("chat-messages");
+          messagesDiv.innerHTML = "";
+          document.getElementById("message-input").value = "";
+
+          addWelcomeMessage();
         }
-
-        const messagesDiv = document.getElementById("chat-messages");
-        messagesDiv.innerHTML = "";
-        document.getElementById("message-input").value = "";
-
-        addWelcomeMessage();
       }
     }
 
@@ -1516,6 +1813,11 @@
       updateHeaderUI();
       nafiLastIntakeDescription = '';
       nafiAwaitingFollowUp = false;
+      generalAiResponseId = null;
+      selectedFiles = [];
+      updateFileTrayUI();
+      document.getElementById('general-ai-header').style.display = 'none';
+
       document.getElementById('message-input').placeholder = await Translator.translate('Type your message here...', window.currentLang);
 
       const messagesDiv = document.getElementById("chat-messages");
@@ -2073,6 +2375,7 @@ Below are some example questions to get you started:
 
         init() {
           this.checkAuth();
+          if (typeof setupDragAndDrop === 'function') setupDragAndDrop();
           window.addEventListener("login-success", (e) => {
             this.userEmail = e.detail.email;
             this.isLoggedIn = true;
@@ -2103,6 +2406,7 @@ Below are some example questions to get you started:
     function updateHeaderUI() {
       const backBtn = document.getElementById('back-to-chat-btn');
       const nafiBtn = document.getElementById('nafi-case-btn-header');
+      const genAiBtn = document.getElementById('general-ai-btn-header');
       const newChatBtn = document.getElementById('new-chat-btn-header');
       const langSel = document.getElementById('lang-selector');
       const menuBtn = document.getElementById('user-menu-btn');
@@ -2110,15 +2414,186 @@ Below are some example questions to get you started:
       if (currentMode === 'nafi') {
         if (backBtn) backBtn.style.display = 'flex';
         if (nafiBtn) nafiBtn.style.display = 'none';
+        if (genAiBtn) genAiBtn.style.display = 'none';
         if (newChatBtn) newChatBtn.style.display = 'none';
+        if (langSel) langSel.style.display = 'none';
+        if (menuBtn) menuBtn.style.display = 'none';
+      } else if (currentMode === 'general_ai') {
+        if (backBtn) backBtn.style.display = 'flex';
+        if (newChatBtn) newChatBtn.style.display = 'flex';
+        if (nafiBtn) nafiBtn.style.display = 'none';
+        if (genAiBtn) genAiBtn.style.display = 'none';
         if (langSel) langSel.style.display = 'none';
         if (menuBtn) menuBtn.style.display = 'none';
       } else {
         if (backBtn) backBtn.style.display = 'none';
         if (nafiBtn) nafiBtn.style.display = 'flex';
+        if (genAiBtn) genAiBtn.style.display = 'flex';
         if (newChatBtn) newChatBtn.style.display = 'flex';
         if (langSel) langSel.style.display = 'block';
         if (menuBtn) menuBtn.style.display = 'block';
+      }
+    }
+
+    async function startGeneralAiChat() {
+      currentMode = 'general_ai';
+      generalAiResponseId = null;
+      selectedFiles = [];
+      updateHeaderUI();
+      updateFileTrayUI();
+
+      const messagesDiv = document.getElementById('chat-messages');
+      messagesDiv.innerHTML = '';
+      document.getElementById('message-input').value = '';
+      document.getElementById('general-ai-header').style.display = 'flex';
+
+      const input = document.getElementById('message-input');
+      input.placeholder = await Translator.translate('Enter your general case details...', window.currentLang);
+    }
+
+    function handleModelChange(val) {
+      if (val === 'latest') {
+        document.getElementById('model-security-modal').style.display = 'flex';
+      } else {
+        generalAiModel = 'default';
+        generalAiResponseId = null; // reset context on model change
+      }
+    }
+
+    function closeSecurityModal() {
+      document.getElementById('model-security-modal').style.display = 'none';
+      if (generalAiModel !== 'latest') {
+        document.getElementById('model-selector').value = 'default';
+      }
+    }
+
+    function saveSecurityCode() {
+      const code = document.getElementById('security-code-input').value;
+      if (!code) {
+        alert('Please enter a security code');
+        return;
+      }
+      localStorage.setItem('general_ai_security_code', code);
+      generalAiModel = 'latest';
+      generalAiResponseId = null; // reset context on model change
+      document.getElementById('model-security-modal').style.display = 'none';
+      document.getElementById('model-selector').value = 'latest';
+    }
+
+    // Drag and Drop
+    function setupDragAndDrop() {
+      const inputWrapper = document.getElementById('input-wrapper');
+      if (!inputWrapper) return;
+
+      inputWrapper.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        inputWrapper.classList.add('drag-over');
+      });
+      inputWrapper.addEventListener('dragleave', () => inputWrapper.classList.remove('drag-over'));
+      inputWrapper.addEventListener('drop', (e) => {
+        e.preventDefault();
+        inputWrapper.classList.remove('drag-over');
+        handleFiles(e.dataTransfer.files);
+      });
+    }
+
+    function handleFiles(files) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const isDuplicate = selectedFiles.some(f => f.name === file.name && f.size === file.size);
+        if (!isDuplicate) {
+          selectedFiles.push(file);
+        }
+      }
+      updateFileTrayUI();
+    }
+
+    function removeFile(index) {
+      selectedFiles.splice(index, 1);
+      updateFileTrayUI();
+    }
+
+    function updateFileTrayUI() {
+      const tray = document.getElementById('file-upload-tray');
+      if (!tray) return;
+
+      if (selectedFiles.length === 0) {
+        tray.classList.remove('active');
+        tray.innerHTML = '';
+        return;
+      }
+      tray.classList.add('active');
+      tray.innerHTML = selectedFiles.map((file, index) => `
+        <div class="file-pill">
+          <span>${file.name}</span>
+          <div class="remove-file" onclick="removeFile(${index})">×</div>
+        </div>
+      `).join('');
+    }
+
+    async function sendGeneralAiMessage() {
+      if (isProcessing) return;
+
+      const input = document.getElementById('message-input');
+      const message = input.value.trim();
+      if (!message && selectedFiles.length === 0) return;
+
+      isProcessing = true;
+      const sendBtn = document.getElementById('send-btn');
+      sendBtn.disabled = true;
+      sendBtn.innerHTML = '<span class="spinner"></span>';
+
+      addMessage('user', message);
+      input.value = '';
+      showTypingIndicator();
+
+      const formData = new FormData();
+      formData.append('message', message);
+
+      if (generalAiModel === 'latest') {
+        const securityCode = localStorage.getItem('general_ai_security_code');
+        if (securityCode) {
+          formData.append('security_code', securityCode);
+        }
+      }
+
+      if (generalAiResponseId) {
+        formData.append('previous_response_id', generalAiResponseId);
+      }
+
+      selectedFiles.forEach(file => {
+        formData.append('files', file);
+      });
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/Playbook_Chatbot/general/chat`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('jwtsopchatbot')}`,
+            'ngrok-skip-browser-warning': 'true'
+          },
+          body: formData
+        });
+
+        const data = await response.json();
+        hideTypingIndicator();
+
+        if (data.answer) {
+          addMessage('assistant', data.answer, data.prompt_log_id);
+          generalAiResponseId = data.response_id;
+        } else {
+          addMessage('assistant', 'Sorry, I couldn\'t process that general request.');
+        }
+      } catch (error) {
+        console.error('General AI error:', error);
+        hideTypingIndicator();
+        addMessage('assistant', 'An error occurred while contacting the General AI service.');
+      } finally {
+        isProcessing = false;
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = await Translator.translate('send', window.currentLang);
+        selectedFiles = [];
+        updateFileTrayUI();
       }
     }
 
@@ -2127,6 +2602,7 @@ Below are some example questions to get you started:
       updateHeaderUI();
       nafiLastIntakeDescription = '';
       nafiAwaitingFollowUp = false;
+      document.getElementById('general-ai-header').style.display = 'none';
 
       const messagesDiv = document.getElementById('chat-messages');
       messagesDiv.innerHTML = '';
