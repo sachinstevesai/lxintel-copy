@@ -386,7 +386,7 @@
     }
 
     .message.assistant.welcome .welcome-content {
-      max-height: 220px;
+      max-height: 8.1rem;
       overflow-y: auto;
       padding-right: 8px;
       white-space: pre-line;
@@ -992,11 +992,11 @@
     .nafi-case-btn {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       background-color: transparent;
       color: #f1c40f;
       border: 1.5px solid rgba(241, 196, 15, 0.6);
-      padding: 10px 16px;
+      padding: 10px 12px;
       border-radius: 6px;
       font-weight: 600;
       cursor: pointer;
@@ -1496,7 +1496,7 @@
           </div>
         </div>
       </div>
-      <div class="header-right" style="display: flex; align-items: center; gap: 16px">
+      <div class="header-right" style="display: flex; align-items: center; gap: 8px">
         <!-- LANGUAGE SELECTOR -->
         <select id="lang-selector" onchange="changeLanguage(this.value)" style="
               background-color: #222;
@@ -1516,11 +1516,11 @@
         <button id="back-to-chat-btn" class="new-chat-btn" onclick="backToChat()" style="
               display: none;
               align-items: center;
-              gap: 8px;
+              gap: 6px;
               background-color: #f1c40f;
               color: #111;
               border: none;
-              padding: 10px 16px;
+              padding: 10px 12px;
               border-radius: 6px;
               font-weight: 600;
               cursor: pointer;
@@ -1538,11 +1538,11 @@
         <button id="general-ai-btn-header" class="new-chat-btn" onclick="startGeneralAiChat()" style="
               display: flex;
               align-items: center;
-              gap: 8px;
+              gap: 6px;
               background-color: #f1c40f;
               color: #111;
               border: none;
-              padding: 10px 16px;
+              padding: 10px 12px;
               border-radius: 6px;
               font-weight: 600;
               cursor: pointer;
@@ -1573,11 +1573,11 @@
         <button id="new-chat-btn-header" class="new-chat-btn" onclick="startNewChat()" style="
               display: flex;
               align-items: center;
-              gap: 8px;
+              gap: 6px;
               background-color: #f1c40f;
               color: #111;
               border: none;
-              padding: 10px 16px;
+              padding: 10px 12px;
               border-radius: 6px;
               font-weight: 600;
               cursor: pointer;
@@ -2624,11 +2624,21 @@ Below are some example questions to get you started:
 
       const messageDiv = document.createElement('div');
       messageDiv.className = 'message assistant welcome translateable-message';
-      messageDiv.dataset.originalContent = 'Enter your NAFI case details';
+      const nafiText = `Describe the matter in clear, full sentences, as if you were briefly explaining it to an intake specialist. Include what happened, when it happened, who was involved, and what kind of injury, harm, or dispute is being reported. Avoid vague prompts, shorthand, jargon, and unexplained acronyms. The more specific your description, the more accurate the screening result will be.
+Good example:
+“The caller says she was injured in a rear-end crash last month, went to urgent care the same day, and now has neck and back pain.”
+Avoid:
+“MVA soft tissue”
+“med mal?”
+“WC issue”
+“bad provider case”
+Tip: If you are unsure about details, say that directly rather than guessing.`;
+
+      messageDiv.dataset.originalContent = nafiText;
 
       const inner = document.createElement('div');
       inner.className = 'welcome-content message-body';
-      inner.textContent = await Translator.translate('Enter your NAFI case details', window.currentLang);
+      inner.textContent = await Translator.translate(nafiText, window.currentLang);
 
       messageDiv.appendChild(inner);
       wrapper.appendChild(messageDiv);
