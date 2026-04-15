@@ -24,6 +24,7 @@
     };
   </script>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
     body,
@@ -367,6 +368,142 @@
       z-index: 2000;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     }
+
+    .billing-report-preview {
+      background: #e8e8e8;
+      color: #000;
+      max-height: 600px;
+      overflow: auto;
+      padding: 24px;
+    }
+
+    .billing-report-page {
+      background: #fff;
+      color: #000;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 28px 34px;
+      box-shadow: 0 0 0 1px #cfcfcf;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 13px;
+      line-height: 1.3;
+    }
+
+    .billing-logo-wrap {
+      margin-bottom: 10px;
+      padding-bottom: 4px;
+    }
+
+    .billing-logo-wrap img {
+      width: 100%;
+      max-width: none;
+      margin-left: 0;
+      display: block;
+    }
+
+    .billing-meta {
+      margin-top: 8px;
+      margin-bottom: 12px;
+      font-size: 14px;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .billing-meta div {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .billing-title {
+      text-align: center;
+      font-size: 15px;
+      font-weight: 700;
+      margin: 8px 0 12px;
+    }
+
+    .billing-section {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      text-decoration: underline;
+      margin: 12px 0 6px;
+      line-height: 1.2;
+    }
+
+    .billing-line,
+    .billing-label,
+    .billing-total,
+    .billing-note,
+    .billing-bullet {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .billing-label {
+      font-size: 13px;
+      font-weight: 700;
+      margin-top: 6px;
+    }
+
+    .billing-line {
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    .billing-total {
+      font-size: 13px;
+      font-weight: 700;
+      margin-top: 6px;
+    }
+
+    .billing-bullet {
+      font-size: 13px;
+      margin-top: 6px;
+      padding-left: 14px;
+      text-indent: -14px;
+    }
+
+    .billing-note {
+      font-size: 13px;
+      margin-top: 6px;
+      font-style: italic;
+    }
+
+    .billing-spacer {
+      height: 6px;
+    }
+
+    @media (max-width: 768px) {
+      .billing-report-page {
+        padding: 18px;
+        font-size: 12px;
+      }
+
+      .billing-logo-wrap img {
+        max-width: none;
+      }
+
+      .billing-meta {
+        font-size: 13px;
+      }
+
+      .billing-title {
+        font-size: 14px;
+      }
+
+      .billing-section {
+        font-size: 13px;
+      }
+
+      .billing-label,
+      .billing-total,
+      .billing-line,
+      .billing-note,
+      .billing-bullet {
+        font-size: 12px;
+      }
+    }
   </style>
 </head>
 
@@ -599,8 +736,7 @@
                 </span>
               </button>
             </div>
-            <div class="p-8 markdown-body overflow-auto" style="background: #fff; color: #000; max-height: 600px"
-              x-html="markdown"></div>
+            <div id="billing-report-content" class="billing-report-preview" x-html="markdown"></div>
           </div>
         </div>
       </template>
@@ -1052,7 +1188,7 @@
                 clearInterval(this.pollInterval);
                 this.status = "completed";
                 this.markdownRaw = data.final_summary;
-                this.markdown = marked.parse(data.final_summary);
+                this.markdown = this.renderFinalSummary(data.final_summary);
                 this.loading = false;
                 this.progress = 100;
                 this.duration = Math.round(
@@ -1070,22 +1206,185 @@
           }, 3000);
         },
 
-        downloadPDF() {
+        escapeHtml(value) {
+          return (value || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+        },
+
+        renderFinalSummary(summaryText) {
+          const lines = (summaryText || "").split(/\r?\n/);
+          const meta = { date: "", client: "", caseNumber: "" };
+          const contentLines = [];
+
+          lines.forEach((line) => {
+            const trimmed = line.trim();
+            if (!meta.date && trimmed.startsWith("Date:")) {
+              meta.date = trimmed.replace(/^Date:\s*/, "");
+              return;
+            }
+            if (!meta.client && trimmed.startsWith("Client:")) {
+              meta.client = trimmed.replace(/^Client:\s*/, "");
+              return;
+            }
+            if (!meta.caseNumber && trimmed.startsWith("Case Number:")) {
+              meta.caseNumber = trimmed.replace(/^Case Number:\s*/, "");
+              return;
+            }
+            contentLines.push(line);
+          });
+
+          const renderedLines = contentLines.map((line) => {
+            const rawLine = this.escapeHtml(line);
+            const trimmed = line.trim();
+
+            if (!trimmed) {
+              return '<div class="billing-spacer"></div>';
+            }
+
+            if (trimmed === "SETTLEMENT MEMORANDUM") {
+              return '<div class="billing-title">SETTLEMENT MEMORANDUM</div>';
+            }
+
+            if (
+              /^[A-Z][A-Z\s&'’\-–]+$/.test(trimmed) &&
+              trimmed.length <= 42 &&
+              !trimmed.includes(":")
+            ) {
+              return `<div class="billing-section">${rawLine}</div>`;
+            }
+
+            if (/^(Total |Net Amount Due to Client|Total Amount Due to Client|Less Previously Paid to Client)/i.test(trimmed)) {
+              return `<div class="billing-total">${rawLine}</div>`;
+            }
+
+            if (/^[A-Za-z][A-Za-z\s'’\-&]+:\s*$/.test(trimmed)) {
+              return `<div class="billing-label">${rawLine}</div>`;
+            }
+
+            if (/^(•|\*)/.test(trimmed)) {
+              const className = trimmed.startsWith("*") ? "billing-note" : "billing-bullet";
+              return `<div class="${className}">${rawLine}</div>`;
+            }
+
+            return `<div class="billing-line">${rawLine}</div>`;
+          });
+
+          const logoMarkup = `
+            <div class="billing-logo-wrap">
+              <img src="./logo.png" alt="RAMOS LAW INJURY DIVISION" />
+            </div>
+          `;
+
+          const metaMarkup = `
+            <div class="billing-meta">
+              <div><span>Date:</span><span>${this.escapeHtml(meta.date || "Details are not found in given case folder")}</span></div>
+              <div><span>Client:</span><span>${this.escapeHtml(meta.client || "Details are not found in given case folder")}</span></div>
+              <div><span>Case Number:</span><span>${this.escapeHtml(meta.caseNumber || "Details are not found in given case folder")}</span></div>
+            </div>
+          `;
+
+          return `
+            <div class="billing-report-page">
+              ${logoMarkup}
+              ${metaMarkup}
+              ${renderedLines.join("")}
+            </div>
+          `;
+        },
+
+        async downloadPDF() {
           if (!this.markdownRaw) {
             alert("No report data available");
             return;
           }
 
-          // Create blob and download markdown
-          const blob = new Blob([this.markdownRaw], { type: "text/markdown" });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = `Case_${this.caseNumber}_Billing_Report.md`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
+          if (typeof window.html2pdf === "undefined") {
+            alert("PDF library failed to load. Please refresh and try again.");
+            return;
+          }
+
+          const source = document.getElementById("billing-report-content");
+          if (!source) {
+            alert("Report preview not found.");
+            return;
+          }
+
+          const page = source.querySelector(".billing-report-page");
+          if (!page) {
+            alert("Report content not ready yet.");
+            return;
+          }
+
+          // Build a clean export clone pinned to top-left to avoid viewport offset shifts.
+          const exportRoot = document.createElement("div");
+          exportRoot.style.position = "fixed";
+          exportRoot.style.left = "0";
+          exportRoot.style.top = "0";
+          exportRoot.style.width = "100vw";
+          exportRoot.style.display = "flex";
+          exportRoot.style.justifyContent = "center";
+          exportRoot.style.alignItems = "flex-start";
+          exportRoot.style.padding = "0";
+          exportRoot.style.margin = "0";
+          exportRoot.style.background = "#ffffff";
+          exportRoot.style.opacity = "0.02";
+          exportRoot.style.overflow = "visible";
+          exportRoot.style.pointerEvents = "none";
+          exportRoot.style.zIndex = "9999";
+
+          const exportPage = page.cloneNode(true);
+          exportPage.style.maxWidth = "816px";
+          exportPage.style.width = "816px";
+          exportPage.style.boxSizing = "border-box";
+          exportPage.style.margin = "0 auto";
+          exportPage.style.boxShadow = "none";
+          exportPage.style.padding = "24px 28px";
+          exportRoot.appendChild(exportPage);
+          document.body.appendChild(exportRoot);
+
+          const images = Array.from(exportRoot.querySelectorAll("img"));
+          await Promise.all(
+            images.map((img) => {
+              if (img.complete) return Promise.resolve();
+              return new Promise((resolve) => {
+                img.onload = () => resolve();
+                img.onerror = () => resolve();
+              });
+            })
+          );
+
+          // Ensure browser reflow/paint completes before html2canvas capture.
+          await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+          const options = {
+            margin: [0.2, 0.2, 0.2, 0.2],
+            filename: `Case_${this.caseNumber}_Billing_Report.pdf`,
+            image: { type: "jpeg", quality: 1 },
+            html2canvas: {
+              scale: 2,
+              useCORS: true,
+              backgroundColor: "#ffffff",
+              logging: false,
+              scrollY: 0,
+              windowWidth: 1200
+            },
+            jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+            // Let html2pdf split long content across pages naturally.
+            pagebreak: { mode: ["css", "legacy"] },
+          };
+
+          try {
+            await window.html2pdf().set(options).from(exportPage).save();
+          } catch (err) {
+            console.error("PDF export failed:", err);
+            alert("Failed to download PDF. Please try again.");
+          } finally {
+            document.body.removeChild(exportRoot);
+          }
         },
 
         reset() {
