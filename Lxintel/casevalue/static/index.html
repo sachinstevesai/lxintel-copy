@@ -344,6 +344,28 @@
       .markdown-body h2 {
         font-size: 16px !important;
       }
+
+      .active_user_popover_style {
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        top: 160px !important;
+        width: 260px !important;
+        max-width: 90% !important;
+        min-width: unset !important;
+      }
+    }
+
+    .active_user_popover_style {
+      position: fixed;
+      top: 85px;
+      left: 260px;
+      background-color: #1a1a1a;
+      border: 1px solid rgba(241, 196, 15, 0.4);
+      border-radius: 8px;
+      padding: 12px;
+      min-width: 220px;
+      z-index: 2000;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     }
   </style>
 </head>
@@ -427,19 +449,7 @@
             Active Users
           </button>
           <!-- Active Users Popover -->
-          <div id="active-users-popover" class="active_user" style="
-    position: fixed;
-    top: 85px;
-    left: 260px;
-    background-color: #1a1a1a;
-    border: 1px solid rgba(241, 196, 15, 0.4);
-    border-radius: 8px;
-    padding: 12px;
-    min-width: 220px;
-    display: none;
-    z-index: 2000;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-  ">
+          <div id="active-users-popover" class="active_user active_user_popover_style" style="display: none;">
             <div style="
     padding: 8px 0;
     margin-bottom: 8px;
@@ -705,7 +715,11 @@
           data.append("username", this.email);
           data.append("password", "not-used-but-required"); // password ignored by backend
 
-          fetch(`${API_BASE_URL}/casevalue/login`, { method: "POST", body: data, headers: { "ngrok-skip-browser-warning": "true" } })
+          fetch(`${API_BASE_URL}/casevalue/login`, {
+            method: "POST",
+            body: data,
+            headers: { "ngrok-skip-browser-warning": "true" }
+          })
             .then((res) => {
               if (!res.ok) throw new Error("Unauthorized email");
               return res.json();
@@ -757,7 +771,7 @@
       try {
         const res = await fetch(`${API_BASE_URL}/casevalue/active-today`, {
           headers: {
-            "Authorization": `Bearer ${token}`,
+            "Authorization": token ? `Bearer ${token}` : "",
             "ngrok-skip-browser-warning": "true"
           }
         });
@@ -895,7 +909,7 @@
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`,
+                "Authorization": token ? `Bearer ${token}` : "",
                 "ngrok-skip-browser-warning": "true"
               },
               body: JSON.stringify({ caseNumber: this.caseNumber }),
@@ -952,7 +966,7 @@
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`,
+                "Authorization": token ? `Bearer ${token}` : "",
                 "ngrok-skip-browser-warning": "true"
               },
               body: JSON.stringify({ caseNumber: this.caseNumber, regenerate: "true" }),
@@ -992,7 +1006,7 @@
               }
               const res = await fetch(`${API_BASE_URL}/casevalue/case-result/${this.caseNumber}`, {
                 headers: {
-                  "Authorization": `Bearer ${token}`,
+                  "Authorization": token ? `Bearer ${token}` : "",
                   "ngrok-skip-browser-warning": "true"
                 }
               });
