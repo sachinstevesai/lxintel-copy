@@ -966,6 +966,15 @@
         background-color: rgba(0, 0, 0, 0.4) !important;
       }
 
+      .general-ai-welcome {
+        width: 100%;
+        max-width: 100%;
+        max-height: 4.8em;
+        font-size: 13px;
+        overflow-y: auto ;
+
+      }
+
       .file-upload-tray {
         gap: 6px !important;
         padding: 8px !important;
@@ -1151,6 +1160,36 @@
     .general-ai-header .header-msg {
       font-weight: 600;
       color: #f1c40f;
+    }
+
+    .general-ai-welcome {
+      display: none;
+      width: fit-content;
+      max-width: min(760px, 72%);
+      margin-bottom: 12px;
+      padding: 12px 14px;
+      border: 1px solid rgba(241, 196, 15, 0.25);
+      border-radius: 12px;
+      background: rgba(241, 196, 15, 0.08);
+      color: #f5f5f5;
+      line-height: 1.5;
+      max-height: 5.2em;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #f1c40f73 #2c2c2c;
+      white-space: pre-wrap;
+    }
+
+    .general-ai-input-warning {
+      display: none;
+      margin-bottom: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(231, 76, 60, 0.45);
+      background: rgba(231, 76, 60, 0.12);
+      color: #ffd2cf;
+      font-size: 13px;
+      line-height: 1.45;
     }
 
     .model-selector-container {
@@ -1674,7 +1713,7 @@
     <div class="chat-container">
       <!-- GENERAL AI HEADER -->
       <div id="general-ai-header" class="general-ai-header" style="display: none;">
-        <div class="header-msg" data-i18n="enterGeneralDetails">Enter your general case details</div>
+        <div class="header-msg">Do not upload PHI, medical records, or sensitive client information. This workspace is not approved for medical-summary generation or raw medical-record analysis. Upload only non-medical, non-PHI, non-sensitive work documents.</div>
         <div class="model-selector-container">
           <select id="model-selector" onchange="handleModelChange(this.value)">
             <option value="default" data-i18n="defaultModel">Default Model</option>
@@ -1683,10 +1722,33 @@
         </div>
       </div>
 
-      <div class="chat-messages" id="chat-messages"></div>
+      <div class="chat-messages" id="chat-messages">
+        <div id="general-ai-welcome" class="general-ai-welcome">
+Use this tool only for Ramos Law work-related tasks. Write in clear, full sentences and describe the specific work task you want help with. Include the goal, key facts, and what kind of help you want, such as drafting, rewriting, reviewing, organizing, or explaining.
+
+Important confidentiality restriction:
+Do not paste or upload PHI, medical records, bills, charts, imaging reports, lab reports, treatment records, dates of birth, medical record numbers, Social Security numbers, addresses, account numbers, or other sensitive client identifiers.
+
+This tool is not for generating medical summaries, summarizing raw medical records, extracting diagnoses, medications, or providers from patient files, analyzing raw client treatment records, personal or non-work requests.
+
+Best way to prompt
+Use full sentences, not fragments
+State the work goal clearly
+Include relevant business context
+Say exactly what you want done with any uploaded file
+Avoid vague prompts, shorthand, jargon, and unexplained acronyms
+
+Good examples
+"Draft a professional follow-up email to a client who has not responded in two weeks."
+"Rewrite this internal message so it is clearer, more concise, and professional."
+"Analyze this uploaded non-medical document and identify the top issues I should review before sending it to an attorney."
+"Turn these notes into a clean internal summary for staff review."
+        </div>
+      </div>
     </div>
 
     <div class="input-container">
+      <div id="general-ai-input-warning" class="general-ai-input-warning">Do not upload PHI, medical records, or sensitive client information. Upload only non-medical, non-PHI, non-sensitive work documents.</div>
       <!-- FILE UPLOAD TRAY -->
       <div id="file-upload-tray" class="file-upload-tray"></div>
 
@@ -1740,7 +1802,7 @@
   </div>
 
   <script>
-    const API_BASE_URL = "";
+    const API_BASE_URL = "https://attired-hitchily-stephane.ngrok-free.dev";
     let isProcessing = false;
 
     // ---- NAFI mode state ----
@@ -2438,6 +2500,9 @@ Below are some example questions to get you started:
       const langSel = document.getElementById('lang-selector');
       const menuBtn = document.getElementById('user-menu-btn');
       const uploadBtn = document.getElementById('upload-btn-label');
+      const generalAiHeader = document.getElementById('general-ai-header');
+      const generalAiWelcome = document.getElementById('general-ai-welcome');
+      const generalAiInputWarning = document.getElementById('general-ai-input-warning');
 
       if (currentMode === 'nafi') {
         if (backBtn) backBtn.style.display = 'flex';
@@ -2455,6 +2520,9 @@ Below are some example questions to get you started:
         if (langSel) langSel.style.display = 'none';
         if (menuBtn) menuBtn.style.display = 'none';
         if (uploadBtn) uploadBtn.style.display = 'flex';
+        if (generalAiHeader) generalAiHeader.style.display = 'flex';
+        if (generalAiWelcome) generalAiWelcome.style.display = 'block';
+        if (generalAiInputWarning) generalAiInputWarning.style.display = 'block';
       } else {
         if (backBtn) backBtn.style.display = 'none';
         if (nafiBtn) nafiBtn.style.display = 'flex';
@@ -2463,6 +2531,9 @@ Below are some example questions to get you started:
         if (langSel) langSel.style.display = 'block';
         if (menuBtn) menuBtn.style.display = 'block';
         if (uploadBtn) uploadBtn.style.display = 'none';
+        if (generalAiHeader) generalAiHeader.style.display = 'none';
+        if (generalAiWelcome) generalAiWelcome.style.display = 'none';
+        if (generalAiInputWarning) generalAiInputWarning.style.display = 'none';
       }
     }
 
@@ -2474,12 +2545,39 @@ Below are some example questions to get you started:
       updateFileTrayUI();
 
       const messagesDiv = document.getElementById('chat-messages');
-      messagesDiv.innerHTML = '';
-      document.getElementById('message-input').value = '';
-      document.getElementById('general-ai-header').style.display = 'flex';
+      let generalAiWelcome = document.getElementById('general-ai-welcome');
+      if (!generalAiWelcome) {
+        generalAiWelcome = document.createElement('div');
+        generalAiWelcome.id = 'general-ai-welcome';
+        generalAiWelcome.className = 'general-ai-welcome';
+        generalAiWelcome.textContent = `Use this tool only for Ramos Law work-related tasks. Write in clear, full sentences and describe the specific work task you want help with. Include the goal, key facts, and what kind of help you want, such as drafting, rewriting, reviewing, organizing, or explaining.
 
+Important confidentiality restriction:
+Do not paste or upload PHI, medical records, bills, charts, imaging reports, lab reports, treatment records, dates of birth, medical record numbers, Social Security numbers, addresses, account numbers, or other sensitive client identifiers.
+
+This tool is not for generating medical summaries, summarizing raw medical records, extracting diagnoses, medications, or providers from patient files, analyzing raw client treatment records, personal or non-work requests.
+
+Best way to prompt
+Use full sentences, not fragments
+State the work goal clearly
+Include relevant business context
+Say exactly what you want done with any uploaded file
+Avoid vague prompts, shorthand, jargon, and unexplained acronyms
+
+Good examples
+"Draft a professional follow-up email to a client who has not responded in two weeks."
+"Rewrite this internal message so it is clearer, more concise, and professional."
+"Analyze this uploaded non-medical document and identify the top issues I should review before sending it to an attorney."
+"Turn these notes into a clean internal summary for staff review."`;
+        messagesDiv.prepend(generalAiWelcome);
+      }
+      Array.from(messagesDiv.children).forEach((child) => {
+        if (child.id !== 'general-ai-welcome') child.remove();
+      });
+      generalAiWelcome.style.display = 'block';
+      document.getElementById('message-input').value = '';
       const input = document.getElementById('message-input');
-      input.placeholder = await Translator.translate('Enter your general case details...', window.currentLang);
+      input.placeholder = 'Describe the work task, goal, and what you want help with...';
     }
 
     function handleModelChange(val) {
@@ -2926,8 +3024,10 @@ Tip: If you are unsure about details, say that directly rather than guessing.`;
         loginPageWrapper.style.display = "none";
         mainAppWrapper.style.display = "flex";
 
-        // Show welcome message if chat is empty
-        if (messagesDiv && messagesDiv.children.length === 0) {
+        // Show welcome/history when there are no actual chat items yet.
+        // Ignore helper UI blocks like the hidden general-ai welcome container.
+        const hasChatItems = !!messagesDiv?.querySelector(".message-wrapper, .typing-wrapper, .empty-state");
+        if (messagesDiv && !hasChatItems) {
           addWelcomeMessage();
           loadChatHistory();
         }
