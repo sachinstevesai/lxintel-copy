@@ -1150,6 +1150,104 @@
       font-size: 13px;
     }
 
+    /* NAFI Tutorial UI */
+    .nafi-tutorial-card {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(241, 196, 15, 0.25);
+      background: rgba(241, 196, 15, 0.05);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .nafi-tutorial-message {
+      white-space: pre-wrap;
+      color: #e0e0e0;
+      padding: 14px 18px 0 18px;
+      font-size: 14px;
+    }
+
+    .nafi-tutorial-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 12px 18px 16px 18px;
+    }
+
+    .nafi-tutorial-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      background: rgba(241, 196, 15, 0.08);
+      border: 1px solid rgba(241, 196, 15, 0.2);
+      border-radius: 8px;
+      color: #e0e0e0;
+      cursor: pointer;
+      width: 50%;
+    }
+
+    .nafi-tutorial-option input {
+      margin-top: 2px;
+      cursor: pointer;
+    }
+
+    .nafi-tutorial-option.disabled {
+      opacity: 0.75;
+      cursor: not-allowed;
+    }
+
+    .nafi-tutorial-action-row {
+      padding: 0 18px 18px 18px;
+    }
+
+    .nafi-tutorial-action-btn {
+      width: 50%;
+      padding: 12px 14px;
+      background-color: #f1c40f;
+      color: #111;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .nafi-tutorial-action-btn:disabled {
+      background-color: #666;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .nafi-tutorial-followups {
+      padding: 12px 18px 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .nafi-tutorial-followup-label {
+      font-weight: 700;
+      color: #f1c40f;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .nafi-tutorial-textarea {
+      width: 100%;
+      background: #000;
+      border: 1px solid rgba(241, 196, 15, 0.3);
+      color: #f1c40f;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 14px;
+      min-height: 44px;
+      resize: vertical;
+    }
+
     /* GENERAL AI BOT STYLES */
     .general-ai-header {
       display: flex;
@@ -1599,6 +1697,27 @@
           <option value="es">Spanish</option>
         </select>
 
+        <!-- TUTORIAL BUTTON (Shows in NAFI mode) -->
+        <button id="tutorial-btn-header" class="new-chat-btn" onclick="startNafiTutorial()" style="
+              display: none;
+              align-items: center;
+              gap: 6px;
+              background-color: #f1c40f;
+              color: #111;
+              border: none;
+              padding: 10px 12px;
+              border-radius: 6px;
+              font-weight: 600;
+              cursor: pointer;
+              font-size: 14px;
+            " title="NAFI Screening Tutorial">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+          </svg>
+          <span>Tutorial</span>
+        </button>
+
         <!-- BACK TO CHAT BUTTON (Shows in NAFI mode) -->
         <button id="back-to-chat-btn" class="new-chat-btn" onclick="backToChat()" style="
               display: none;
@@ -1859,6 +1978,10 @@ Good examples
     let currentMode = 'chat'; // 'chat' | 'nafi' | 'general_ai'
     let nafiLastIntakeDescription = '';
     let nafiAwaitingFollowUp = false;
+    // ---- NAFI Tutorial mode state ----
+    let nafiTutorialActive = false;
+    let nafiTutorialLastAnswer = null;
+    let nafiTutorialProcessing = false;
 
     // ---- GENERAL AI mode state ----
     let generalAiResponseId = null;
@@ -1949,6 +2072,15 @@ Good examples
 
     async function backToChat() {
       currentMode = 'chat';
+      // Stop tutorial UI if it was open
+      nafiTutorialActive = false;
+      nafiTutorialLastAnswer = null;
+      nafiTutorialProcessing = false;
+
+      // Restore input UI for chat mode
+      const inputContainer = document.querySelector('.input-container');
+      if (inputContainer) inputContainer.style.display = 'block';
+
       updateHeaderUI();
       nafiLastIntakeDescription = '';
       nafiAwaitingFollowUp = false;
@@ -2544,6 +2676,7 @@ Below are some example questions to get you started:
 
     function updateHeaderUI() {
       const backBtn = document.getElementById('back-to-chat-btn');
+      const tutorialBtn = document.getElementById('tutorial-btn-header');
       const nafiBtn = document.getElementById('nafi-case-btn-header');
       const genAiBtn = document.getElementById('general-ai-btn-header');
       const newChatBtn = document.getElementById('new-chat-btn-header');
@@ -2556,6 +2689,7 @@ Below are some example questions to get you started:
 
       if (currentMode === 'nafi') {
         if (backBtn) backBtn.style.display = 'flex';
+        if (tutorialBtn) tutorialBtn.style.display = 'flex';
         if (nafiBtn) nafiBtn.style.display = 'none';
         if (genAiBtn) genAiBtn.style.display = 'none';
         if (newChatBtn) newChatBtn.style.display = 'none';
@@ -2564,6 +2698,7 @@ Below are some example questions to get you started:
         if (uploadBtn) uploadBtn.style.display = 'none';
       } else if (currentMode === 'general_ai') {
         if (backBtn) backBtn.style.display = 'flex';
+        if (tutorialBtn) tutorialBtn.style.display = 'none';
         if (newChatBtn) newChatBtn.style.display = 'flex';
         if (nafiBtn) nafiBtn.style.display = 'none';
         if (genAiBtn) genAiBtn.style.display = 'none';
@@ -2575,6 +2710,7 @@ Below are some example questions to get you started:
         if (generalAiInputWarning) generalAiInputWarning.style.display = 'block';
       } else {
         if (backBtn) backBtn.style.display = 'none';
+        if (tutorialBtn) tutorialBtn.style.display = 'none';
         if (nafiBtn) nafiBtn.style.display = 'flex';
         if (genAiBtn) genAiBtn.style.display = 'flex';
         if (newChatBtn) newChatBtn.style.display = 'flex';
@@ -2780,6 +2916,14 @@ Good examples
     }
 
     async function startNafiChat() {
+      nafiTutorialActive = false;
+      nafiTutorialLastAnswer = null;
+      nafiTutorialProcessing = false;
+
+      // Ensure NAFI chat input is visible when entering normal NAFI mode
+      const inputContainer = document.querySelector('.input-container');
+      if (inputContainer) inputContainer.style.display = 'block';
+
       currentMode = 'nafi';
       updateHeaderUI();
       nafiLastIntakeDescription = '';
@@ -2826,6 +2970,296 @@ Tip: If you are unsure about details, say that directly rather than guessing.`;
       wrapper.appendChild(messageDiv);
       messagesDiv.appendChild(wrapper);
       scrollToBottom();
+    }
+
+    // ============ NAFI TUTORIAL UI ============
+    async function startNafiTutorial() {
+      if (nafiTutorialProcessing) return;
+      if (nafiTutorialActive) return;
+
+      nafiTutorialActive = true;
+      nafiTutorialLastAnswer = null;
+      nafiTutorialProcessing = true;
+      let success = false;
+
+      const tutorialBtn = document.getElementById('tutorial-btn-header');
+      if (tutorialBtn) tutorialBtn.disabled = true;
+
+      // Hide chat input UI (no typing / send buttons during tutorial)
+      const inputContainer = document.querySelector('.input-container');
+      if (inputContainer) inputContainer.style.display = 'none';
+
+      const messagesDiv = document.getElementById('chat-messages');
+      messagesDiv.innerHTML = '';
+
+      showTypingIndicator();
+      try {
+        const data = await callNafiTutorialApi({ action: 'start' });
+        await renderNafiTutorialStep(data);
+        success = true;
+      } catch (error) {
+        addMessage('assistant', 'Error: ' + error.message);
+      } finally {
+        hideTypingIndicator();
+        nafiTutorialProcessing = false;
+        if (tutorialBtn) tutorialBtn.disabled = false;
+        if (!success) {
+          nafiTutorialActive = false;
+          nafiTutorialLastAnswer = null;
+          if (inputContainer) inputContainer.style.display = 'block';
+        }
+      }
+    }
+
+    async function callNafiTutorialApi(payload) {
+      const response = await fetch(`${API_BASE_URL}/Playbook_Chatbot/chat/nafi/tutorial`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('jwtsopchatbot')}`,
+          'ngrok-skip-browser-warning': 'true'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const text = await response.text().catch(() => '');
+        throw new Error(`NAFI tutorial API failed (${response.status}) ${text}`);
+      }
+
+      return await response.json();
+    }
+
+    async function renderNafiTutorialStep(data) {
+      const messagesDiv = document.getElementById('chat-messages');
+
+      let ui = document.getElementById('nafi-tutorial-ui');
+      if (!ui) {
+        ui = document.createElement('div');
+        ui.id = 'nafi-tutorial-ui';
+        messagesDiv.appendChild(ui);
+      }
+      ui.innerHTML = '';
+
+      const message = data?.message || '';
+      const expectedFields = Array.isArray(data?.expected_fields)
+        ? data.expected_fields
+        : [];
+      const needsFollowup = expectedFields.includes('followup_questions');
+
+      const card = document.createElement('div');
+      card.className = 'nafi-tutorial-card';
+
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'nafi-tutorial-message';
+      messageDiv.textContent = await Translator.translate(message, window.currentLang);
+      card.appendChild(messageDiv);
+
+      if (needsFollowup) {
+        const options = [
+          { value: 'yes_nafi', label: 'Nafi' },
+          { value: 'no_not_nafi', label: 'Not Nafi' },
+          { value: 'more_info_needed', label: 'More Info Needed' }
+        ];
+
+        const disabledSelectedValue = nafiTutorialLastAnswer || 'more_info_needed';
+
+        const optionsBlock = document.createElement('div');
+        optionsBlock.className = 'nafi-tutorial-options';
+
+        options.forEach((opt) => {
+          const row = document.createElement('label');
+          row.className = 'nafi-tutorial-option disabled';
+
+          const input = document.createElement('input');
+          input.type = 'radio';
+          input.name = 'nafi-tutorial-answer';
+          input.value = opt.value;
+          input.disabled = true;
+          if (opt.value === disabledSelectedValue) input.checked = true;
+
+          const label = document.createElement('div');
+          label.textContent = opt.label;
+
+          row.appendChild(input);
+          row.appendChild(label);
+          optionsBlock.appendChild(row);
+        });
+
+        card.appendChild(optionsBlock);
+
+        const actionRow = document.createElement('div');
+        actionRow.className = 'nafi-tutorial-action-row';
+
+        const submitBtn = document.createElement('button');
+        submitBtn.id = 'nafi-tutorial-submit-btn';
+        submitBtn.className = 'nafi-tutorial-action-btn';
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submit';
+
+        actionRow.appendChild(submitBtn);
+        card.appendChild(actionRow);
+
+        const followupsBlock = document.createElement('div');
+        followupsBlock.className = 'nafi-tutorial-followups';
+
+        const q1Label = document.createElement('div');
+        q1Label.className = 'nafi-tutorial-followup-label';
+        q1Label.textContent = 'Question 1';
+
+        const q1 = document.createElement('textarea');
+        q1.id = 'nafi-tutorial-followup-q1';
+        q1.className = 'nafi-tutorial-textarea';
+
+        const q2Label = document.createElement('div');
+        q2Label.className = 'nafi-tutorial-followup-label';
+        q2Label.textContent = 'Question 2';
+
+        const q2 = document.createElement('textarea');
+        q2.id = 'nafi-tutorial-followup-q2';
+        q2.className = 'nafi-tutorial-textarea';
+
+        followupsBlock.appendChild(q1Label);
+        followupsBlock.appendChild(q1);
+        followupsBlock.appendChild(q2Label);
+        followupsBlock.appendChild(q2);
+
+        card.appendChild(followupsBlock);
+
+        const saveRow = document.createElement('div');
+        saveRow.className = 'nafi-tutorial-action-row';
+
+        const saveBtn = document.createElement('button');
+        saveBtn.id = 'nafi-tutorial-save-btn';
+        saveBtn.className = 'nafi-tutorial-action-btn';
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Save Question';
+        saveBtn.addEventListener('click', saveNafiTutorialFollowupQuestions);
+
+        const updateSaveEnabled = () => {
+          const q1Val = q1.value.trim();
+          const q2Val = q2.value.trim();
+          saveBtn.disabled = !(q1Val && q2Val);
+        };
+
+        q1.addEventListener('input', updateSaveEnabled);
+        q2.addEventListener('input', updateSaveEnabled);
+
+        saveRow.appendChild(saveBtn);
+        card.appendChild(saveRow);
+      } else {
+        const options = [
+          { value: 'yes_nafi', label: 'Nafi' },
+          { value: 'no_not_nafi', label: 'Not Nafi' },
+          { value: 'more_info_needed', label: 'More Info Needed' }
+        ];
+
+        const optionsBlock = document.createElement('div');
+        optionsBlock.className = 'nafi-tutorial-options';
+
+        options.forEach((opt) => {
+          const row = document.createElement('label');
+          row.className = 'nafi-tutorial-option';
+
+          const input = document.createElement('input');
+          input.type = 'radio';
+          input.name = 'nafi-tutorial-answer';
+          input.value = opt.value;
+
+          const label = document.createElement('div');
+          label.textContent = opt.label;
+
+          row.appendChild(input);
+          row.appendChild(label);
+          optionsBlock.appendChild(row);
+        });
+
+        card.appendChild(optionsBlock);
+
+        const actionRow = document.createElement('div');
+        actionRow.className = 'nafi-tutorial-action-row';
+
+        const submitBtn = document.createElement('button');
+        submitBtn.id = 'nafi-tutorial-submit-btn';
+        submitBtn.className = 'nafi-tutorial-action-btn';
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submit';
+        submitBtn.addEventListener('click', submitNafiTutorialAnswer);
+
+        optionsBlock.addEventListener('change', () => {
+          const checked = ui.querySelector('input[name="nafi-tutorial-answer"]:checked');
+          submitBtn.disabled = !checked;
+        });
+
+        actionRow.appendChild(submitBtn);
+        card.appendChild(actionRow);
+      }
+
+      ui.appendChild(card);
+      scrollToBottom();
+    }
+
+    function getSelectedNafiTutorialAnswer() {
+      const checked = document.querySelector('input[name="nafi-tutorial-answer"]:checked');
+      return checked ? checked.value : null;
+    }
+
+    async function submitNafiTutorialAnswer() {
+      if (nafiTutorialProcessing) return;
+
+      const selected = getSelectedNafiTutorialAnswer();
+      if (!selected) return;
+
+      nafiTutorialLastAnswer = selected;
+      nafiTutorialProcessing = true;
+
+      const submitBtn = document.getElementById('nafi-tutorial-submit-btn');
+      if (submitBtn) submitBtn.disabled = true;
+
+      showTypingIndicator();
+      let success = false;
+      try {
+        const data = await callNafiTutorialApi({ answer: selected });
+        await renderNafiTutorialStep(data);
+        success = true;
+      } catch (error) {
+        addMessage('assistant', 'Error: ' + error.message);
+      } finally {
+        hideTypingIndicator();
+        nafiTutorialProcessing = false;
+        if (!success && submitBtn) submitBtn.disabled = false;
+      }
+    }
+
+    async function saveNafiTutorialFollowupQuestions() {
+      if (nafiTutorialProcessing) return;
+
+      const q1El = document.getElementById('nafi-tutorial-followup-q1');
+      const q2El = document.getElementById('nafi-tutorial-followup-q2');
+      const q1 = q1El ? q1El.value.trim() : '';
+      const q2 = q2El ? q2El.value.trim() : '';
+
+      if (!q1 || !q2) return;
+
+      nafiTutorialProcessing = true;
+
+      const saveBtn = document.getElementById('nafi-tutorial-save-btn');
+      if (saveBtn) saveBtn.disabled = true;
+
+      showTypingIndicator();
+      let success = false;
+      try {
+        const data = await callNafiTutorialApi({ followup_questions: [q1, q2] });
+        nafiTutorialLastAnswer = null;
+        await renderNafiTutorialStep(data);
+        success = true;
+      } catch (error) {
+        addMessage('assistant', 'Error: ' + error.message);
+      } finally {
+        hideTypingIndicator();
+        nafiTutorialProcessing = false;
+        if (!success && saveBtn) saveBtn.disabled = false;
+      }
     }
 
     async function sendNafiMessage() {
