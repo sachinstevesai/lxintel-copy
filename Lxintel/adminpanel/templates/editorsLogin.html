@@ -781,6 +781,14 @@
                     <input id="playbook-file-input" type="file" accept=".pdf,.doc,.docx" class="upload-field-input" />
                 </div>
 
+                <!-- Editor Code Input -->
+                <div style="margin-bottom: 22px;">
+                    <label class="upload-field-label" for="playbook-editor-code-input">Editor Code</label>
+                    <input id="playbook-editor-code-input" type="number" placeholder="Enter your editor code"
+                        class="upload-field-input" required onfocus="this.style.borderColor='rgba(241,196,15,0.7)'"
+                        onblur="this.style.borderColor='rgba(241,196,15,0.3)'" />
+                </div>
+
                 <!-- Department Input -->
                 <div style="margin-bottom: 28px;">
                     <label class="upload-field-label" for="playbook-department-input">Department (Optional)</label>
@@ -871,7 +879,7 @@
 
 
     <script>
-        const API_BASE_URL = "https://attired-hitchily-stephane.ngrok-free.dev";
+        const API_BASE_URL = "";
 
         function logout() {
             localStorage.removeItem("jwteditorspanel");
@@ -996,17 +1004,20 @@
 
         function resetUploadForm() {
             const fileInput = document.getElementById("playbook-file-input");
+            const editorCodeInput = document.getElementById("playbook-editor-code-input");
             const departmentInput = document.getElementById("playbook-department-input");
             const uploadBtn = document.getElementById("playbook-upload-btn");
             const uploadMessage = document.getElementById("playbook-upload-message");
 
             if (fileInput) { fileInput.value = ""; fileInput.disabled = false; }
+            if (editorCodeInput) { editorCodeInput.value = ""; editorCodeInput.disabled = false; }
             if (departmentInput) { departmentInput.value = ""; departmentInput.disabled = false; }
             if (uploadMessage) { uploadMessage.style.display = "none"; uploadMessage.textContent = ""; }
             if (uploadBtn) { uploadBtn.disabled = false; uploadBtn.textContent = "Upload"; uploadBtn.onclick = handlePlaybookUpload; }
 
             lastPlaybookUploadedFile = null;
             lastPlaybookUploadedDepartment = null;
+            lastPlaybookUploadedEditorCode = null;
         }
 
         function updateFileName(input) {
@@ -1150,22 +1161,32 @@
 
         let lastPlaybookUploadedFile = null;
         let lastPlaybookUploadedDepartment = null;
+        let lastPlaybookUploadedEditorCode = null;
 
         // Handle Playbook file upload
         async function handlePlaybookUpload() {
             const fileInput = document.getElementById("playbook-file-input");
+            const editorCodeInput = document.getElementById("playbook-editor-code-input");
             const departmentInput = document.getElementById("playbook-department-input");
             const uploadBtn = document.getElementById("playbook-upload-btn");
             const uploadMessage = document.getElementById("playbook-upload-message");
 
             const file = fileInput.files[0];
+            const editorCode = editorCodeInput.value.trim();
             const department = departmentInput.value.trim();
 
-            // Validation - file is required
+            // Validation - file and editor code are required
             if (!file) {
                 uploadMessage.style.display = "block";
                 uploadMessage.style.color = "#e74c3c";
                 uploadMessage.textContent = "Please select a file";
+                return;
+            }
+
+            if (!editorCode) {
+                uploadMessage.style.display = "block";
+                uploadMessage.style.color = "#e74c3c";
+                uploadMessage.textContent = "Please enter your editor code";
                 return;
             }
 
@@ -1178,6 +1199,7 @@
                 // Create FormData
                 const formData = new FormData();
                 formData.append("file", file);
+                formData.append("editor_upload_code", editorCode);
                 if (department) {
                     formData.append("department", department);
                 }
@@ -1207,9 +1229,10 @@
 
                 // Check if response has indexed status or file already exists
                 if (data.result && (data.result.status === "indexed" || data.result.status.includes("file is already present"))) {
-                    // Store the uploaded file and department for regenerate
+                    // Store the uploaded file, department and code for regenerate
                     lastPlaybookUploadedFile = file;
                     lastPlaybookUploadedDepartment = department;
+                    lastPlaybookUploadedEditorCode = editorCode;
 
                     // Show the status message (either indexed or file already present)
                     uploadMessage.style.display = "block";
@@ -1221,8 +1244,9 @@
                     uploadBtn.textContent = "Regenerate";
                     uploadBtn.onclick = handlePlaybookRegenerate;
 
-                    // Disable file and department inputs
+                    // Disable file, code and department inputs
                     fileInput.disabled = true;
+                    editorCodeInput.disabled = true;
                     departmentInput.disabled = true;
                 } else {
                     // Success message for other responses
@@ -1233,12 +1257,14 @@
                     // Reset form after 2 seconds
                     setTimeout(() => {
                         fileInput.value = "";
+                        editorCodeInput.value = "";
                         departmentInput.value = "";
                         uploadMessage.style.display = "none";
                         uploadBtn.disabled = false;
                         uploadBtn.textContent = "Upload";
                         uploadBtn.onclick = handlePlaybookUpload;
                         fileInput.disabled = false;
+                        editorCodeInput.disabled = false;
                         departmentInput.disabled = false;
                     }, 2000);
                 }
@@ -1257,6 +1283,7 @@
         // Handle Playbook file regenerate
         async function handlePlaybookRegenerate() {
             const fileInput = document.getElementById("playbook-file-input");
+            const editorCodeInput = document.getElementById("playbook-editor-code-input");
             const departmentInput = document.getElementById("playbook-department-input");
             const uploadBtn = document.getElementById("playbook-upload-btn");
             const uploadMessage = document.getElementById("playbook-upload-message");
@@ -1274,13 +1301,16 @@
                 uploadBtn.innerHTML = '<span class="spinner"></span> Regenerating...';
                 uploadMessage.style.display = "none";
 
-                // Enable file and department inputs during regenerate
+                // Enable file, code and department inputs during regenerate
+                // Note: file and code are usually kept same for regenerate
                 fileInput.disabled = true;
+                editorCodeInput.disabled = true;
                 departmentInput.disabled = false;
 
                 // Create FormData
                 const formData = new FormData();
                 formData.append("file", lastPlaybookUploadedFile);
+                formData.append("editor_upload_code", lastPlaybookUploadedEditorCode);
                 if (lastPlaybookUploadedDepartment) {
                     formData.append("department", lastPlaybookUploadedDepartment);
                 }
@@ -1316,13 +1346,16 @@
                 // Reset to Upload state
                 lastPlaybookUploadedFile = null;
                 lastPlaybookUploadedDepartment = null;
+                lastPlaybookUploadedEditorCode = null;
 
                 // Enable inputs
                 fileInput.disabled = false;
+                editorCodeInput.disabled = false;
                 departmentInput.disabled = false;
 
                 // Clear inputs
                 fileInput.value = "";
+                editorCodeInput.value = "";
                 departmentInput.value = "";
 
                 // Reset button
