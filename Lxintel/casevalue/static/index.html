@@ -1519,8 +1519,9 @@
 
           // Track current section context for smart rendering
           let currentSection = "";
+          let pendingAttyLabel = false;
 
-          const renderedLines = contentLines.map((line) => {
+          const renderedLines = contentLines.map((line, index) => {
             const e = (s) => this.escapeHtml(s);
             // Strip [REDACTED] tokens globally before any processing
             const trimmed = line.trim().replace(/\[REDACTED\]/gi, "").replace(/\s{2,}/g, " ").trim();
@@ -1629,9 +1630,36 @@
             `;
             }
 
-            // Attorney Fees header label - just the label, columns already shown by section header
+            // Attorney Fees label & dynamic header logic
             if (/^Attorney Fees:/i.test(trimmed)) {
-              return '<div style="margin-top:6px;"><div class="billing-atty-header"><span class="col-name"><span style="font-weight:700;">Attorney Fees:</span></span><span class="col-fee"><u>Fee</u></span><span class="col-reduced"><u>Reduced</u></span><span class="col-billed"><u>Billed</u></span></div></div>';
+              // Check if next line is dynamic headers to combine them
+              const nextLine = (contentLines[index + 1] || "").trim().replace(/\[REDACTED\]/gi, "").replace(/\s{2,}/g, " ").trim();
+              if (/^(Fee|Reduced|Billed)(\s*(Fee|Reduced|Billed))*$/i.test(nextLine)) {
+                pendingAttyLabel = true;
+                return null;
+              }
+              return '<div class="billing-label" style="font-weight:700; margin-top:6px;">Attorney Fees:</div>';
+            }
+
+            // Attorney Fees dynamic header row (handles combination with label)
+            if (currentSection === "DEDUCT" && /^(Fee|Reduced|Billed)(\s*(Fee|Reduced|Billed))*$/i.test(trimmed)) {
+              const hasFee = /Fee/i.test(trimmed);
+              const hasReduced = /Reduced/i.test(trimmed);
+              const hasBilled = /Billed/i.test(trimmed);
+
+              const labelContent = pendingAttyLabel ? "Attorney Fees:" : "";
+              pendingAttyLabel = false;
+
+              return `
+                <div style="margin-top:6px;">
+                  <div class="billing-atty-header">
+                    <span class="col-name"><span style="font-weight:700;">${labelContent}</span></span>
+                    <span class="col-fee">${hasFee ? "<u>Fee</u>" : ""}</span>
+                    <span class="col-reduced">${hasReduced ? "<u>Reduced</u>" : ""}</span>
+                    <span class="col-billed">${hasBilled ? "<u>Billed</u>" : ""}</span>
+                  </div>
+                </div>
+              `;
             }
 
             // Attorney fee data row: Ramos Law   $26,000.00   $2,305.00   $23,695.00
@@ -1835,7 +1863,7 @@
             }
 
             return `<div class="billing-line">${e(trimmed)}</div>`;
-          });
+          }).filter(l => l !== null);
 
           const logoMarkup = `
             <div class="billing-logo-wrap">
