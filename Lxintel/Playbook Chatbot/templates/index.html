@@ -3055,6 +3055,14 @@ Tip: If you are unsure about details, say that directly rather than guessing.`;
       messageDiv.textContent = await Translator.translate(message, window.currentLang);
       card.appendChild(messageDiv);
 
+      // Final summary: show only the message (no options / submit).
+      const isFinalScore = /Final\s*Score/i.test(message);
+      if (isFinalScore) {
+        ui.appendChild(card);
+        scrollToBottom();
+        return;
+      }
+
       if (needsFollowup) {
         const options = [
           { value: 'yes_nafi', label: 'Nafi' },
