@@ -713,8 +713,11 @@
 
     @media (max-width: 768px) {
       .billing-report-page {
-        padding: 18px;
+        padding: 12px;
         font-size: 10px;
+        overflow-x: auto;
+        width: 100%;
+        display: block;
       }
 
       .billing-logo-wrap img {
@@ -725,19 +728,12 @@
         font-size: 10px;
       }
 
-      .billing-title {
-        font-size: 14px;
-      }
-
+      .billing-title,
       .billing-section {
         font-size: 14px;
       }
 
-      .billing-label,
-      .billing-total,
-      .billing-line,
-      .billing-note,
-      .billing-bullet,
+      /* Fix alignment and ensure consistent layout on mobile */
       .billing-header-row,
       .billing-data-row,
       .billing-atty-header,
@@ -747,6 +743,45 @@
       .billing-debits-header,
       .billing-debits-row {
         font-size: 9px;
+        min-width: max-content;
+        width: 100%;
+        display: flex !important;
+      }
+
+      /* Text/Label columns - Fixed width to ensure alignment */
+      .col-label,
+      .col-desc,
+      .col-name,
+      .col-provider {
+        flex: 0 0 140px !important;
+        min-width: 140px !important;
+        text-align: left;
+      }
+
+      /* Numeric columns - Fixed width to ensure alignment */
+      .col-collected,
+      .col-balance,
+      .col-fee,
+      .col-reduced,
+      .col-billed,
+      .col-date,
+      .col-due,
+      .col-total,
+      .col-paid,
+      .col-reduction {
+        flex: 0 0 80px !important;
+        min-width: 80px !important;
+        text-align: right;
+      }
+
+      .billing-label,
+      .billing-total,
+      .billing-line,
+      .billing-note,
+      .billing-bullet {
+        font-size: 9px;
+        min-width: max-content;
+        width: 100%;
       }
     }
   </style>
@@ -989,7 +1024,7 @@
   </div>
 
   <script>
-    const API_BASE_URL = "";
+    const API_BASE_URL = "https://laurene-clearheaded-nonaromatically.ngrok-free.dev";
 
     // Shared state between login and upload
     const appState = {
