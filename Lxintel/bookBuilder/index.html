@@ -386,7 +386,7 @@
   <div class="video-background"></div>
   <div class="overlay"></div>
 
-  <div class="w-full max-w-[40rem] relative z-10" x-data="loginApp()" x-show="!loggedIn">
+  <div class="w-full max-w-[40rem] relative z-10 mx-auto mt-6 md:mt-10" x-data="loginApp()" x-show="!loggedIn">
     <div class="header-text">
       <img src="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
         alt="Ramos Law Book Builder" />
@@ -469,16 +469,17 @@
     <div class="pt-32 sm:pt-28 pb-10 space-y-6">
       <div class="section-card">
         <div class="section-header">
-          <h3 class="section-title">Project Run History</h3>
-          <button class="dark-theme-btn-primary px-4 py-2 text-sm" @click="openCreateModal()">
+          <h3 class="section-title">Project List</h3>
+          <button class="dark-theme-btn-primary px-4 py-2 text-sm" @click="openCreateProjectModal()">
             Create Project
           </button>
         </div>
 
-        <div class="project-table-wrap" >
-          <table class="project-table" style="" x-show="projects.length > 0">
+        <div class="project-table-wrap">
+          <table class="project-table" x-show="projects.length > 0">
             <thead>
               <tr>
+                <th>#</th>
                 <th>Title</th>
                 <th>Description</th>
                 <th>Created By</th>
@@ -486,8 +487,10 @@
               </tr>
             </thead>
             <tbody>
-              <template x-for="project in projects" :key="project.id">
-                <tr>
+              <template x-for="(project, idx) in projects" :key="project.id">
+                <tr @click="selectProject(project.id)" class="cursor-pointer"
+                  :class="selectedProjectId === project.id ? 'bg-[rgba(241,196,15,0.14)]' : ''">
+                  <td x-text="idx + 1"></td>
                   <td x-text="project.title || '-'"></td>
                   <td x-text="project.description || '-'"></td>
                   <td x-text="project.created_by || '-'"></td>
@@ -497,23 +500,88 @@
             </tbody>
           </table>
         </div>
-
-        <div class="project-empty" x-show="!loadingProjects && projects.length === 0">
-          No projects found.
-        </div>
-        <div class="project-empty" x-show="loadingProjects">
-          Loading projects...
-        </div>
+        <div class="project-empty" x-show="!loadingProjects && projects.length === 0">No projects found.</div>
+        <div class="project-empty" x-show="loadingProjects">Loading projects...</div>
         <div class="project-empty !text-red-400" x-show="projectError" x-text="projectError"></div>
       </div>
 
-      <div class="modal-backdrop" x-show="showCreateModal" x-transition.opacity @click="closeCreateModal()">
+      <div class="section-card">
+        <div class="section-header">
+          <h3 class="section-title">Project Chapters</h3>
+          <button class="dark-theme-btn-primary px-4 py-2 text-sm" :disabled="!selectedProjectId"
+            @click="openCreateChapterModal()">
+            Create Chapter
+          </button>
+        </div>
+
+        <div class="project-table-wrap">
+          <table class="project-table" x-show="chapters.length > 0">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Title</th>
+                <th>Chapter Order</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="(chapter, idx) in chapters" :key="chapter.id">
+                <tr @click="selectChapter(chapter.id)" class="cursor-pointer"
+                  :class="selectedChapterId === chapter.id ? 'bg-[rgba(241,196,15,0.14)]' : ''">
+                  <td x-text="idx + 1"></td>
+                  <td x-text="chapter.title || '-'"></td>
+                  <td x-text="chapter.chapter_order ?? '-'"></td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+        <div class="project-empty" x-show="!selectedProjectId">Select a project to view chapters.</div>
+        <div class="project-empty" x-show="selectedProjectId && !loadingChapters && chapters.length === 0">No chapters found.</div>
+        <div class="project-empty" x-show="loadingChapters">Loading chapters...</div>
+        <div class="project-empty !text-red-400" x-show="chapterError" x-text="chapterError"></div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-header">
+          <h3 class="section-title">Chapter Section</h3>
+          <button class="dark-theme-btn-primary px-4 py-2 text-sm" :disabled="!selectedChapterId"
+            @click="openCreateSectionModal()">
+            Create Section
+          </button>
+        </div>
+
+        <div class="project-table-wrap">
+          <table class="project-table" x-show="sections.length > 0">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Title</th>
+                <th>Section Order</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="(section, idx) in sections" :key="section.id">
+                <tr>
+                  <td x-text="idx + 1"></td>
+                  <td x-text="section.title || '-'"></td>
+                  <td x-text="section.section_order ?? '-'"></td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+        <div class="project-empty" x-show="!selectedChapterId">Select a chapter to view sections.</div>
+        <div class="project-empty" x-show="selectedChapterId && !loadingSections && sections.length === 0">No sections found.</div>
+        <div class="project-empty" x-show="loadingSections">Loading sections...</div>
+        <div class="project-empty !text-red-400" x-show="sectionError" x-text="sectionError"></div>
+      </div>
+
+      <div class="modal-backdrop" x-show="showCreateProjectModal" x-transition.opacity @click="closeCreateProjectModal()">
         <div class="create-project-modal" @click.stop>
           <div class="flex items-start justify-between gap-3 mb-5">
             <h4 class="text-2xl font-bold text-[#f1c40f]">Create Project</h4>
-            <button class="text-[#8f9bb3] text-xl leading-none" @click="closeCreateModal()">×</button>
+            <button class="text-[#8f9bb3] text-xl leading-none" @click="closeCreateProjectModal()">×</button>
           </div>
-
           <div class="space-y-4">
             <div>
               <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Title</label>
@@ -525,11 +593,52 @@
               <textarea x-model.trim="newProjectDescription" placeholder="Enter project description" rows="4"
                 class="w-full p-3 dark-theme-input text-sm resize-none"></textarea>
             </div>
-            <p x-show="createError" class="error-message mt-0" x-text="createError"></p>
-            <button @click="submitProject()" :disabled="creatingProject"
-              class="dark-theme-btn-primary w-full py-3 text-lg font-bold">
+            <p x-show="createProjectError" class="error-message mt-0" x-text="createProjectError"></p>
+            <button @click="submitProject()" :disabled="creatingProject" class="dark-theme-btn-primary w-full py-3 text-lg font-bold">
               <span x-show="!creatingProject">Submit</span>
               <span x-show="creatingProject">Submitting...</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-backdrop" x-show="showCreateChapterModal" x-transition.opacity @click="closeCreateChapterModal()">
+        <div class="create-project-modal" @click.stop>
+          <div class="flex items-start justify-between gap-3 mb-5">
+            <h4 class="text-2xl font-bold text-[#f1c40f]">Create Chapter</h4>
+            <button class="text-[#8f9bb3] text-xl leading-none" @click="closeCreateChapterModal()">×</button>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Title</label>
+              <input type="text" x-model.trim="newChapterTitle" placeholder="Enter chapter title"
+                class="w-full p-3 dark-theme-input text-sm" />
+            </div>
+            <p x-show="createChapterError" class="error-message mt-0" x-text="createChapterError"></p>
+            <button @click="submitChapter()" :disabled="creatingChapter" class="dark-theme-btn-primary w-full py-3 text-lg font-bold">
+              <span x-show="!creatingChapter">Submit</span>
+              <span x-show="creatingChapter">Submitting...</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-backdrop" x-show="showCreateSectionModal" x-transition.opacity @click="closeCreateSectionModal()">
+        <div class="create-project-modal" @click.stop>
+          <div class="flex items-start justify-between gap-3 mb-5">
+            <h4 class="text-2xl font-bold text-[#f1c40f]">Create Section</h4>
+            <button class="text-[#8f9bb3] text-xl leading-none" @click="closeCreateSectionModal()">×</button>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Title</label>
+              <input type="text" x-model.trim="newSectionTitle" placeholder="Enter section title"
+                class="w-full p-3 dark-theme-input text-sm" />
+            </div>
+            <p x-show="createSectionError" class="error-message mt-0" x-text="createSectionError"></p>
+            <button @click="submitSection()" :disabled="creatingSection" class="dark-theme-btn-primary w-full py-3 text-lg font-bold">
+              <span x-show="!creatingSection">Submit</span>
+              <span x-show="creatingSection">Submitting...</span>
             </button>
           </div>
         </div>
@@ -539,7 +648,6 @@
 
   <script>
     const API_BASE_URL = "https://laurene-clearheaded-nonaromatically.ngrok-free.dev";
-    const SKIP_AUTH = true;
     const DEV_USER_EMAIL = "bookbuilder@ramoslaw.dev";
 
     function requireToken() {
@@ -573,12 +681,6 @@
         loggingIn: false,
 
         init() {
-          if (SKIP_AUTH) {
-            this.loggedIn = true;
-            this.email = DEV_USER_EMAIL;
-            return;
-          }
-
           const token = localStorage.getItem("bookBuilderToken");
           const savedEmail = localStorage.getItem("bookBuilderEmail");
           if (token && savedEmail) {
@@ -603,7 +705,7 @@
 
           this.emailChecking = true;
           this.error = "";
-          fetch(`${API_BASE_URL}/casevalue/verify-email?email=${encodeURIComponent(this.email)}`, {
+          fetch(`${API_BASE_URL}/bookbuilder/verify-email?email=${encodeURIComponent(this.email)}`, {
             headers: { "ngrok-skip-browser-warning": "true" }
           })
             .then((res) => res.json())
@@ -638,7 +740,7 @@
           data.append("username", this.email);
           data.append("password", "not-used-but-required");
 
-          fetch(`${API_BASE_URL}/casevalue/login`, {
+          fetch(`${API_BASE_URL}/bookbuilder/login`, {
             method: "POST",
             body: data,
             headers: { "ngrok-skip-browser-warning": "true" }
@@ -668,22 +770,31 @@
         isLoggedIn: false,
         userEmail: "",
         projects: [],
+        selectedProjectId: "",
         loadingProjects: false,
         projectError: "",
-        showCreateModal: false,
+        showCreateProjectModal: false,
         newProjectTitle: "",
         newProjectDescription: "",
         creatingProject: false,
-        createError: "",
+        createProjectError: "",
+        chapters: [],
+        selectedChapterId: "",
+        loadingChapters: false,
+        chapterError: "",
+        showCreateChapterModal: false,
+        newChapterTitle: "",
+        creatingChapter: false,
+        createChapterError: "",
+        sections: [],
+        loadingSections: false,
+        sectionError: "",
+        showCreateSectionModal: false,
+        newSectionTitle: "",
+        creatingSection: false,
+        createSectionError: "",
 
         init() {
-          if (SKIP_AUTH) {
-            this.isLoggedIn = true;
-            this.userEmail = DEV_USER_EMAIL;
-            this.loadProjects();
-            return;
-          }
-
           const token = localStorage.getItem("bookBuilderToken");
           const email = localStorage.getItem("bookBuilderEmail");
           if (token && email) {
@@ -714,6 +825,16 @@
           window.dispatchEvent(new Event("logout-success"));
         },
 
+        getAuthHeaders(extra = {}) {
+          const token = requireToken();
+          if (!token) return null;
+          return {
+            ...extra,
+            "Authorization": `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+          };
+        },
+
         formatDate(value) {
           if (!value) return "-";
           const date = new Date(value);
@@ -733,12 +854,26 @@
           this.loadingProjects = true;
           this.projectError = "";
           try {
+            const headers = this.getAuthHeaders();
+            if (!headers) return;
             const res = await fetch(`${API_BASE_URL}/bookbuilder/projects`, {
-              headers: { "ngrok-skip-browser-warning": "true" }
+              headers
             });
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
             if (!res.ok) throw new Error("Failed to fetch projects");
             const data = await res.json();
             this.projects = Array.isArray(data) ? data : [];
+            if (this.projects.length > 0) {
+              this.selectProject(this.selectedProjectId || this.projects[0].id);
+            } else {
+              this.selectedProjectId = "";
+              this.chapters = [];
+              this.sections = [];
+              this.selectedChapterId = "";
+            }
           } catch (err) {
             this.projectError = err.message || "Unable to load projects";
             this.projects = [];
@@ -747,31 +882,68 @@
           }
         },
 
-        openCreateModal() {
-          this.showCreateModal = true;
-          this.createError = "";
+        selectProject(projectId) {
+          if (!projectId || this.selectedProjectId === projectId) return;
+          this.selectedProjectId = projectId;
+          this.selectedChapterId = "";
+          this.sections = [];
+          this.loadChapters();
         },
 
-        closeCreateModal() {
-          this.showCreateModal = false;
+        selectChapter(chapterId) {
+          this.selectedChapterId = chapterId || "";
+          this.loadSections();
+        },
+
+        openCreateProjectModal() {
+          this.showCreateProjectModal = true;
+          this.createProjectError = "";
+        },
+
+        closeCreateProjectModal() {
+          this.showCreateProjectModal = false;
           this.newProjectTitle = "";
           this.newProjectDescription = "";
-          this.createError = "";
+          this.createProjectError = "";
+        },
+
+        openCreateChapterModal() {
+          this.showCreateChapterModal = true;
+          this.createChapterError = "";
+        },
+
+        closeCreateChapterModal() {
+          this.showCreateChapterModal = false;
+          this.newChapterTitle = "";
+          this.createChapterError = "";
+        },
+
+        openCreateSectionModal() {
+          this.showCreateSectionModal = true;
+          this.createSectionError = "";
+        },
+
+        closeCreateSectionModal() {
+          this.showCreateSectionModal = false;
+          this.newSectionTitle = "";
+          this.createSectionError = "";
         },
 
         async submitProject() {
           if (!this.newProjectTitle) {
-            this.createError = "Title is required";
+            this.createProjectError = "Title is required";
             return;
           }
           if (!this.newProjectDescription) {
-            this.createError = "Description is required";
+            this.createProjectError = "Description is required";
             return;
           }
 
           this.creatingProject = true;
-          this.createError = "";
+          this.createProjectError = "";
           try {
+            const headers = this.getAuthHeaders({ "Content-Type": "application/json" });
+            if (!headers) return;
             const payload = {
               title: this.newProjectTitle,
               description: this.newProjectDescription,
@@ -780,12 +952,13 @@
 
             const res = await fetch(`${API_BASE_URL}/bookbuilder/projects`, {
               method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "ngrok-skip-browser-warning": "true",
-              },
+              headers,
               body: JSON.stringify(payload),
             });
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
 
             if (!res.ok) {
               const errorJson = await res.json().catch(() => ({}));
@@ -793,11 +966,136 @@
             }
 
             await this.loadProjects();
-            this.closeCreateModal();
+            this.closeCreateProjectModal();
           } catch (err) {
-            this.createError = err.message || "Unable to create project";
+            this.createProjectError = err.message || "Unable to create project";
           } finally {
             this.creatingProject = false;
+          }
+        },
+
+        async loadChapters() {
+          if (!this.selectedProjectId) return;
+          this.loadingChapters = true;
+          this.chapterError = "";
+          this.chapters = [];
+          try {
+            const headers = this.getAuthHeaders();
+            if (!headers) return;
+            const res = await fetch(`${API_BASE_URL}/bookbuilder/projects/${this.selectedProjectId}/chapters`, { headers });
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
+            if (!res.ok) throw new Error("Failed to fetch chapters");
+            const data = await res.json();
+            this.chapters = Array.isArray(data) ? data : [];
+          } catch (err) {
+            this.chapterError = err.message || "Unable to load chapters";
+            this.chapters = [];
+          } finally {
+            this.loadingChapters = false;
+          }
+        },
+
+        async submitChapter() {
+          if (!this.selectedProjectId) {
+            this.createChapterError = "Please select a project";
+            return;
+          }
+          if (!this.newChapterTitle) {
+            this.createChapterError = "Title is required";
+            return;
+          }
+
+          this.creatingChapter = true;
+          this.createChapterError = "";
+          try {
+            const headers = this.getAuthHeaders({ "Content-Type": "application/json" });
+            if (!headers) return;
+            const res = await fetch(`${API_BASE_URL}/bookbuilder/projects/${this.selectedProjectId}/chapters`, {
+              method: "POST",
+              headers,
+              body: JSON.stringify({ title: this.newChapterTitle }),
+            });
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
+            if (!res.ok) {
+              const errorJson = await res.json().catch(() => ({}));
+              throw new Error(errorJson.detail || "Failed to create chapter");
+            }
+            await this.loadChapters();
+            this.closeCreateChapterModal();
+          } catch (err) {
+            this.createChapterError = err.message || "Unable to create chapter";
+          } finally {
+            this.creatingChapter = false;
+          }
+        },
+
+        async loadSections() {
+          if (!this.selectedChapterId) {
+            this.sections = [];
+            return;
+          }
+          this.loadingSections = true;
+          this.sectionError = "";
+          this.sections = [];
+          try {
+            const headers = this.getAuthHeaders();
+            if (!headers) return;
+            const res = await fetch(`${API_BASE_URL}/bookbuilder/chapters/${this.selectedChapterId}/sections`, { headers });
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
+            if (!res.ok) throw new Error("Failed to fetch sections");
+            const data = await res.json();
+            this.sections = Array.isArray(data) ? data : [];
+          } catch (err) {
+            this.sectionError = err.message || "Unable to load sections";
+            this.sections = [];
+          } finally {
+            this.loadingSections = false;
+          }
+        },
+
+        async submitSection() {
+          if (!this.selectedChapterId) {
+            this.createSectionError = "Please select a chapter";
+            return;
+          }
+          if (!this.newSectionTitle) {
+            this.createSectionError = "Title is required";
+            return;
+          }
+
+          this.creatingSection = true;
+          this.createSectionError = "";
+          try {
+            const headers = this.getAuthHeaders({ "Content-Type": "application/json" });
+            if (!headers) return;
+            const res = await fetch(`${API_BASE_URL}/bookbuilder/chapters/${this.selectedChapterId}/sections`, {
+              method: "POST",
+              headers,
+              body: JSON.stringify({ title: this.newSectionTitle }),
+            });
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
+            if (!res.ok) {
+              const errorJson = await res.json().catch(() => ({}));
+              throw new Error(errorJson.detail || "Failed to create section");
+            }
+            await this.loadSections();
+            this.closeCreateSectionModal();
+          } catch (err) {
+            this.createSectionError = err.message || "Unable to create section";
+          } finally {
+            this.creatingSection = false;
           }
         },
       };
@@ -813,21 +1111,10 @@
     }
 
     async function loadActiveUsers() {
-      if (SKIP_AUTH) {
-        const countEl = document.getElementById("active-user-count");
-        const list = document.getElementById("active-users-list");
-        if (countEl) countEl.innerText = "0";
-        if (list) {
-          list.innerHTML =
-            "<p style='color:#aaa; font-size:13px'>Active users API not connected yet</p>";
-        }
-        return;
-      }
-
       const token = requireToken();
       if (!token) return;
       try {
-        const res = await fetch(`${API_BASE_URL}/casevalue/active-today`, {
+        const res = await fetch(`${API_BASE_URL}/bookbuilder/active-today`, {
           headers: {
             "Authorization": token ? `Bearer ${token}` : "",
             "ngrok-skip-browser-warning": "true"
