@@ -271,6 +271,8 @@
 
     .project-table-wrap {
       overflow-x: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #f1c40f73 #2c2c2c;
     }
 
     .project-table {
@@ -424,7 +426,7 @@
     </div>
   </div>
 
-  <div class="w-full max-w-[75rem] relative z-10 mt-24 px-2 sm:px-4" x-data="bookBuilderApp()" x-show="isLoggedIn">
+  <div class="w-full max-w-none relative z-10 px-1 sm:px-5" x-data="bookBuilderApp()" x-show="isLoggedIn">
     <div class="header-bar">
       <div class="flex justify-between items-center header-layout">
         <div class="flex items-center gap-3 top-logo-area">
@@ -441,7 +443,8 @@
             Active Users
           </button>
           <div id="active-users-popover" class="active-user-popover">
-            <div style="padding: 8px 0; margin-bottom: 8px; border-bottom: 1px solid rgba(241, 196, 15, 0.3); color: #f1c40f; font-size: 12px; font-weight: 600;">
+            <div
+              style="padding: 8px 0; margin-bottom: 8px; border-bottom: 1px solid rgba(241, 196, 15, 0.3); color: #f1c40f; font-size: 12px; font-weight: 600;">
               Active Users
             </div>
             <div id="active-users-list"></div>
@@ -472,8 +475,8 @@
           </button>
         </div>
 
-        <div class="project-table-wrap">
-          <table class="project-table" x-show="projects.length > 0">
+        <div class="project-table-wrap" >
+          <table class="project-table" style="" x-show="projects.length > 0">
             <thead>
               <tr>
                 <th>Title</th>
