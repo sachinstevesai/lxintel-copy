@@ -243,6 +243,93 @@
       display: none;
     }
 
+    .section-card {
+      background: rgba(17, 17, 17, 0.95);
+      border: 1px solid rgba(241, 196, 15, 0.35);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+    }
+
+    .section-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(241, 196, 15, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: linear-gradient(to bottom, rgba(241, 196, 15, 0.07), rgba(241, 196, 15, 0.02));
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #f1c40f;
+    }
+
+    .project-table-wrap {
+      overflow-x: auto;
+    }
+
+    .project-table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: collapse;
+      color: #ddd;
+    }
+
+    .project-table th,
+    .project-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(241, 196, 15, 0.14);
+      text-align: left;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .project-table th {
+      color: #a9a9a9;
+      font-size: 11px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      font-weight: 700;
+      background: rgba(0, 0, 0, 0.35);
+    }
+
+    .project-table tbody tr:hover {
+      background: rgba(241, 196, 15, 0.08);
+    }
+
+    .project-empty {
+      padding: 24px 16px;
+      text-align: center;
+      color: #9b9b9b;
+      font-size: 14px;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 1100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+    }
+
+    .create-project-modal {
+      width: 100%;
+      max-width: 560px;
+      background: #111;
+      border: 1px solid rgba(241, 196, 15, 0.35);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+    }
+
     @media (max-width: 768px) {
       .header-bar {
         padding: 12px 14px;
@@ -285,11 +372,15 @@
       .header-text p {
         font-size: 1rem;
       }
+
+      .create-project-modal {
+        padding: 16px;
+      }
     }
   </style>
 </head>
 
-<body class="min-h-screen flex items-center justify-center p-4">
+<body class="min-h-screen p-4">
   <div class="video-background"></div>
   <div class="overlay"></div>
 
@@ -372,10 +463,73 @@
       </div>
     </div>
 
-    <div class="pt-32 sm:pt-28 pb-10">
-      <div class="dark-theme-card p-6 sm:p-8 text-center">
-        <h3 class="text-2xl sm:text-3xl font-bold text-[#f1c40f] mb-3">Book Builder Flow</h3>
-        <p class="text-[#aaa]">Header and login flow are ready. Next, we can implement the content below this section.</p>
+    <div class="pt-32 sm:pt-28 pb-10 space-y-6">
+      <div class="section-card">
+        <div class="section-header">
+          <h3 class="section-title">Project Run History</h3>
+          <button class="dark-theme-btn-primary px-4 py-2 text-sm" @click="openCreateModal()">
+            Create Project
+          </button>
+        </div>
+
+        <div class="project-table-wrap">
+          <table class="project-table" x-show="projects.length > 0">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Created By</th>
+                <th>Created At</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="project in projects" :key="project.id">
+                <tr>
+                  <td x-text="project.title || '-'"></td>
+                  <td x-text="project.description || '-'"></td>
+                  <td x-text="project.created_by || '-'"></td>
+                  <td x-text="formatDate(project.created_at)"></td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="project-empty" x-show="!loadingProjects && projects.length === 0">
+          No projects found.
+        </div>
+        <div class="project-empty" x-show="loadingProjects">
+          Loading projects...
+        </div>
+        <div class="project-empty !text-red-400" x-show="projectError" x-text="projectError"></div>
+      </div>
+
+      <div class="modal-backdrop" x-show="showCreateModal" x-transition.opacity @click="closeCreateModal()">
+        <div class="create-project-modal" @click.stop>
+          <div class="flex items-start justify-between gap-3 mb-5">
+            <h4 class="text-2xl font-bold text-[#f1c40f]">Create Project</h4>
+            <button class="text-[#8f9bb3] text-xl leading-none" @click="closeCreateModal()">×</button>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Title</label>
+              <input type="text" x-model.trim="newProjectTitle" placeholder="Enter project title"
+                class="w-full p-3 dark-theme-input text-sm" />
+            </div>
+            <div>
+              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Description</label>
+              <textarea x-model.trim="newProjectDescription" placeholder="Enter project description" rows="4"
+                class="w-full p-3 dark-theme-input text-sm resize-none"></textarea>
+            </div>
+            <p x-show="createError" class="error-message mt-0" x-text="createError"></p>
+            <button @click="submitProject()" :disabled="creatingProject"
+              class="dark-theme-btn-primary w-full py-3 text-lg font-bold">
+              <span x-show="!creatingProject">Submit</span>
+              <span x-show="creatingProject">Submitting...</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -510,11 +664,20 @@
       return {
         isLoggedIn: false,
         userEmail: "",
+        projects: [],
+        loadingProjects: false,
+        projectError: "",
+        showCreateModal: false,
+        newProjectTitle: "",
+        newProjectDescription: "",
+        creatingProject: false,
+        createError: "",
 
         init() {
           if (SKIP_AUTH) {
             this.isLoggedIn = true;
             this.userEmail = DEV_USER_EMAIL;
+            this.loadProjects();
             return;
           }
 
@@ -524,12 +687,14 @@
             this.isLoggedIn = true;
             this.userEmail = email;
             loadActiveUsers();
+            this.loadProjects();
           }
 
           window.addEventListener("login-success", () => {
             this.isLoggedIn = true;
             this.userEmail = localStorage.getItem("bookBuilderEmail") || "";
             loadActiveUsers();
+            this.loadProjects();
           });
 
           window.addEventListener("logout-success", () => {
@@ -544,6 +709,93 @@
           this.isLoggedIn = false;
           this.userEmail = "";
           window.dispatchEvent(new Event("logout-success"));
+        },
+
+        formatDate(value) {
+          if (!value) return "-";
+          const date = new Date(value);
+          if (Number.isNaN(date.getTime())) return "-";
+          return date.toLocaleString("en-US", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+          });
+        },
+
+        async loadProjects() {
+          this.loadingProjects = true;
+          this.projectError = "";
+          try {
+            const res = await fetch(`${API_BASE_URL}/bookbuilder/projects`, {
+              headers: { "ngrok-skip-browser-warning": "true" }
+            });
+            if (!res.ok) throw new Error("Failed to fetch projects");
+            const data = await res.json();
+            this.projects = Array.isArray(data) ? data : [];
+          } catch (err) {
+            this.projectError = err.message || "Unable to load projects";
+            this.projects = [];
+          } finally {
+            this.loadingProjects = false;
+          }
+        },
+
+        openCreateModal() {
+          this.showCreateModal = true;
+          this.createError = "";
+        },
+
+        closeCreateModal() {
+          this.showCreateModal = false;
+          this.newProjectTitle = "";
+          this.newProjectDescription = "";
+          this.createError = "";
+        },
+
+        async submitProject() {
+          if (!this.newProjectTitle) {
+            this.createError = "Title is required";
+            return;
+          }
+          if (!this.newProjectDescription) {
+            this.createError = "Description is required";
+            return;
+          }
+
+          this.creatingProject = true;
+          this.createError = "";
+          try {
+            const payload = {
+              title: this.newProjectTitle,
+              description: this.newProjectDescription,
+              created_by: this.userEmail || DEV_USER_EMAIL,
+            };
+
+            const res = await fetch(`${API_BASE_URL}/bookbuilder/projects`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "ngrok-skip-browser-warning": "true",
+              },
+              body: JSON.stringify(payload),
+            });
+
+            if (!res.ok) {
+              const errorJson = await res.json().catch(() => ({}));
+              throw new Error(errorJson.detail || "Failed to create project");
+            }
+
+            await this.loadProjects();
+            this.closeCreateModal();
+          } catch (err) {
+            this.createError = err.message || "Unable to create project";
+          } finally {
+            this.creatingProject = false;
+          }
         },
       };
     }
