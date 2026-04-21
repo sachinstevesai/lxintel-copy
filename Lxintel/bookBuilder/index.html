@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ramos Law Book Builder</title>
+  <link rel="icon" type="image/webp"
+    href="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: { fontFamily: { sans: ["Montserrat", "system-ui"] } },
+      },
+    };
+  </script>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <style>
+    body,
+    html {
+      font-family: "Montserrat", sans-serif;
+      background-color: #111;
+      color: #f1c40f;
+    }
+
+    .video-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-image: url("https://static.vecteezy.com/system/resources/previews/007/596/744/non_2x/abstract-digital-glossy-particles-and-lines-connected-3d-illustration-on-black-background-free-photo.jpg");
+      background-size: cover;
+      background-position: center top 150px;
+      z-index: -2;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.75);
+      z-index: -1;
+    }
+
+    .dark-theme-card {
+      background-color: #111;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(241, 196, 15, 0.1);
+      border: 1px solid #333;
+      color: #f1c40f;
+    }
+
+    .dark-theme-input {
+      background-color: #000 !important;
+      color: #fff !important;
+      border: 1px solid #444 !important;
+      border-radius: 6px !important;
+    }
+
+    .dark-theme-input::placeholder {
+      color: #777 !important;
+      opacity: 0.7;
+    }
+
+    .dark-theme-btn-primary {
+      background-color: #f1c40f !important;
+      color: #000 !important;
+      font-weight: bold !important;
+      border: none !important;
+      border-radius: 6px !important;
+    }
+
+    .dark-theme-btn-primary:hover {
+      background-color: #d4ac0d !important;
+    }
+
+    .dark-theme-btn-primary:disabled {
+      background-color: #a08209 !important;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    .error-message {
+      color: #e74c3c;
+      background-color: rgba(231, 76, 60, 0.1);
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 10px;
+    }
+
+    .email-status {
+      display: flex;
+      align-items: center;
+      margin-top: 8px;
+      font-size: 0.85rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .email-status.visible {
+      opacity: 1;
+    }
+
+    .email-status .status-icon {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    .email-status .status-icon.checking {
+      background-color: #3498db;
+      animation: pulse 1.5s infinite;
+    }
+
+    .email-status .status-icon.valid {
+      background-color: #2ecc71;
+    }
+
+    .email-status .status-icon.invalid {
+      background-color: #e74c3c;
+    }
+
+    @keyframes pulse {
+      0% {
+        opacity: 0.6;
+      }
+
+      50% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0.6;
+      }
+    }
+
+    .header-text {
+      text-align: center;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .header-text img {
+      max-height: 120px;
+      margin-bottom: 1rem;
+    }
+
+    .header-text h1 {
+      font-size: 3rem;
+      letter-spacing: 1px;
+      text-shadow: 1px 1px 8px rgba(241, 196, 15, 0.6);
+      color: #f1c40f;
+      margin: 0;
+    }
+
+    .header-text p {
+      color: #aaa;
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .header-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      background-color: rgba(17, 17, 17, 0.95);
+      color: #f1c40f;
+      padding: 15px 20px;
+      border-bottom: 1px solid #333;
+      z-index: 100;
+    }
+
+    .menu-container {
+      position: relative;
+    }
+
+    .menu-button {
+      background: none;
+      border: none;
+      color: #f1c40f;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .menu-popover {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background-color: #222;
+      border: 1px solid #333;
+      border-radius: 6px;
+      margin-top: 8px;
+      z-index: 200;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      min-width: 140px;
+    }
+
+    .menu-popover button {
+      display: block;
+      width: 100%;
+      padding: 12px 20px;
+      background: none;
+      border: none;
+      color: #e74c3c;
+      text-align: left;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.2s;
+    }
+
+    .menu-popover button:hover {
+      background-color: rgba(231, 76, 60, 0.1);
+    }
+
+    .active-user-popover {
+      position: fixed;
+      top: 85px;
+      left: 260px;
+      background-color: #1a1a1a;
+      border: 1px solid rgba(241, 196, 15, 0.4);
+      border-radius: 8px;
+      padding: 12px;
+      min-width: 220px;
+      z-index: 2000;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .header-bar {
+        padding: 12px 14px;
+      }
+
+      .header-layout {
+        gap: 10px;
+      }
+
+      .top-logo-area {
+        gap: 8px !important;
+        flex-wrap: wrap;
+      }
+
+      .top-logo-area img {
+        max-height: 34px !important;
+      }
+
+      .top-logo-area h2 {
+        font-size: 15px !important;
+      }
+
+      .heading-top-mail {
+        font-size: 13px !important;
+      }
+
+      .active-user-popover {
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        top: 150px !important;
+        width: 260px !important;
+        max-width: 90% !important;
+        min-width: unset !important;
+      }
+
+      .header-text h1 {
+        font-size: 2.2rem;
+      }
+
+      .header-text p {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-4">
+  <div class="video-background"></div>
+  <div class="overlay"></div>
+
+  <div class="w-full max-w-[40rem] relative z-10" x-data="loginApp()" x-show="!loggedIn">
+    <div class="header-text">
+      <img src="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
+        alt="Ramos Law Book Builder" />
+      <h1>Ramos Law Book Builder</h1>
+      <p>Secure Access for Authorized Ramos Law Users</p>
+    </div>
+
+    <div class="dark-theme-card p-6 space-y-5">
+      <h2 class="text-[36px] font-extrabold uppercase tracking-[0.5px] text-center text-[#f1c40f] mt-0 mb-0">
+        Login
+      </h2>
+
+      <div>
+        <label class="block text-[#f1c40f] font-semibold mb-2">Email</label>
+        <input type="email" placeholder="Enter your email" x-model="email" @input.debounce.500="verifyEmail()"
+          @keydown.enter="emailValid && login()"
+          class="w-full p-3 dark-theme-input font-medium text-[15px] leading-[28px]" />
+
+        <div class="email-status" :class="email && email.includes('@') ? 'visible' : ''"
+          x-show="email && email.includes('@')">
+          <span class="status-icon" :class="emailChecking ? 'checking' : emailValid ? 'valid' : 'invalid'"></span>
+          <span class="status-text">
+            <span x-show="emailChecking">Checking email...</span>
+            <span x-show="!emailChecking && emailValid" style="color: #f1c40f">Email authorized</span>
+            <span x-show="!emailChecking && !emailValid" style="color: #f1c40f">Email not authorized</span>
+          </span>
+        </div>
+      </div>
+
+      <p x-show="error" x-text="error" class="error-message"></p>
+
+      <button @click="login()" :disabled="!emailValid || !email"
+        :class="emailValid && email ? 'dark-theme-btn-primary w-full py-3 font-medium transition' : 'opacity-50 cursor-not-allowed dark-theme-btn-primary w-full py-3 font-medium transition'">
+        <span x-show="!loggingIn">Login</span>
+        <span x-show="loggingIn">Logging in...</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="w-full max-w-[75rem] relative z-10 mt-24 px-2 sm:px-4" x-data="bookBuilderApp()" x-show="isLoggedIn">
+    <div class="header-bar">
+      <div class="flex justify-between items-center header-layout">
+        <div class="flex items-center gap-3 top-logo-area">
+          <img src="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
+            alt="Ramos Law Book Builder" style="max-height: 40px" />
+          <h2 class="mb-0 text-[#f1c40f]" style="font-size: 20px; font-weight: 600">
+            Ramos Law Book Builder
+          </h2>
+          <button id="active-users-btn" onclick="toggleActiveUsers()"
+            class="flex items-center gap-2 text-xs font-semibold px-2 py-1 rounded hover:bg-yellow-500/10"
+            title="Active users">
+            <span class="w-2 h-2 bg-green-500 rounded-full shadow"></span>
+            <span id="active-user-count">0</span>
+            Active Users
+          </button>
+          <div id="active-users-popover" class="active-user-popover">
+            <div style="padding: 8px 0; margin-bottom: 8px; border-bottom: 1px solid rgba(241, 196, 15, 0.3); color: #f1c40f; font-size: 12px; font-weight: 600;">
+              Active Users
+            </div>
+            <div id="active-users-list"></div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <div class="text-right text-[0.9rem] text-[#aaa] hidden sm:block">
+            <span class="block text-[#f1c40f] font-semibold heading-top-mail" x-text="userEmail"></span>
+            <span class="text-[0.85rem]">Logged in</span>
+          </div>
+          <div class="menu-container" x-data="{ menuOpen: false }">
+            <button class="menu-button" @click="menuOpen = !menuOpen">⋮</button>
+            <div class="menu-popover" x-show="menuOpen" @click.outside="menuOpen = false">
+              <button @click="logout()">Logout</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pt-32 sm:pt-28 pb-10">
+      <div class="dark-theme-card p-6 sm:p-8 text-center">
+        <h3 class="text-2xl sm:text-3xl font-bold text-[#f1c40f] mb-3">Book Builder Flow</h3>
+        <p class="text-[#aaa]">Header and login flow are ready. Next, we can implement the content below this section.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE_URL = "https://laurene-clearheaded-nonaromatically.ngrok-free.dev";
+    const SKIP_AUTH = true;
+    const DEV_USER_EMAIL = "bookbuilder@ramoslaw.dev";
+
+    function requireToken() {
+      const token = localStorage.getItem("bookBuilderToken");
+      if (!token) {
+        alert("Your session has expired or you are not logged in. Please log in first.");
+        localStorage.removeItem("bookBuilderToken");
+        localStorage.removeItem("bookBuilderEmail");
+        window.dispatchEvent(new Event("logout-success"));
+        location.reload();
+        return null;
+      }
+      return token;
+    }
+
+    function handle401() {
+      alert("Your session has expired. Please log in again.");
+      localStorage.removeItem("bookBuilderToken");
+      localStorage.removeItem("bookBuilderEmail");
+      window.dispatchEvent(new Event("logout-success"));
+      location.reload();
+    }
+
+    function loginApp() {
+      return {
+        email: "",
+        emailValid: false,
+        emailChecking: false,
+        error: "",
+        loggedIn: false,
+        loggingIn: false,
+
+        init() {
+          if (SKIP_AUTH) {
+            this.loggedIn = true;
+            this.email = DEV_USER_EMAIL;
+            return;
+          }
+
+          const token = localStorage.getItem("bookBuilderToken");
+          const savedEmail = localStorage.getItem("bookBuilderEmail");
+          if (token && savedEmail) {
+            this.loggedIn = true;
+            this.email = savedEmail;
+          }
+
+          window.addEventListener("logout-success", () => {
+            this.loggedIn = false;
+            this.email = "";
+            this.emailValid = false;
+            this.error = "";
+          });
+        },
+
+        verifyEmail() {
+          if (!this.email.includes("@")) {
+            this.emailValid = false;
+            this.error = "";
+            return;
+          }
+
+          this.emailChecking = true;
+          this.error = "";
+          fetch(`${API_BASE_URL}/casevalue/verify-email?email=${encodeURIComponent(this.email)}`, {
+            headers: { "ngrok-skip-browser-warning": "true" }
+          })
+            .then((res) => res.json())
+            .then((json) => {
+              this.emailValid = json.valid;
+              this.emailChecking = false;
+              if (!json.valid) {
+                this.error = "Access denied: Your email is not on the authorized list.";
+              }
+            })
+            .catch(() => {
+              this.emailValid = false;
+              this.emailChecking = false;
+              this.error = "Access denied: Your email is not on the authorized list.";
+            });
+        },
+
+        login() {
+          if (!this.emailValid) {
+            this.error = "Email not authorized";
+            return;
+          }
+
+          if (!this.email || !this.email.includes("@")) {
+            this.error = "Please enter a valid email";
+            return;
+          }
+
+          this.loggingIn = true;
+
+          const data = new URLSearchParams();
+          data.append("username", this.email);
+          data.append("password", "not-used-but-required");
+
+          fetch(`${API_BASE_URL}/casevalue/login`, {
+            method: "POST",
+            body: data,
+            headers: { "ngrok-skip-browser-warning": "true" }
+          })
+            .then((res) => {
+              if (!res.ok) throw new Error("Unauthorized email");
+              return res.json();
+            })
+            .then((json) => {
+              localStorage.setItem("bookBuilderToken", json.access_token);
+              localStorage.setItem("bookBuilderEmail", this.email);
+              this.loggedIn = true;
+              this.error = "";
+              this.loggingIn = false;
+              window.dispatchEvent(new CustomEvent("login-success"));
+            })
+            .catch((err) => {
+              this.error = err.message;
+              this.loggingIn = false;
+            });
+        },
+      };
+    }
+
+    function bookBuilderApp() {
+      return {
+        isLoggedIn: false,
+        userEmail: "",
+
+        init() {
+          if (SKIP_AUTH) {
+            this.isLoggedIn = true;
+            this.userEmail = DEV_USER_EMAIL;
+            return;
+          }
+
+          const token = localStorage.getItem("bookBuilderToken");
+          const email = localStorage.getItem("bookBuilderEmail");
+          if (token && email) {
+            this.isLoggedIn = true;
+            this.userEmail = email;
+            loadActiveUsers();
+          }
+
+          window.addEventListener("login-success", () => {
+            this.isLoggedIn = true;
+            this.userEmail = localStorage.getItem("bookBuilderEmail") || "";
+            loadActiveUsers();
+          });
+
+          window.addEventListener("logout-success", () => {
+            this.isLoggedIn = false;
+            this.userEmail = "";
+          });
+        },
+
+        logout() {
+          localStorage.removeItem("bookBuilderToken");
+          localStorage.removeItem("bookBuilderEmail");
+          this.isLoggedIn = false;
+          this.userEmail = "";
+          window.dispatchEvent(new Event("logout-success"));
+        },
+      };
+    }
+
+    function toggleActiveUsers() {
+      const popover = document.getElementById("active-users-popover");
+      const isOpening = popover.style.display !== "block";
+      if (isOpening) {
+        loadActiveUsers();
+      }
+      popover.style.display = isOpening ? "block" : "none";
+    }
+
+    async function loadActiveUsers() {
+      if (SKIP_AUTH) {
+        const countEl = document.getElementById("active-user-count");
+        const list = document.getElementById("active-users-list");
+        if (countEl) countEl.innerText = "0";
+        if (list) {
+          list.innerHTML =
+            "<p style='color:#aaa; font-size:13px'>Active users API not connected yet</p>";
+        }
+        return;
+      }
+
+      const token = requireToken();
+      if (!token) return;
+      try {
+        const res = await fetch(`${API_BASE_URL}/casevalue/active-today`, {
+          headers: {
+            "Authorization": token ? `Bearer ${token}` : "",
+            "ngrok-skip-browser-warning": "true"
+          }
+        });
+
+        if (res.status === 401 || res.status === 403) {
+          handle401();
+          return;
+        }
+        if (!res.ok) throw new Error("Failed to fetch active users");
+
+        const data = await res.json();
+        const users = Array.isArray(data) ? data : [];
+        document.getElementById("active-user-count").innerText = users.length;
+
+        const list = document.getElementById("active-users-list");
+        list.innerHTML = "";
+        if (users.length === 0) {
+          list.innerHTML = "<p style='color:#aaa; font-size:13px'>No active users</p>";
+          return;
+        }
+
+        users.forEach((user) => {
+          const div = document.createElement("div");
+          div.style.padding = "10px 8px";
+          div.style.fontSize = "13px";
+          div.style.borderBottom = "1px solid #333";
+          div.style.display = "flex";
+          div.style.justifyContent = "space-between";
+          div.style.alignItems = "center";
+          div.style.gap = "16px";
+
+          const emailSpan = document.createElement("span");
+          emailSpan.style.color = "#f1c40f";
+          emailSpan.style.fontWeight = "500";
+          emailSpan.style.flex = "1";
+          emailSpan.innerText = user.email || "";
+
+          const timeSpan = document.createElement("span");
+          timeSpan.style.color = "#aaa";
+          timeSpan.style.fontSize = "12px";
+          timeSpan.style.whiteSpace = "nowrap";
+          timeSpan.style.flexShrink = "0";
+          timeSpan.innerText = formatLastActive(user.last_active);
+
+          div.appendChild(emailSpan);
+          div.appendChild(timeSpan);
+          list.appendChild(div);
+        });
+      } catch (err) {
+        console.error("Active users fetch failed", err);
+      }
+    }
+
+    function formatLastActive(dateStr) {
+      try {
+        const date = new Date(dateStr);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+
+        if (diffMins < 1) return "just now";
+        if (diffMins < 60) return `${diffMins}m ago`;
+        if (diffHours < 24) return `${diffHours}h ago`;
+        return `${diffDays}d ago`;
+      } catch (e) {
+        return "";
+      }
+    }
+
+    document.addEventListener("click", (event) => {
+      const popover = document.getElementById("active-users-popover");
+      const button = document.getElementById("active-users-btn");
+      if (!popover || !button) return;
+      if (popover.style.display !== "block") return;
+      if (!popover.contains(event.target) && !button.contains(event.target)) {
+        popover.style.display = "none";
+      }
+    });
+  </script>
+</body>
+
+</html>
