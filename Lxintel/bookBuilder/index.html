@@ -534,10 +534,16 @@
       <div class="section-card">
         <div class="section-header">
           <h3 class="section-title">Project Chapters</h3>
-          <button class="dark-theme-btn-primary px-4 py-2 text-sm" :disabled="!selectedProjectId"
-            @click="openCreateChapterModal()">
-            Create Chapter
-          </button>
+          <div class="flex items-center gap-2">
+            <button class="dark-theme-btn-primary px-4 py-2 text-sm" :disabled="!selectedProjectId"
+              @click="openViewSourcesModal()">
+              View Sources
+            </button>
+            <button class="dark-theme-btn-primary px-4 py-2 text-sm" :disabled="!selectedProjectId"
+              @click="openCreateChapterModal()">
+              Create Chapter
+            </button>
+          </div>
         </div>
 
         <div class="project-table-wrap">
@@ -722,6 +728,41 @@
           </div>
         </div>
       </div>
+      <div class="modal-backdrop" x-show="showViewSourcesModal" x-transition.opacity @click="closeViewSourcesModal()">
+        <div class="create-project-modal upload-source-modal" @click.stop>
+          <div class="flex items-start justify-between gap-3 mb-5">
+            <h4 class="text-2xl font-bold text-[#f1c40f]">Project Sources</h4>
+            <button class="text-[#8f9bb3] text-xl leading-none" @click="closeViewSourcesModal()">×</button>
+          </div>
+          <div class="project-table-wrap">
+            <table class="project-table" x-show="projectSources.length > 0">
+              <thead>
+                <tr>
+                  <th>Source Type</th>
+                  <th>Created At</th>
+                  <th>Title</th>
+                  <th>Topic Tags</th>
+                  <th>Source Tier</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="source in projectSources" :key="source.id">
+                  <tr>
+                    <td x-text="source.source_type || '-'"></td>
+                    <td x-text="formatDate(source.created_at)"></td>
+                    <td x-text="source.title || '-'"></td>
+                    <td x-text="Array.isArray(source.topic_tags) ? source.topic_tags.join(', ') : '-'"></td>
+                    <td x-text="sourceTierLabel(source.source_tier)"></td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+          <div class="project-empty" x-show="loadingProjectSources">Loading sources...</div>
+          <div class="project-empty" x-show="!loadingProjectSources && projectSources.length === 0">No sources found.</div>
+          <div class="project-empty !text-red-400" x-show="projectSourcesError" x-text="projectSourcesError"></div>
+        </div>
+      </div>
       <div class="toast-success" x-show="showSuccessToast" x-transition.opacity x-text="successToastMessage"></div>
     </div>
   </div>
@@ -882,6 +923,10 @@
         uploadSourceText: "",
         uploadSourceError: "",
         uploadingSource: false,
+        showViewSourcesModal: false,
+        loadingProjectSources: false,
+        projectSources: [],
+        projectSourcesError: "",
         showSuccessToast: false,
         successToastMessage: "",
 
@@ -939,6 +984,12 @@
             second: "2-digit",
             hour12: false,
           });
+        },
+
+        sourceTierLabel(value) {
+          if (String(value) === "1") return "Author Material";
+          if (String(value) === "2") return "SOPs / Playbooks / Workflow Docs";
+          return "-";
         },
 
         async loadProjects() {
@@ -1040,6 +1091,43 @@
           this.uploadSourceFile = null;
           this.uploadSourceText = "";
           this.uploadSourceError = "";
+        },
+
+        async openViewSourcesModal() {
+          if (!this.selectedProjectId) return;
+          this.showViewSourcesModal = true;
+          await this.loadProjectSources();
+        },
+
+        closeViewSourcesModal() {
+          this.showViewSourcesModal = false;
+          this.projectSources = [];
+          this.projectSourcesError = "";
+          this.loadingProjectSources = false;
+        },
+
+        async loadProjectSources() {
+          if (!this.selectedProjectId) return;
+          this.loadingProjectSources = true;
+          this.projectSourcesError = "";
+          this.projectSources = [];
+          try {
+            const headers = this.getAuthHeaders();
+            if (!headers) return;
+            const res = await fetch(`${API_BASE_URL}/bookbuilder/projects/${this.selectedProjectId}/sources`, { headers });
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
+            if (!res.ok) throw new Error("Failed to fetch project sources");
+            const data = await res.json();
+            this.projectSources = Array.isArray(data) ? data : [];
+          } catch (err) {
+            this.projectSourcesError = err.message || "Unable to load sources";
+            this.projectSources = [];
+          } finally {
+            this.loadingProjectSources = false;
+          }
         },
 
         triggerSuccessToast(message) {
