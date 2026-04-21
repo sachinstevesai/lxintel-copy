@@ -332,6 +332,28 @@
       box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
     }
 
+    .upload-source-modal {
+      max-height: 78vh;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #f1c40f73 #2c2c2c;
+    }
+
+    .toast-success {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 2100;
+      background: rgba(26, 26, 26, 0.97);
+      color: #2ecc71;
+      border: 1px solid rgba(46, 204, 113, 0.55);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+    }
+
     @media (max-width: 768px) {
       .header-bar {
         padding: 12px 14px;
@@ -377,6 +399,10 @@
 
       .create-project-modal {
         padding: 16px;
+      }
+
+      .upload-source-modal {
+        max-height: 82vh;
       }
     }
   </style>
@@ -521,6 +547,7 @@
                 <th>#</th>
                 <th>Title</th>
                 <th>Chapter Order</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -530,6 +557,12 @@
                   <td x-text="idx + 1"></td>
                   <td x-text="chapter.title || '-'"></td>
                   <td x-text="chapter.chapter_order ?? '-'"></td>
+                  <td @click.stop>
+                    <button class="dark-theme-btn-primary px-3 py-1 text-xs" :disabled="!selectedProjectId"
+                      @click="openUploadSourceModal(chapter.id)">
+                      Upload Source
+                    </button>
+                  </td>
                 </tr>
               </template>
             </tbody>
@@ -643,6 +676,53 @@
           </div>
         </div>
       </div>
+
+      <div class="modal-backdrop" x-show="showUploadSourceModal" x-transition.opacity @click="closeUploadSourceModal()">
+        <div class="create-project-modal upload-source-modal" @click.stop>
+          <div class="flex items-start justify-between gap-3 mb-5">
+            <h4 class="text-2xl font-bold text-[#f1c40f]">Upload Source</h4>
+            <button class="text-[#8f9bb3] text-xl leading-none" @click="closeUploadSourceModal()">×</button>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Title</label>
+              <input type="text" x-model.trim="uploadSourceTitle" placeholder="Enter source title"
+                class="w-full p-3 dark-theme-input text-sm" />
+            </div>
+            <div>
+              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Topic Tags</label>
+              <input type="text" x-model.trim="uploadSourceTopicTags" placeholder="Enter comma separated text"
+                class="w-full p-3 dark-theme-input text-sm" />
+            </div>
+            <div>
+              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Source Tier</label>
+              <select x-model="uploadSourceTier" class="w-full p-3 dark-theme-input text-sm">
+                <option value="1">Author Material</option>
+                <option value="2">SOPs / Playbooks / Workflow Docs</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Upload File (pdf, docx, txt)</label>
+              <input type="file" accept=".pdf,.docx,.txt" class="w-full p-3 dark-theme-input text-sm"
+                :disabled="uploadSourceText.trim().length > 0"
+                @change="handleSourceFileChange($event)" />
+            </div>
+            <div>
+              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Text Input</label>
+              <textarea rows="5" x-model="uploadSourceText" placeholder="Paste or type source text"
+                class="w-full p-3 dark-theme-input text-sm resize-none"
+                :disabled="uploadSourceFile !== null"></textarea>
+            </div>
+            <p x-show="uploadSourceError" class="error-message mt-0" x-text="uploadSourceError"></p>
+            <button @click="submitUploadSource()" :disabled="uploadingSource"
+              class="dark-theme-btn-primary w-full py-3 text-lg font-bold">
+              <span x-show="!uploadingSource">Submit</span>
+              <span x-show="uploadingSource">Submitting...</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="toast-success" x-show="showSuccessToast" x-transition.opacity x-text="successToastMessage"></div>
     </div>
   </div>
 
@@ -793,6 +873,17 @@
         newSectionTitle: "",
         creatingSection: false,
         createSectionError: "",
+        showUploadSourceModal: false,
+        uploadSourceChapterId: "",
+        uploadSourceTitle: "",
+        uploadSourceTopicTags: "",
+        uploadSourceTier: "1",
+        uploadSourceFile: null,
+        uploadSourceText: "",
+        uploadSourceError: "",
+        uploadingSource: false,
+        showSuccessToast: false,
+        successToastMessage: "",
 
         init() {
           const token = localStorage.getItem("bookBuilderToken");
@@ -927,6 +1018,41 @@
           this.showCreateSectionModal = false;
           this.newSectionTitle = "";
           this.createSectionError = "";
+        },
+
+        openUploadSourceModal(chapterId) {
+          this.uploadSourceChapterId = chapterId || "";
+          this.showUploadSourceModal = true;
+          this.uploadSourceTitle = "";
+          this.uploadSourceTopicTags = "";
+          this.uploadSourceTier = "1";
+          this.uploadSourceFile = null;
+          this.uploadSourceText = "";
+          this.uploadSourceError = "";
+        },
+
+        closeUploadSourceModal() {
+          this.showUploadSourceModal = false;
+          this.uploadSourceChapterId = "";
+          this.uploadSourceTitle = "";
+          this.uploadSourceTopicTags = "";
+          this.uploadSourceTier = "1";
+          this.uploadSourceFile = null;
+          this.uploadSourceText = "";
+          this.uploadSourceError = "";
+        },
+
+        triggerSuccessToast(message) {
+          this.successToastMessage = message || "Saved successfully";
+          this.showSuccessToast = true;
+          window.setTimeout(() => {
+            this.showSuccessToast = false;
+          }, 2200);
+        },
+
+        handleSourceFileChange(event) {
+          const file = event.target.files && event.target.files[0] ? event.target.files[0] : null;
+          this.uploadSourceFile = file;
         },
 
         async submitProject() {
@@ -1096,6 +1222,85 @@
             this.createSectionError = err.message || "Unable to create section";
           } finally {
             this.creatingSection = false;
+          }
+        },
+
+        async submitUploadSource() {
+          if (!this.selectedProjectId) {
+            this.uploadSourceError = "Please select a project first";
+            return;
+          }
+          if (!this.uploadSourceChapterId) {
+            this.uploadSourceError = "Chapter id is missing";
+            return;
+          }
+          if (!this.uploadSourceTitle) {
+            this.uploadSourceError = "Title is required";
+            return;
+          }
+
+          const hasFile = !!this.uploadSourceFile;
+          const hasText = this.uploadSourceText.trim().length > 0;
+          if (!hasFile && !hasText) {
+            this.uploadSourceError = "Please upload a file or enter text";
+            return;
+          }
+          if (hasFile && hasText) {
+            this.uploadSourceError = "Use either file or text, not both";
+            return;
+          }
+
+          this.uploadingSource = true;
+          this.uploadSourceError = "";
+          try {
+            const token = requireToken();
+            if (!token) return;
+
+            const formData = new FormData();
+            formData.append("title", this.uploadSourceTitle);
+            formData.append("source_tier", this.uploadSourceTier);
+            formData.append("chapter_ids", JSON.stringify([this.uploadSourceChapterId]));
+
+            const tags = this.uploadSourceTopicTags
+              .split(",")
+              .map((tag) => tag.trim())
+              .filter(Boolean);
+            formData.append("topic_tags", JSON.stringify(tags));
+
+            if (hasFile) {
+              formData.append("file", this.uploadSourceFile);
+              const extension = (this.uploadSourceFile.name.split(".").pop() || "").toLowerCase();
+              const fileType = ["pdf", "docx", "txt"].includes(extension) ? extension : "pdf";
+              formData.append("source_type", fileType);
+            } else {
+              formData.append("pasted_text", this.uploadSourceText.trim());
+              formData.append("source_type", "pasted");
+            }
+
+            const res = await fetch(`${API_BASE_URL}/bookbuilder/projects/${this.selectedProjectId}/sources/upload`, {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${token}`,
+                "ngrok-skip-browser-warning": "true",
+              },
+              body: formData,
+            });
+
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
+            if (!res.ok) {
+              const errorJson = await res.json().catch(() => ({}));
+              throw new Error(errorJson.detail || "Failed to upload source");
+            }
+
+            this.closeUploadSourceModal();
+            this.triggerSuccessToast("Source uploaded successfully");
+          } catch (err) {
+            this.uploadSourceError = err.message || "Unable to upload source";
+          } finally {
+            this.uploadingSource = false;
           }
         },
       };
