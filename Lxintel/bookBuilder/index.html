@@ -427,25 +427,21 @@
 
       <div>
         <label class="block text-[#f1c40f] font-semibold mb-2">Email</label>
-        <input type="email" placeholder="Enter your email" x-model="email" @input.debounce.500="verifyEmail()"
-          @keydown.enter="emailValid && login()"
+        <input type="email" placeholder="Enter your email" x-model="email"
+          @keydown.enter="email && password && login()"
           class="w-full p-3 dark-theme-input font-medium text-[15px] leading-[28px]" />
-
-        <div class="email-status" :class="email && email.includes('@') ? 'visible' : ''"
-          x-show="email && email.includes('@')">
-          <span class="status-icon" :class="emailChecking ? 'checking' : emailValid ? 'valid' : 'invalid'"></span>
-          <span class="status-text">
-            <span x-show="emailChecking">Checking email...</span>
-            <span x-show="!emailChecking && emailValid" style="color: #f1c40f">Email authorized</span>
-            <span x-show="!emailChecking && !emailValid" style="color: #f1c40f">Email not authorized</span>
-          </span>
-        </div>
+      </div>
+      <div>
+        <label class="block text-[#f1c40f] font-semibold mb-2">Password</label>
+        <input type="password" placeholder="Enter your password" x-model="password"
+          @keydown.enter="email && password && login()"
+          class="w-full p-3 dark-theme-input font-medium text-[15px] leading-[28px]" />
       </div>
 
       <p x-show="error" x-text="error" class="error-message"></p>
 
-      <button @click="login()" :disabled="!emailValid || !email"
-        :class="emailValid && email ? 'dark-theme-btn-primary w-full py-3 font-medium transition' : 'opacity-50 cursor-not-allowed dark-theme-btn-primary w-full py-3 font-medium transition'">
+      <button @click="login()" :disabled="!email || !password"
+        :class="email && password ? 'dark-theme-btn-primary w-full py-3 font-medium transition' : 'opacity-50 cursor-not-allowed dark-theme-btn-primary w-full py-3 font-medium transition'">
         <span x-show="!loggingIn">Login</span>
         <span x-show="loggingIn">Logging in...</span>
       </button>
@@ -600,7 +596,7 @@
             </thead>
             <tbody>
               <template x-for="(section, idx) in sections" :key="section.id">
-                <tr>
+                <tr @click="openSectionSeedModal(section, false)" class="cursor-pointer">
                   <td x-text="idx + 1"></td>
                   <td x-text="section.title || '-'"></td>
                   <td x-text="section.section_order ?? '-'"></td>
@@ -613,6 +609,53 @@
         <div class="project-empty" x-show="selectedChapterId && !loadingSections && sections.length === 0">No sections found.</div>
         <div class="project-empty" x-show="loadingSections">Loading sections...</div>
         <div class="project-empty !text-red-400" x-show="sectionError" x-text="sectionError"></div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-header">
+          <h3 class="section-title">Section Seed List</h3>
+        </div>
+        <div class="project-table-wrap">
+          <table class="project-table" x-show="sectionSeedList.length > 0">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Title</th>
+                <th>Section Order</th>
+                <th>Author Seed</th>
+                <th>Tone</th>
+                <th>Current Thesis ID</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="(section, idx) in sectionSeedList" :key="section.id">
+                <tr>
+                  <td x-text="idx + 1"></td>
+                  <td x-text="section.title || '-'"></td>
+                  <td x-text="section.section_order ?? '-'"></td>
+                  <td>
+                    <span x-text="authorSeedPreview(section.author_seed, section.id)"></span>
+                    <button x-show="(section.author_seed || '').length > 80" @click.stop="toggleAuthorSeed(section.id)"
+                      class="dark-theme-btn-primary px-2 py-1 text-xs ml-2">
+                      <span x-text="expandedAuthorSeeds[section.id] ? 'Hide' : 'Show'"></span>
+                    </button>
+                  </td>
+                  <td x-text="section.tone || '-'"></td>
+                  <td x-text="section.current_thesis_id || '-'"></td>
+                  <td @click.stop>
+                    <button class="dark-theme-btn-primary px-3 py-1 text-xs" @click="openSectionSeedModal(section, true)">
+                      Edit
+                    </button>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+        <div class="project-empty" x-show="!selectedChapterId">Select a chapter to view section seed list.</div>
+        <div class="project-empty" x-show="selectedChapterId && !loadingSections && sectionSeedList.length === 0">No section seed data found.</div>
+        <div class="project-empty" x-show="loadingSections">Loading section seed list...</div>
       </div>
 
       <div class="modal-backdrop" x-show="showCreateProjectModal" x-transition.opacity @click="closeCreateProjectModal()">
@@ -728,6 +771,32 @@
           </div>
         </div>
       </div>
+      <div class="modal-backdrop" x-show="showSectionSeedModal" x-transition.opacity @click="closeSectionSeedModal()">
+        <div class="create-project-modal" @click.stop>
+          <div class="flex items-start justify-between gap-3 mb-5">
+            <h4 class="text-2xl font-bold text-[#f1c40f]" x-text="sectionSeedEditMode ? 'Edit Section Seed' : 'Add Section Seed'"></h4>
+            <button class="text-[#8f9bb3] text-xl leading-none" @click="closeSectionSeedModal()">×</button>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Author Seed</label>
+              <textarea rows="5" x-model.trim="sectionSeedAuthorSeed" placeholder="Enter author seed"
+                class="w-full p-3 dark-theme-input text-sm resize-none"></textarea>
+            </div>
+            <div>
+              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Tone</label>
+              <input type="text" x-model.trim="sectionSeedTone" placeholder="Enter tone"
+                class="w-full p-3 dark-theme-input text-sm" />
+            </div>
+            <p x-show="sectionSeedError" class="error-message mt-0" x-text="sectionSeedError"></p>
+            <button @click="submitSectionSeed()" :disabled="submittingSectionSeed"
+              class="dark-theme-btn-primary w-full py-3 text-lg font-bold">
+              <span x-show="!submittingSectionSeed">Submit</span>
+              <span x-show="submittingSectionSeed">Submitting...</span>
+            </button>
+          </div>
+        </div>
+      </div>
       <div class="modal-backdrop" x-show="showViewSourcesModal" x-transition.opacity @click="closeViewSourcesModal()">
         <div class="create-project-modal upload-source-modal" @click.stop>
           <div class="flex items-start justify-between gap-3 mb-5">
@@ -769,7 +838,6 @@
 
   <script>
     const API_BASE_URL = "https://laurene-clearheaded-nonaromatically.ngrok-free.dev";
-    const DEV_USER_EMAIL = "bookbuilder@ramoslaw.dev";
 
     function requireToken() {
       const token = localStorage.getItem("bookBuilderToken");
@@ -795,8 +863,7 @@
     function loginApp() {
       return {
         email: "",
-        emailValid: false,
-        emailChecking: false,
+        password: "",
         error: "",
         loggedIn: false,
         loggingIn: false,
@@ -812,54 +879,27 @@
           window.addEventListener("logout-success", () => {
             this.loggedIn = false;
             this.email = "";
-            this.emailValid = false;
+            this.password = "";
             this.error = "";
           });
         },
 
-        verifyEmail() {
-          if (!this.email.includes("@")) {
-            this.emailValid = false;
-            this.error = "";
-            return;
-          }
-
-          this.emailChecking = true;
-          this.error = "";
-          fetch(`${API_BASE_URL}/bookbuilder/verify-email?email=${encodeURIComponent(this.email)}`, {
-            headers: { "ngrok-skip-browser-warning": "true" }
-          })
-            .then((res) => res.json())
-            .then((json) => {
-              this.emailValid = json.valid;
-              this.emailChecking = false;
-              if (!json.valid) {
-                this.error = "Access denied: Your email is not on the authorized list.";
-              }
-            })
-            .catch(() => {
-              this.emailValid = false;
-              this.emailChecking = false;
-              this.error = "Access denied: Your email is not on the authorized list.";
-            });
-        },
-
         login() {
-          if (!this.emailValid) {
-            this.error = "Email not authorized";
-            return;
-          }
-
           if (!this.email || !this.email.includes("@")) {
             this.error = "Please enter a valid email";
             return;
           }
+          if (!this.password) {
+            this.error = "Please enter your password";
+            return;
+          }
 
           this.loggingIn = true;
+          this.error = "";
 
-          const data = new URLSearchParams();
+          const data = new FormData();
           data.append("username", this.email);
-          data.append("password", "not-used-but-required");
+          data.append("password", this.password);
 
           fetch(`${API_BASE_URL}/bookbuilder/login`, {
             method: "POST",
@@ -873,6 +913,7 @@
             .then((json) => {
               localStorage.setItem("bookBuilderToken", json.access_token);
               localStorage.setItem("bookBuilderEmail", this.email);
+              this.password = "";
               this.loggedIn = true;
               this.error = "";
               this.loggingIn = false;
@@ -908,6 +949,8 @@
         creatingChapter: false,
         createChapterError: "",
         sections: [],
+        sectionSeedList: [],
+        expandedAuthorSeeds: {},
         loadingSections: false,
         sectionError: "",
         showCreateSectionModal: false,
@@ -923,6 +966,13 @@
         uploadSourceText: "",
         uploadSourceError: "",
         uploadingSource: false,
+        showSectionSeedModal: false,
+        sectionSeedEditMode: false,
+        selectedSectionId: "",
+        sectionSeedAuthorSeed: "",
+        sectionSeedTone: "",
+        sectionSeedError: "",
+        submittingSectionSeed: false,
         showViewSourcesModal: false,
         loadingProjectSources: false,
         projectSources: [],
@@ -1014,6 +1064,7 @@
               this.selectedProjectId = "";
               this.chapters = [];
               this.sections = [];
+            this.sectionSeedList = [];
               this.selectedChapterId = "";
             }
           } catch (err) {
@@ -1029,11 +1080,14 @@
           this.selectedProjectId = projectId;
           this.selectedChapterId = "";
           this.sections = [];
+          this.sectionSeedList = [];
+          this.expandedAuthorSeeds = {};
           this.loadChapters();
         },
 
         selectChapter(chapterId) {
           this.selectedChapterId = chapterId || "";
+          this.expandedAuthorSeeds = {};
           this.loadSections();
         },
 
@@ -1091,6 +1145,46 @@
           this.uploadSourceFile = null;
           this.uploadSourceText = "";
           this.uploadSourceError = "";
+        },
+
+        openSectionSeedModal(section, editMode = false) {
+          if (!section || !section.id) return;
+          this.selectedSectionId = section.id;
+          this.sectionSeedEditMode = !!editMode;
+          if (this.sectionSeedEditMode) {
+            this.sectionSeedAuthorSeed = section.author_seed || "";
+            this.sectionSeedTone = section.tone || "";
+          } else {
+            this.sectionSeedAuthorSeed = "";
+            this.sectionSeedTone = "";
+          }
+          this.sectionSeedError = "";
+          this.showSectionSeedModal = true;
+        },
+
+        closeSectionSeedModal() {
+          this.showSectionSeedModal = false;
+          this.sectionSeedEditMode = false;
+          this.selectedSectionId = "";
+          this.sectionSeedAuthorSeed = "";
+          this.sectionSeedTone = "";
+          this.sectionSeedError = "";
+          this.submittingSectionSeed = false;
+        },
+
+        authorSeedPreview(value, sectionId) {
+          const text = value || "";
+          if (this.expandedAuthorSeeds[sectionId] || text.length <= 80) {
+            return text || "-";
+          }
+          return `${text.slice(0, 80)}...`;
+        },
+
+        toggleAuthorSeed(sectionId) {
+          this.expandedAuthorSeeds = {
+            ...this.expandedAuthorSeeds,
+            [sectionId]: !this.expandedAuthorSeeds[sectionId],
+          };
         },
 
         async openViewSourcesModal() {
@@ -1161,7 +1255,7 @@
             const payload = {
               title: this.newProjectTitle,
               description: this.newProjectDescription,
-              created_by: this.userEmail || DEV_USER_EMAIL,
+              created_by: this.userEmail,
             };
 
             const res = await fetch(`${API_BASE_URL}/bookbuilder/projects`, {
@@ -1252,11 +1346,13 @@
         async loadSections() {
           if (!this.selectedChapterId) {
             this.sections = [];
+            this.sectionSeedList = [];
             return;
           }
           this.loadingSections = true;
           this.sectionError = "";
           this.sections = [];
+          this.sectionSeedList = [];
           try {
             const headers = this.getAuthHeaders();
             if (!headers) return;
@@ -1268,11 +1364,66 @@
             if (!res.ok) throw new Error("Failed to fetch sections");
             const data = await res.json();
             this.sections = Array.isArray(data) ? data : [];
+            this.sectionSeedList = this.sections;
           } catch (err) {
             this.sectionError = err.message || "Unable to load sections";
             this.sections = [];
+            this.sectionSeedList = [];
           } finally {
             this.loadingSections = false;
+          }
+        },
+
+        async submitSectionSeed() {
+          if (!this.selectedSectionId) {
+            this.sectionSeedError = "Section id is missing";
+            return;
+          }
+          if (!this.sectionSeedAuthorSeed) {
+            this.sectionSeedError = "Author seed is required";
+            return;
+          }
+          if (!this.sectionSeedTone) {
+            this.sectionSeedError = "Tone is required";
+            return;
+          }
+
+          this.submittingSectionSeed = true;
+          this.sectionSeedError = "";
+          const isEditMode = this.sectionSeedEditMode;
+          try {
+            const headers = this.getAuthHeaders({ "Content-Type": "application/json" });
+            if (!headers) return;
+            const endpoint = isEditMode
+              ? `${API_BASE_URL}/bookbuilder/sections/${this.selectedSectionId}`
+              : `${API_BASE_URL}/bookbuilder/sections/${this.selectedSectionId}/seed`;
+            const method = isEditMode ? "PUT" : "POST";
+            const body = JSON.stringify({
+              author_seed: this.sectionSeedAuthorSeed,
+              tone: this.sectionSeedTone,
+            });
+
+            const res = await fetch(endpoint, {
+              method,
+              headers,
+              body,
+            });
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
+            if (!res.ok) {
+              const errorJson = await res.json().catch(() => ({}));
+              throw new Error(errorJson.detail || "Failed to submit section seed");
+            }
+
+            await this.loadSections();
+            this.closeSectionSeedModal();
+            this.triggerSuccessToast(isEditMode ? "Section seed updated successfully" : "Section seed added successfully");
+          } catch (err) {
+            this.sectionSeedError = err.message || "Unable to submit section seed";
+          } finally {
+            this.submittingSectionSeed = false;
           }
         },
 
