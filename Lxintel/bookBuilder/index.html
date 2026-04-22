@@ -304,6 +304,58 @@
       background: rgba(241, 196, 15, 0.08);
     }
 
+    .qa-table-wrap,
+    .thesis-table-wrap {
+      max-height: 340px;
+      overflow-y: auto;
+      overflow-x: auto;
+    }
+
+    .qa-table th,
+    .qa-table td,
+    .thesis-table th,
+    .thesis-table td {
+      white-space: normal;
+      vertical-align: top;
+    }
+
+    .qa-table .qa-question-col,
+    .qa-table .qa-answer-col {
+      width: 30%;
+    }
+
+    .qa-table .qa-flag-col,
+    .qa-table .qa-order-col {
+      width: 10%;
+    }
+
+    .thesis-table .thesis-version-col {
+      width: 10%;
+    }
+
+    .thesis-table .thesis-text-col {
+      width: 70%;
+    }
+
+    .thesis-table .thesis-action-col {
+      width: 20%;
+    }
+
+    .long-text-preview {
+      display: block;
+      max-width: 320px;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+
+    .long-text-preview.clamped {
+      display: -webkit-box;
+      line-clamp: 2;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
     .project-empty {
       padding: 24px 16px;
       text-align: center;
@@ -579,10 +631,16 @@
       <div class="section-card">
         <div class="section-header">
           <h3 class="section-title">Chapter Section</h3>
-          <button class="dark-theme-btn-primary px-4 py-2 text-sm" :disabled="!selectedChapterId"
-            @click="openCreateSectionModal()">
-            Create Section
-          </button>
+          <div class="flex items-center gap-2">
+            <button class="dark-theme-btn-primary px-4 py-2 text-sm"
+              :disabled="!selectedChapterId || !selectedSectionForPrincipleId" @click="openCreatePrincipleModal()">
+              Create Principle
+            </button>
+            <button class="dark-theme-btn-primary px-4 py-2 text-sm" :disabled="!selectedChapterId"
+              @click="openCreateSectionModal()">
+              Create Section
+            </button>
+          </div>
         </div>
 
         <div class="project-table-wrap">
@@ -596,7 +654,8 @@
             </thead>
             <tbody>
               <template x-for="(section, idx) in sections" :key="section.id">
-                <tr @click="openSectionSeedModal(section, false)" class="cursor-pointer">
+                <tr @click="handleSectionRowClick(section)" class="cursor-pointer"
+                  :class="selectedSectionForPrincipleId === section.id ? 'bg-[rgba(241,196,15,0.14)]' : ''">
                   <td x-text="idx + 1"></td>
                   <td x-text="section.title || '-'"></td>
                   <td x-text="section.section_order ?? '-'"></td>
@@ -659,6 +718,138 @@
         <div class="project-empty" x-show="selectedChapterId && !loadingSections && sectionSeedList.length === 0">No
           section seed data found.</div>
         <div class="project-empty" x-show="loadingSections">Loading section seed list...</div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-header">
+          <h3 class="section-title">Principle list</h3>
+        </div>
+        <div class="project-table-wrap">
+          <table class="project-table" x-show="principleList.length > 0">
+            <thead>
+              <tr>
+                <th>Text</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="principle in principleList" :key="principle.id">
+                <tr>
+                  <td x-text="principle.text || '-'"></td>
+                  <td x-text="principle.type || '-'"></td>
+                  <td x-text="principle.status || '-'"></td>
+                  <td @click.stop>
+                    <button class="dark-theme-btn-primary px-3 py-1 text-xs"
+                      :disabled="approvingPrincipleId === principle.id || principle.status === 'approved'"
+                      @click="approvePrinciple(principle.id)">
+                      <span x-show="approvingPrincipleId !== principle.id">Approve</span>
+                      <span x-show="approvingPrincipleId === principle.id">Approving...</span>
+                    </button>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+        <div class="project-empty" x-show="!selectedSectionForPrincipleId">Select a section to view principle list.</div>
+        <div class="project-empty"
+          x-show="selectedSectionForPrincipleId && !loadingPrinciples && principleList.length === 0">No principles found.</div>
+        <div class="project-empty" x-show="loadingPrinciples">Loading principles...</div>
+        <div class="project-empty !text-red-400" x-show="principleError" x-text="principleError"></div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-header">
+          <h3 class="section-title">QA: System will help you generate some guided questions to get you started. Once you answer them, System will help you generate a central thesis</h3>
+          <button class="dark-theme-btn-primary px-4 py-2 text-sm" :disabled="!selectedSectionForPrincipleId || generatingQuestions"
+            @click="openGenerateQuestionModal()">
+            <span x-show="!generatingQuestions">Generate Questoin</span>
+            <span x-show="generatingQuestions">Generating...</span>
+          </button>
+        </div>
+        <div class="project-table-wrap qa-table-wrap">
+          <table class="project-table qa-table" x-show="qaList.length > 0">
+            <thead>
+              <tr>
+                <th class="qa-question-col">Question</th>
+                <th class="qa-answer-col">Answer</th>
+                <th class="qa-flag-col">Is Answered</th>
+                <th class="qa-order-col">QA Order</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="qa in qaList" :key="qa.id">
+                <tr>
+                  <td class="qa-question-col">
+                    <span class="long-text-preview" :class="expandedQaQuestions[qa.id] ? '' : 'clamped'" x-text="qa.question_text || '-'"></span>
+                    <button x-show="(qa.question_text || '').length > 120" @click.stop="toggleLongText(qa.id, expandedQaQuestions)"
+                      class="dark-theme-btn-primary px-2 py-1 text-xs ml-2">
+                      <span x-text="expandedQaQuestions[qa.id] ? 'Hide' : 'Show'"></span>
+                    </button>
+                  </td>
+                  <td class="qa-answer-col">
+                    <span class="long-text-preview" :class="expandedQaAnswers[qa.id] ? '' : 'clamped'" x-text="qa.answer_text || '-'"></span>
+                    <button x-show="(qa.answer_text || '').length > 120" @click.stop="toggleLongText(qa.id, expandedQaAnswers)"
+                      class="dark-theme-btn-primary px-2 py-1 text-xs ml-2">
+                      <span x-text="expandedQaAnswers[qa.id] ? 'Hide' : 'Show'"></span>
+                    </button>
+                  </td>
+                  <td class="qa-flag-col" x-text="qa.is_answered ? 'true' : 'false'"></td>
+                  <td class="qa-order-col" x-text="qa.qa_order ?? '-'"></td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+        <div class="project-empty" x-show="!selectedSectionForPrincipleId">Select a section to view QA list.</div>
+        <div class="project-empty" x-show="selectedSectionForPrincipleId && !loadingQA && qaList.length === 0">No QA found.</div>
+        <div class="project-empty" x-show="loadingQA">Loading QA...</div>
+        <div class="project-empty !text-red-400" x-show="qaError" x-text="qaError"></div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-header">
+          <h3 class="section-title">question answer list</h3>
+        </div>
+        <div class="project-table-wrap thesis-table-wrap">
+          <table class="project-table thesis-table" x-show="thesisList.length > 0">
+            <thead>
+              <tr>
+                <th class="thesis-version-col">Version</th>
+                <th class="thesis-text-col">Thesis Text</th>
+                <th class="thesis-action-col">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="thesis in thesisList" :key="thesis.id">
+                <tr>
+                  <td class="thesis-version-col" x-text="thesis.version ?? '-'"></td>
+                  <td class="thesis-text-col">
+                    <span class="long-text-preview" :class="expandedThesisTexts[thesis.id] ? '' : 'clamped'" x-text="thesis.thesis_text || '-'"></span>
+                    <button x-show="(thesis.thesis_text || '').length > 120" @click.stop="toggleLongText(thesis.id, expandedThesisTexts)"
+                      class="dark-theme-btn-primary px-2 py-1 text-xs ml-2">
+                      <span x-text="expandedThesisTexts[thesis.id] ? 'Hide' : 'Show'"></span>
+                    </button>
+                  </td>
+                  <td class="thesis-action-col" @click.stop>
+                    <button class="dark-theme-btn-primary px-3 py-1 text-xs"
+                      :disabled="selectingThesisId === thesis.id"
+                      @click="selectThesis(thesis.id)">
+                      <span x-show="selectingThesisId !== thesis.id">Submit</span>
+                      <span x-show="selectingThesisId === thesis.id">Submitting...</span>
+                    </button>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+        <div class="project-empty" x-show="!selectedSectionForPrincipleId">Select a section to view thesis list.</div>
+        <div class="project-empty" x-show="selectedSectionForPrincipleId && !loadingThesis && thesisList.length === 0">No thesis found.</div>
+        <div class="project-empty" x-show="loadingThesis">Loading thesis...</div>
+        <div class="project-empty !text-red-400" x-show="thesisError" x-text="thesisError"></div>
       </div>
 
       <div class="modal-backdrop" x-show="showCreateProjectModal" x-transition.opacity
@@ -813,6 +1004,64 @@
           </div>
         </div>
       </div>
+      <div class="modal-backdrop" x-show="showCreatePrincipleModal" x-transition.opacity @click="closeCreatePrincipleModal()">
+        <div class="create-project-modal" @click.stop>
+          <div class="flex items-start justify-between gap-3 mb-5">
+            <h4 class="text-2xl font-bold text-[#f1c40f]">Create Principle</h4>
+            <button class="text-[#8f9bb3] text-xl leading-none" @click="closeCreatePrincipleModal()">×</button>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Text</label>
+              <textarea rows="4" x-model.trim="principleText" placeholder="Enter principle text"
+                class="w-full p-3 dark-theme-input text-sm resize-none"></textarea>
+            </div>
+            <div>
+              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Type</label>
+              <select x-model="principleType" class="w-full p-3 dark-theme-input text-sm">
+                <option value="value">value</option>
+                <option value="workflow_standard">workflow_standard</option>
+                <option value="friction_point">friction_point</option>
+                <option value="judgment_rule">judgment_rule</option>
+                <option value="transformation_opportunity">transformation_opportunity</option>
+                <option value="others">others</option>
+              </select>
+            </div>
+            <p x-show="createPrincipleError" class="error-message mt-0" x-text="createPrincipleError"></p>
+            <button @click="submitPrinciple()" :disabled="creatingPrinciple" class="dark-theme-btn-primary w-full py-3 text-lg font-bold">
+              <span x-show="!creatingPrinciple">Submit</span>
+              <span x-show="creatingPrinciple">Submitting...</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-backdrop" x-show="showQAGenerateModal" x-transition.opacity>
+        <div class="create-project-modal upload-source-modal" style="max-height: 80vh; overflow-y: auto;" @click.stop>
+          <div class="flex items-start justify-between gap-3 mb-5">
+            <h4 class="text-2xl font-bold text-[#f1c40f]">Generated Questions</h4>
+            <button class="text-[#8f9bb3] text-xl leading-none" @click="closeQAGenerateModal()">×</button>
+          </div>
+          <div class="space-y-4">
+            <p x-show="qaModalError" class="error-message mt-0" x-text="qaModalError"></p>
+            <template x-for="(qa, idx) in generatedQuestions" :key="qa.id">
+              <div class="dark-theme-card p-3 space-y-2">
+                <p class="text-[#f1c40f] font-semibold text-sm" x-text="`Q${idx + 1}. ${qa.question_text || '-'}`"></p>
+                <div class="flex items-end gap-2">
+                  <textarea rows="3" x-model.trim="qaAnswerDrafts[qa.id]" placeholder="Type your answer"
+                    class="w-full p-3 dark-theme-input text-sm resize-none"></textarea>
+                  <button class="dark-theme-btn-primary px-3 py-2 text-xs whitespace-nowrap"
+                    :disabled="submittingQaAnswerId === qa.id"
+                    @click="submitQAAnswer(qa.id)">
+                    <span x-show="submittingQaAnswerId !== qa.id">Submit</span>
+                    <span x-show="submittingQaAnswerId === qa.id">Submitting...</span>
+                  </button>
+                </div>
+              </div>
+            </template>
+            <div class="project-empty" x-show="!generatingQuestions && generatedQuestions.length === 0">No generated questions found.</div>
+          </div>
+        </div>
+      </div>
       <div class="modal-backdrop" x-show="showViewSourcesModal" x-transition.opacity @click="closeViewSourcesModal()">
         <div class="create-project-modal upload-source-modal" @click.stop>
           <div class="flex items-start justify-between gap-3 mb-5">
@@ -959,6 +1208,7 @@
         createProjectError: "",
         chapters: [],
         selectedChapterId: "",
+        selectedSectionForPrincipleId: "",
         loadingChapters: false,
         chapterError: "",
         showCreateChapterModal: false,
@@ -990,6 +1240,31 @@
         sectionSeedTone: "analytical",
         sectionSeedError: "",
         submittingSectionSeed: false,
+        showCreatePrincipleModal: false,
+        principleText: "",
+        principleType: "value",
+        createPrincipleError: "",
+        creatingPrinciple: false,
+        principleList: [],
+        loadingPrinciples: false,
+        principleError: "",
+        approvingPrincipleId: "",
+        showQAGenerateModal: false,
+        generatedQuestions: [],
+        qaAnswerDrafts: {},
+        qaModalError: "",
+        generatingQuestions: false,
+        submittingQaAnswerId: "",
+        qaList: [],
+        loadingQA: false,
+        qaError: "",
+        expandedQaQuestions: {},
+        expandedQaAnswers: {},
+        thesisList: [],
+        loadingThesis: false,
+        thesisError: "",
+        expandedThesisTexts: {},
+        selectingThesisId: "",
         showViewSourcesModal: false,
         loadingProjectSources: false,
         projectSources: [],
@@ -1082,6 +1357,10 @@
               this.chapters = [];
               this.sections = [];
               this.sectionSeedList = [];
+              this.selectedSectionForPrincipleId = "";
+              this.principleList = [];
+              this.qaList = [];
+              this.thesisList = [];
               this.selectedChapterId = "";
             }
           } catch (err) {
@@ -1098,14 +1377,34 @@
           this.selectedChapterId = "";
           this.sections = [];
           this.sectionSeedList = [];
+          this.selectedSectionForPrincipleId = "";
+          this.principleList = [];
+          this.qaList = [];
+          this.thesisList = [];
           this.expandedAuthorSeeds = {};
           this.loadChapters();
         },
 
         selectChapter(chapterId) {
           this.selectedChapterId = chapterId || "";
+          this.selectedSectionForPrincipleId = "";
+          this.principleList = [];
+          this.principleError = "";
+          this.qaList = [];
+          this.qaError = "";
+          this.thesisList = [];
+          this.thesisError = "";
           this.expandedAuthorSeeds = {};
           this.loadSections();
+        },
+
+        handleSectionRowClick(section) {
+          if (!section || !section.id) return;
+          this.selectedSectionForPrincipleId = section.id;
+          this.openSectionSeedModal(section, false);
+          this.loadPrinciples();
+          this.loadSectionQA();
+          this.loadSectionThesis();
         },
 
         openCreateProjectModal() {
@@ -1189,6 +1488,104 @@
           this.submittingSectionSeed = false;
         },
 
+        openCreatePrincipleModal() {
+          if (!this.selectedSectionForPrincipleId || !this.selectedProjectId || !this.selectedChapterId) return;
+          this.showCreatePrincipleModal = true;
+          this.principleText = "";
+          this.principleType = "value";
+          this.createPrincipleError = "";
+        },
+
+        closeCreatePrincipleModal() {
+          this.showCreatePrincipleModal = false;
+          this.principleText = "";
+          this.principleType = "value";
+          this.createPrincipleError = "";
+          this.creatingPrinciple = false;
+        },
+
+        async openGenerateQuestionModal() {
+          if (!this.selectedSectionForPrincipleId) return;
+          this.showQAGenerateModal = true;
+          this.generatingQuestions = true;
+          this.qaModalError = "";
+          this.generatedQuestions = [];
+          this.qaAnswerDrafts = {};
+          try {
+            const headers = this.getAuthHeaders();
+            if (!headers) return;
+            const res = await fetch(`${API_BASE_URL}/bookbuilder/sections/${this.selectedSectionForPrincipleId}/qa/generate`, {
+              method: "POST",
+              headers,
+            });
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
+            if (!res.ok) throw new Error("Failed to generate questions");
+            const data = await res.json();
+            this.generatedQuestions = Array.isArray(data) ? data : [];
+            this.generatedQuestions.forEach((qa) => {
+              this.qaAnswerDrafts[qa.id] = qa.answer_text || "";
+            });
+          } catch (err) {
+            this.qaModalError = err.message || "Unable to generate questions";
+          } finally {
+            this.generatingQuestions = false;
+          }
+        },
+
+        async submitQAAnswer(questionId) {
+          if (!questionId) return;
+          const answer = (this.qaAnswerDrafts[questionId] || "").trim();
+          if (!answer) {
+            this.qaModalError = "Answer is required before submit.";
+            return;
+          }
+          this.submittingQaAnswerId = questionId;
+          this.qaModalError = "";
+          try {
+            const headers = this.getAuthHeaders({ "Content-Type": "application/json" });
+            if (!headers) return;
+            const res = await fetch(`${API_BASE_URL}/bookbuilder/qa/${questionId}/answer`, {
+              method: "PUT",
+              headers,
+              body: JSON.stringify({ answer }),
+            });
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
+            if (!res.ok) throw new Error("Failed to submit answer");
+            const data = await res.json().catch(() => ({}));
+            this.generatedQuestions = this.generatedQuestions.map((qa) => {
+              if (qa.id !== questionId) return qa;
+              return {
+                ...qa,
+                answer_text: data.answer_text || answer,
+                is_answered: data.is_answered === true,
+              };
+            });
+            this.triggerSuccessToast("Answer submitted successfully");
+          } catch (err) {
+            this.qaModalError = err.message || "Unable to submit answer";
+          } finally {
+            this.submittingQaAnswerId = "";
+          }
+        },
+
+        async closeQAGenerateModal() {
+          this.showQAGenerateModal = false;
+          this.generatingQuestions = false;
+          this.submittingQaAnswerId = "";
+          this.generatedQuestions = [];
+          this.qaAnswerDrafts = {};
+          this.qaModalError = "";
+          await this.loadSectionQA();
+          await this.generateSectionThesis();
+          await this.loadSectionThesis();
+        },
+
         authorSeedPreview(value, sectionId) {
           const text = value || "";
           if (this.expandedAuthorSeeds[sectionId] || text.length <= 80) {
@@ -1202,6 +1599,17 @@
             ...this.expandedAuthorSeeds,
             [sectionId]: !this.expandedAuthorSeeds[sectionId],
           };
+        },
+
+        previewLongText(value, id, stateMap) {
+          const text = value || "";
+          if (!text) return "-";
+          if (stateMap[id] || text.length <= 120) return text;
+          return `${text.slice(0, 120)}...`;
+        },
+
+        toggleLongText(id, stateMap) {
+          stateMap[id] = !stateMap[id];
         },
 
         async openViewSourcesModal() {
@@ -1364,6 +1772,10 @@
           if (!this.selectedChapterId) {
             this.sections = [];
             this.sectionSeedList = [];
+            this.selectedSectionForPrincipleId = "";
+            this.principleList = [];
+            this.qaList = [];
+            this.thesisList = [];
             return;
           }
           this.loadingSections = true;
@@ -1382,12 +1794,238 @@
             const data = await res.json();
             this.sections = Array.isArray(data) ? data : [];
             this.sectionSeedList = this.sections;
+            const hasSelectedSection = this.sections.some((section) => section.id === this.selectedSectionForPrincipleId);
+            if (!hasSelectedSection) {
+              this.selectedSectionForPrincipleId = "";
+              this.principleList = [];
+              this.principleError = "";
+              this.qaList = [];
+              this.qaError = "";
+              this.thesisList = [];
+              this.thesisError = "";
+            }
           } catch (err) {
             this.sectionError = err.message || "Unable to load sections";
             this.sections = [];
             this.sectionSeedList = [];
+            this.selectedSectionForPrincipleId = "";
+            this.principleList = [];
+            this.qaList = [];
+            this.thesisList = [];
           } finally {
             this.loadingSections = false;
+          }
+        },
+
+        async loadSectionQA() {
+          if (!this.selectedSectionForPrincipleId) {
+            this.qaList = [];
+            this.qaError = "";
+            return;
+          }
+          this.loadingQA = true;
+          this.qaError = "";
+          this.qaList = [];
+          this.expandedQaQuestions = {};
+          this.expandedQaAnswers = {};
+          try {
+            const headers = this.getAuthHeaders();
+            if (!headers) return;
+            const res = await fetch(`${API_BASE_URL}/bookbuilder/sections/${this.selectedSectionForPrincipleId}/qa`, { headers });
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
+            if (!res.ok) throw new Error("Failed to fetch QA");
+            const data = await res.json();
+            this.qaList = Array.isArray(data) ? data : [];
+          } catch (err) {
+            this.qaError = err.message || "Unable to load QA";
+            this.qaList = [];
+          } finally {
+            this.loadingQA = false;
+          }
+        },
+
+        async generateSectionThesis() {
+          if (!this.selectedSectionForPrincipleId) return;
+          try {
+            const headers = this.getAuthHeaders();
+            if (!headers) return;
+            const res = await fetch(`${API_BASE_URL}/bookbuilder/sections/${this.selectedSectionForPrincipleId}/thesis`, {
+              method: "POST",
+              headers,
+            });
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
+            if (!res.ok) throw new Error("Failed to generate thesis");
+          } catch (err) {
+            this.thesisError = err.message || "Unable to generate thesis";
+          }
+        },
+
+        async loadSectionThesis() {
+          if (!this.selectedSectionForPrincipleId) {
+            this.thesisList = [];
+            this.thesisError = "";
+            return;
+          }
+          this.loadingThesis = true;
+          this.thesisError = "";
+          this.thesisList = [];
+          this.expandedThesisTexts = {};
+          try {
+            const headers = this.getAuthHeaders();
+            if (!headers) return;
+            const res = await fetch(`${API_BASE_URL}/bookbuilder/sections/${this.selectedSectionForPrincipleId}/thesis`, { headers });
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
+            if (!res.ok) throw new Error("Failed to fetch thesis");
+            const data = await res.json();
+            this.thesisList = Array.isArray(data) ? data : [];
+          } catch (err) {
+            this.thesisError = err.message || "Unable to load thesis";
+            this.thesisList = [];
+          } finally {
+            this.loadingThesis = false;
+          }
+        },
+
+        async loadPrinciples() {
+          if (!this.selectedSectionForPrincipleId) {
+            this.principleList = [];
+            this.principleError = "";
+            return;
+          }
+          this.loadingPrinciples = true;
+          this.principleError = "";
+          this.principleList = [];
+          try {
+            const headers = this.getAuthHeaders();
+            if (!headers) return;
+            const res = await fetch(`${API_BASE_URL}/bookbuilder/sections/${this.selectedSectionForPrincipleId}/principles`, {
+              headers,
+            });
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
+            if (!res.ok) throw new Error("Failed to fetch principles");
+            const data = await res.json();
+            this.principleList = Array.isArray(data) ? data : [];
+          } catch (err) {
+            this.principleError = err.message || "Unable to load principles";
+            this.principleList = [];
+          } finally {
+            this.loadingPrinciples = false;
+          }
+        },
+
+        async submitPrinciple() {
+          if (!this.selectedProjectId) {
+            this.createPrincipleError = "Please select a project";
+            return;
+          }
+          if (!this.selectedChapterId) {
+            this.createPrincipleError = "Please select a chapter";
+            return;
+          }
+          if (!this.selectedSectionForPrincipleId) {
+            this.createPrincipleError = "Please select a section";
+            return;
+          }
+          if (!this.principleText) {
+            this.createPrincipleError = "Text is required";
+            return;
+          }
+
+          this.creatingPrinciple = true;
+          this.createPrincipleError = "";
+          try {
+            const headers = this.getAuthHeaders({ "Content-Type": "application/json" });
+            if (!headers) return;
+            const payload = {
+              project_id: this.selectedProjectId,
+              chapter_id: this.selectedChapterId,
+              text: this.principleText,
+              type: this.principleType,
+            };
+            const res = await fetch(`${API_BASE_URL}/bookbuilder/sections/${this.selectedSectionForPrincipleId}/principles`, {
+              method: "POST",
+              headers,
+              body: JSON.stringify(payload),
+            });
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
+            if (!res.ok) {
+              const errorJson = await res.json().catch(() => ({}));
+              throw new Error(errorJson.detail || "Failed to create principle");
+            }
+            this.closeCreatePrincipleModal();
+            await this.loadPrinciples();
+            this.triggerSuccessToast("Principle created successfully");
+          } catch (err) {
+            this.createPrincipleError = err.message || "Unable to create principle";
+          } finally {
+            this.creatingPrinciple = false;
+          }
+        },
+
+        async approvePrinciple(principleId) {
+          if (!principleId) return;
+          this.approvingPrincipleId = principleId;
+          try {
+            const headers = this.getAuthHeaders();
+            if (!headers) return;
+            const res = await fetch(`${API_BASE_URL}/bookbuilder/principles/${principleId}/approve`, {
+              method: "PUT",
+              headers,
+            });
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
+            if (!res.ok) {
+              const errorJson = await res.json().catch(() => ({}));
+              throw new Error(errorJson.detail || "Failed to approve principle");
+            }
+            await this.loadPrinciples();
+            this.triggerSuccessToast("Principle approved successfully");
+          } catch (err) {
+            this.principleError = err.message || "Unable to approve principle";
+          } finally {
+            this.approvingPrincipleId = "";
+          }
+        },
+
+        async selectThesis(thesisId) {
+          if (!thesisId || !this.selectedSectionForPrincipleId) return;
+          this.selectingThesisId = thesisId;
+          try {
+            const headers = this.getAuthHeaders();
+            if (!headers) return;
+            const res = await fetch(`${API_BASE_URL}/bookbuilder/sections/${this.selectedSectionForPrincipleId}/thesis/${thesisId}/select`, {
+              method: "PUT",
+              headers,
+            });
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
+            if (!res.ok) throw new Error("Failed to submit thesis");
+            await this.loadSections();
+            await this.loadSectionThesis();
+            this.triggerSuccessToast("Thesis selected successfully");
+          } catch (err) {
+            this.thesisError = err.message || "Unable to submit thesis";
+          } finally {
+            this.selectingThesisId = "";
           }
         },
 
