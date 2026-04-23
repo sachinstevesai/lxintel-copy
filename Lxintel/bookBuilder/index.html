@@ -722,7 +722,7 @@
 
       <div class="section-card">
         <div class="section-header">
-          <h3 class="section-title">Principle list</h3>
+          <h3 class="section-title">Principle list ( only approved ones will be used in thesis generation)</h3>
         </div>
         <div class="project-table-wrap">
           <table class="project-table" x-show="principleList.length > 0">
@@ -765,7 +765,7 @@
           <h3 class="section-title">QA: System will help you generate some guided questions to get you started. Once you answer them, System will help you generate a central thesis</h3>
           <button class="dark-theme-btn-primary px-4 py-2 text-sm" :disabled="!selectedSectionForPrincipleId || generatingQuestions"
             @click="openGenerateQuestionModal()">
-            <span x-show="!generatingQuestions">Generate Questoin</span>
+            <span x-show="!generatingQuestions">Generate New Questions</span>
             <span x-show="generatingQuestions">Generating...</span>
           </button>
         </div>
@@ -811,7 +811,7 @@
 
       <div class="section-card">
         <div class="section-header">
-          <h3 class="section-title">question answer list</h3>
+          <h3 class="section-title">List Generated Thesis</h3>
         </div>
         <div class="project-table-wrap thesis-table-wrap">
           <table class="project-table thesis-table" x-show="thesisList.length > 0">
@@ -956,6 +956,7 @@
               <input type="file" accept=".pdf,.docx,.txt" class="w-full p-3 dark-theme-input text-sm"
                 :disabled="uploadSourceText.trim().length > 0" @change="handleSourceFileChange($event)" />
             </div>
+            <div class="text-center text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">OR</div>
             <div>
               <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Text Input</label>
               <textarea rows="5" x-model="uploadSourceText" placeholder="Paste or type source text"
