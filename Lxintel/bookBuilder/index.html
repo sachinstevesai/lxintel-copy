@@ -406,6 +406,21 @@
       word-break: break-word;
     }
 
+    .section-seed-table th,
+    .section-seed-table td {
+      white-space: normal;
+      vertical-align: top;
+    }
+
+    .section-seed-current-thesis {
+      width: 180px;
+      max-width: 180px;
+    }
+
+    .section-seed-current-thesis .long-text-preview {
+      max-width: 170px;
+    }
+
     .project-empty {
       padding: 24px 16px;
       text-align: center;
@@ -726,7 +741,7 @@
           <h3 class="section-title">Section Seed List</h3>
         </div>
         <div class="project-table-wrap">
-          <table class="project-table" x-show="sectionSeedList.length > 0">
+          <table class="project-table section-seed-table" x-show="sectionSeedList.length > 0">
             <thead>
               <tr>
                 <th>No</th>
@@ -734,7 +749,7 @@
                 <th>Section Order</th>
                 <th>Author Seed</th>
                 <th>Tone</th>
-                <th>Current Thesis</th>
+                <th class="section-seed-current-thesis">Current Thesis</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -752,8 +767,10 @@
                     </button>
                   </td>
                   <td x-text="section.tone || '-'"></td>
-                  <td>
-                    <span x-text="section.current_thesis || '-'"></span>
+                  <td class="section-seed-current-thesis">
+                    <span class="long-text-preview"
+                      :class="expandedCurrentThesis[section.id] ? '' : 'clamped'"
+                      x-text="section.current_thesis || '-'"></span>
                     <button x-show="(section.current_thesis || '').length > 80" @click.stop="toggleCurrentThesis(section.id)"
                       class="dark-theme-btn-primary px-2 py-1 text-xs ml-2">
                       <span x-text="expandedCurrentThesis[section.id] ? 'Hide' : 'Show'"></span>
@@ -1063,6 +1080,11 @@
             <button class="text-[#8f9bb3] text-xl leading-none" @click="closeSectionSeedModal()">×</button>
           </div>
           <div class="space-y-4">
+            <div x-show="sectionSeedEditMode">
+              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Title</label>
+              <input type="text" x-model.trim="sectionSeedTitle" placeholder="Enter title"
+                class="w-full p-3 dark-theme-input text-sm" />
+            </div>
             <div>
               <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Author Seed</label>
               <textarea rows="5" x-model.trim="sectionSeedAuthorSeed" placeholder="Enter author seed"
@@ -1337,6 +1359,7 @@
         sections: [],
         sectionSeedList: [],
         expandedAuthorSeeds: {},
+        expandedCurrentThesis: {},
         loadingSections: false,
         sectionError: "",
         showCreateSectionModal: false,
@@ -1355,6 +1378,7 @@
         showSectionSeedModal: false,
         sectionSeedEditMode: false,
         selectedSectionId: "",
+        sectionSeedTitle: "",
         sectionSeedAuthorSeed: "",
         sectionSeedTone: "analytical",
         sectionSeedError: "",
@@ -1514,6 +1538,7 @@
           this.thesisList = [];
           this.draftList = [];
           this.expandedAuthorSeeds = {};
+          this.expandedCurrentThesis = {};
           this.loadChapters();
         },
 
@@ -1529,6 +1554,7 @@
           this.draftList = [];
           this.draftError = "";
           this.expandedAuthorSeeds = {};
+          this.expandedCurrentThesis = {};
           this.loadSections();
         },
 
@@ -1603,9 +1629,11 @@
           this.selectedSectionId = section.id;
           this.sectionSeedEditMode = !!editMode;
           if (this.sectionSeedEditMode) {
+            this.sectionSeedTitle = section.title || "";
             this.sectionSeedAuthorSeed = section.author_seed || "";
             this.sectionSeedTone = section.tone || "analytical";
           } else {
+            this.sectionSeedTitle = "";
             this.sectionSeedAuthorSeed = "";
             this.sectionSeedTone = "analytical";
           }
@@ -1617,6 +1645,7 @@
           this.showSectionSeedModal = false;
           this.sectionSeedEditMode = false;
           this.selectedSectionId = "";
+          this.sectionSeedTitle = "";
           this.sectionSeedAuthorSeed = "";
           this.sectionSeedTone = "analytical";
           this.sectionSeedError = "";
@@ -1733,6 +1762,13 @@
           this.expandedAuthorSeeds = {
             ...this.expandedAuthorSeeds,
             [sectionId]: !this.expandedAuthorSeeds[sectionId],
+          };
+        },
+
+        toggleCurrentThesis(sectionId) {
+          this.expandedCurrentThesis = {
+            ...this.expandedCurrentThesis,
+            [sectionId]: !this.expandedCurrentThesis[sectionId],
           };
         },
 
@@ -1930,6 +1966,7 @@
             const data = await res.json();
             this.sections = Array.isArray(data) ? data : [];
             this.sectionSeedList = this.sections;
+            this.expandedCurrentThesis = {};
             const hasSelectedSection = this.sections.some((section) => section.id === this.selectedSectionForPrincipleId);
             if (!hasSelectedSection) {
               this.selectedSectionForPrincipleId = "";
@@ -2313,10 +2350,14 @@
               ? `${API_BASE_URL}/bookbuilder/sections/${this.selectedSectionId}`
               : `${API_BASE_URL}/bookbuilder/sections/${this.selectedSectionId}/seed`;
             const method = isEditMode ? "PUT" : "POST";
-            const body = JSON.stringify({
+            const payload = {
               author_seed: this.sectionSeedAuthorSeed,
               tone: this.sectionSeedTone,
-            });
+            };
+            if (isEditMode) {
+              payload.title = this.sectionSeedTitle;
+            }
+            const body = JSON.stringify(payload);
 
             const res = await fetch(endpoint, {
               method,
