@@ -356,6 +356,56 @@
       overflow: hidden;
     }
 
+    .draft-cards-wrap {
+      padding: 14px 16px;
+      max-height: 360px;
+      overflow-y: auto;
+    }
+
+    .draft-cards-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    }
+
+    .draft-card {
+      position: relative;
+      border: 1px solid rgba(241, 196, 15, 0.22);
+      border-radius: 10px;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.35);
+      cursor: pointer;
+    }
+
+    .draft-card:hover {
+      border-color: rgba(241, 196, 15, 0.5);
+      background: rgba(241, 196, 15, 0.06);
+    }
+
+    .draft-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(241, 196, 15, 0.18);
+      color: #f1c40f;
+      border: 1px solid rgba(241, 196, 15, 0.35);
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 700;
+    }
+
+    .draft-preview {
+      color: #d6d6d6;
+      font-size: 13px;
+      line-height: 1.45;
+      margin-top: 24px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
     .project-empty {
       padding: 24px 16px;
       text-align: center;
@@ -684,7 +734,7 @@
                 <th>Section Order</th>
                 <th>Author Seed</th>
                 <th>Tone</th>
-                <th>Current Thesis ID</th>
+                <th>Current Thesis</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -702,7 +752,13 @@
                     </button>
                   </td>
                   <td x-text="section.tone || '-'"></td>
-                  <td x-text="section.current_thesis_id || '-'"></td>
+                  <td>
+                    <span x-text="section.current_thesis || '-'"></span>
+                    <button x-show="(section.current_thesis || '').length > 80" @click.stop="toggleCurrentThesis(section.id)"
+                      class="dark-theme-btn-primary px-2 py-1 text-xs ml-2">
+                      <span x-text="expandedCurrentThesis[section.id] ? 'Hide' : 'Show'"></span>
+                    </button>
+                  </td>
                   <td @click.stop>
                     <button class="dark-theme-btn-primary px-3 py-1 text-xs"
                       @click="openSectionSeedModal(section, true)">
@@ -850,6 +906,33 @@
         <div class="project-empty" x-show="selectedSectionForPrincipleId && !loadingThesis && thesisList.length === 0">No thesis found.</div>
         <div class="project-empty" x-show="loadingThesis">Loading thesis...</div>
         <div class="project-empty !text-red-400" x-show="thesisError" x-text="thesisError"></div>
+      </div>
+
+      <div class="section-card" style="scrollbar-width: thin; scrollbar-color: rgba(241, 196, 15, 0.35) #1a1a1a;">
+        <div class="section-header">
+          <h3 class="section-title">Draft</h3>
+          <button class="dark-theme-btn-primary px-4 py-2 text-sm" :disabled="!selectedSectionForPrincipleId || generatingDraft"
+            @click="generateDraft()">
+            <span x-show="!generatingDraft">Generate Draft</span>
+            <span x-show="generatingDraft">Generating...</span>
+          </button>
+        </div>
+        <div class="draft-cards-wrap" x-show="draftList.length > 0">
+          <div class="draft-cards-grid">
+            <template x-for="draft in draftList" :key="draft.draft_id">
+              <div class="draft-card" @click="openDraftDetailModal(draft.draft_id)">
+                <span class="draft-badge" x-text="draft.generation_type || '-'"></span>
+                <div class="draft-preview"
+                  x-text="(draft.preview || draft.generated_draft || draft.content || draft[''] || '-').slice(0, 260) + ((draft.preview || draft.generated_draft || draft.content || draft[''] || '').length > 260 ? '...' : '')">
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+        <div class="project-empty" x-show="!selectedSectionForPrincipleId">Select a section to view drafts.</div>
+        <div class="project-empty" x-show="selectedSectionForPrincipleId && !loadingDrafts && draftList.length === 0">No drafts found.</div>
+        <div class="project-empty" x-show="loadingDrafts">Loading drafts...</div>
+        <div class="project-empty !text-red-400" x-show="draftError" x-text="draftError"></div>
       </div>
 
       <div class="modal-backdrop" x-show="showCreateProjectModal" x-transition.opacity
@@ -1063,6 +1146,41 @@
           </div>
         </div>
       </div>
+      <div class="modal-backdrop" x-show="showDraftDetailModal" x-transition.opacity>
+        <div class="create-project-modal upload-source-modal" style="max-height: 82vh; overflow-y: auto;" @click.stop>
+          <div class="flex items-start justify-between gap-3 mb-5">
+            <h4 class="text-2xl font-bold text-[#f1c40f]">Draft Detail</h4>
+            <button class="text-[#8f9bb3] text-xl leading-none" @click="closeDraftDetailModal()">×</button>
+          </div>
+          <div class="space-y-4">
+            <p x-show="draftDetailError" class="error-message mt-0" x-text="draftDetailError"></p>
+            <div class="project-empty" x-show="loadingDraftDetail">Loading draft detail...</div>
+            <template x-if="!loadingDraftDetail && draftDetail">
+              <div class="space-y-3">
+                <div><span class="text-[#a9a9a9] text-xs uppercase">Version:</span> <span x-text="draftDetail.version ?? '-'"></span></div>
+                <div><span class="text-[#a9a9a9] text-xs uppercase">Created At:</span> <span x-text="formatDate(draftDetail.created_at)"></span></div>
+                <div><span class="text-[#a9a9a9] text-xs uppercase">Author Seed Snapshot:</span> <span x-text="draftDetail.author_seed_snapshot || '-'"></span></div>
+                <div><span class="text-[#a9a9a9] text-xs uppercase">Tone Snapshot:</span> <span x-text="draftDetail.tone_snapshot || '-'"></span></div>
+                <div><span class="text-[#a9a9a9] text-xs uppercase">Generation Type:</span> <span x-text="draftDetail.generation_type || '-'"></span></div>
+                <div><span class="text-[#a9a9a9] text-xs uppercase">AI Density:</span> <span x-text="draftDetail.ai_density ?? '-'"></span></div>
+                <div>
+                  <div class="text-[#a9a9a9] text-xs uppercase mb-1">Content:</div>
+                  <div class="draft-preview" x-text="showFullDraftContent ? (draftDetail.content || '-') : previewLongText(draftDetail.content, draftDetail.draft_id || 'draft-content', {})"></div>
+                  <button x-show="(draftDetail.content || '').length > 120" @click="showFullDraftContent = !showFullDraftContent"
+                    class="dark-theme-btn-primary px-2 py-1 text-xs mt-2">
+                    <span x-text="showFullDraftContent ? 'Hide' : 'Show'"></span>
+                  </button>
+                </div>
+                <button class="dark-theme-btn-primary w-full py-3 text-lg font-bold" :disabled="regeneratingDraft"
+                  @click="regenerateDraftFromModal()">
+                  <span x-show="!regeneratingDraft">Regenerate</span>
+                  <span x-show="regeneratingDraft">Regenerating...</span>
+                </button>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
       <div class="modal-backdrop" x-show="showViewSourcesModal" x-transition.opacity @click="closeViewSourcesModal()">
         <div class="create-project-modal upload-source-modal" @click.stop>
           <div class="flex items-start justify-between gap-3 mb-5">
@@ -1266,6 +1384,17 @@
         thesisError: "",
         expandedThesisTexts: {},
         selectingThesisId: "",
+        draftList: [],
+        loadingDrafts: false,
+        draftError: "",
+        generatingDraft: false,
+        showDraftDetailModal: false,
+        selectedDraftId: "",
+        draftDetail: null,
+        loadingDraftDetail: false,
+        draftDetailError: "",
+        showFullDraftContent: false,
+        regeneratingDraft: false,
         showViewSourcesModal: false,
         loadingProjectSources: false,
         projectSources: [],
@@ -1362,6 +1491,7 @@
               this.principleList = [];
               this.qaList = [];
               this.thesisList = [];
+              this.draftList = [];
               this.selectedChapterId = "";
             }
           } catch (err) {
@@ -1382,6 +1512,7 @@
           this.principleList = [];
           this.qaList = [];
           this.thesisList = [];
+          this.draftList = [];
           this.expandedAuthorSeeds = {};
           this.loadChapters();
         },
@@ -1395,6 +1526,8 @@
           this.qaError = "";
           this.thesisList = [];
           this.thesisError = "";
+          this.draftList = [];
+          this.draftError = "";
           this.expandedAuthorSeeds = {};
           this.loadSections();
         },
@@ -1406,6 +1539,7 @@
           this.loadPrinciples();
           this.loadSectionQA();
           this.loadSectionThesis();
+          this.loadDrafts();
         },
 
         openCreateProjectModal() {
@@ -1777,6 +1911,7 @@
             this.principleList = [];
             this.qaList = [];
             this.thesisList = [];
+            this.draftList = [];
             return;
           }
           this.loadingSections = true;
@@ -1804,6 +1939,8 @@
               this.qaError = "";
               this.thesisList = [];
               this.thesisError = "";
+              this.draftList = [];
+              this.draftError = "";
             }
           } catch (err) {
             this.sectionError = err.message || "Unable to load sections";
@@ -1813,6 +1950,7 @@
             this.principleList = [];
             this.qaList = [];
             this.thesisList = [];
+            this.draftList = [];
           } finally {
             this.loadingSections = false;
           }
@@ -1893,6 +2031,127 @@
             this.thesisList = [];
           } finally {
             this.loadingThesis = false;
+          }
+        },
+
+        async generateDraft() {
+          if (!this.selectedSectionForPrincipleId) return;
+          this.generatingDraft = true;
+          this.draftError = "";
+          try {
+            const headers = this.getAuthHeaders();
+            if (!headers) return;
+            const res = await fetch(`${API_BASE_URL}/bookbuilder/sections/${this.selectedSectionForPrincipleId}/drafts`, {
+              method: "POST",
+              headers,
+            });
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
+            if (!res.ok) throw new Error("Failed to generate draft");
+            await this.loadDrafts();
+            this.triggerSuccessToast("Draft generated successfully");
+          } catch (err) {
+            this.draftError = err.message || "Unable to generate draft";
+          } finally {
+            this.generatingDraft = false;
+          }
+        },
+
+        async loadDrafts() {
+          if (!this.selectedSectionForPrincipleId) {
+            this.draftList = [];
+            this.draftError = "";
+            return;
+          }
+          this.loadingDrafts = true;
+          this.draftError = "";
+          this.draftList = [];
+          try {
+            const headers = this.getAuthHeaders();
+            if (!headers) return;
+            const res = await fetch(`${API_BASE_URL}/bookbuilder/sections/${this.selectedSectionForPrincipleId}/drafts`, { headers });
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
+            if (!res.ok) throw new Error("Failed to fetch drafts");
+            const data = await res.json();
+            this.draftList = Array.isArray(data) ? data : [];
+          } catch (err) {
+            this.draftError = err.message || "Unable to load drafts";
+            this.draftList = [];
+          } finally {
+            this.loadingDrafts = false;
+          }
+        },
+
+        async openDraftDetailModal(draftId) {
+          if (!draftId) return;
+          this.showDraftDetailModal = true;
+          this.selectedDraftId = draftId;
+          this.loadingDraftDetail = true;
+          this.draftDetail = null;
+          this.draftDetailError = "";
+          this.showFullDraftContent = false;
+          try {
+            const headers = this.getAuthHeaders();
+            if (!headers) return;
+            const res = await fetch(`${API_BASE_URL}/bookbuilder/drafts/${draftId}`, { headers });
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
+            if (!res.ok) throw new Error("Failed to fetch draft detail");
+            const data = await res.json();
+            this.draftDetail = data || null;
+          } catch (err) {
+            this.draftDetailError = err.message || "Unable to load draft detail";
+          } finally {
+            this.loadingDraftDetail = false;
+          }
+        },
+
+        async closeDraftDetailModal() {
+          this.showDraftDetailModal = false;
+          this.selectedDraftId = "";
+          this.draftDetail = null;
+          this.loadingDraftDetail = false;
+          this.draftDetailError = "";
+          this.showFullDraftContent = false;
+          this.regeneratingDraft = false;
+          await this.loadDrafts();
+        },
+
+        async regenerateDraftFromModal() {
+          if (!this.selectedSectionForPrincipleId) return;
+          this.regeneratingDraft = true;
+          this.draftDetailError = "";
+          try {
+            const headers = this.getAuthHeaders();
+            if (!headers) return;
+            const res = await fetch(`${API_BASE_URL}/bookbuilder/sections/${this.selectedSectionForPrincipleId}/drafts/regenerate`, {
+              method: "POST",
+              headers,
+            });
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
+            if (!res.ok) throw new Error("Failed to regenerate draft");
+            await this.loadDrafts();
+            this.showDraftDetailModal = false;
+            this.selectedDraftId = "";
+            this.draftDetail = null;
+            this.loadingDraftDetail = false;
+            this.draftDetailError = "";
+            this.showFullDraftContent = false;
+            this.triggerSuccessToast("Draft regenerated successfully");
+          } catch (err) {
+            this.draftDetailError = err.message || "Unable to regenerate draft";
+          } finally {
+            this.regeneratingDraft = false;
           }
         },
 
