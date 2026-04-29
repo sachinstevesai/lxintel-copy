@@ -1012,7 +1012,7 @@
                       <div x-show="item.weak_areas && item.weak_areas.length">
                         <div class="text-[#f1c40f] font-semibold text-sm mb-1">
                           Weak areas
-                          <<<<<<< Updated upstream </div>
+                          </div>
                             <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
                               <template x-for="(v, i) in item.weak_areas" :key="i">
                                 <li x-text="v"></li>
@@ -1168,11 +1168,11 @@
                         <div x-show="item.created_at">
                           <div class="text-[#f1c40f] font-semibold text-sm mb-1">
                             Created at
-                            >>>>>>> Stashed changes
+                            
                           </div>
                           <div class="text-[#ddd] text-sm" x-text="item.created_at"></div>
                         </div>
-                        <<<<<<< Updated upstream <div x-show="story.content || story.text || story.story_text"
+                        <div x-show="story.content || story.text || story.story_text"
                           class="text-[#ddd] text-sm leading-6 break-words text-left">
                           <span class="text-left"
                             x-text="(story.content || story.text || story.story_text || '-').trim()"></span>
@@ -1186,8 +1186,7 @@
                         <span :class="story.approved ? 'text-green-500' : 'text-yellow-500'" class="font-semibold"
                           x-text="story.approved ? 'Approved' : 'Pending'"></span>
                       </div>
-                      =======
-                      >>>>>>> Stashed changes
+                      
                     </div>
                   </template>
                 </div>
@@ -1261,7 +1260,7 @@
                           </button>
                         </td>
                         <td x-text="item.chapter_count_estimate"></td>
-                        <<<<<<< Updated upstream </tr>
+                        </tr>
                     </template>
                   </tbody>
                 </table>
@@ -1270,7 +1269,6 @@
                 </div>
                 <div class="project-empty" x-show="loadingStructures">
                   Loading structures...
-                  =======
                   </tr>
                   </template>
                   </tbody>
@@ -1365,7 +1363,7 @@
                     <div class="project-empty" x-show="loadingChapterCards">
                       Loading chapter cards...
                     </div>
-                    >>>>>>> Stashed changes
+                  
                   </div>
                 </div>
               </div>
@@ -1641,6 +1639,7 @@
               expandedStoryTexts: {},
               generatingStories: false,
               approvingStoryId: "",
+
               chapterCards: [],
               loadingChapterCards: false,
               expandedChapterSummary: {},
