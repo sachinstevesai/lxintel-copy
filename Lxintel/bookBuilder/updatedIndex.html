@@ -19,6 +19,17 @@
     };
   </script>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: { fontFamily: { sans: ["Montserrat", "system-ui"] } },
+      },
+    };
+  </script>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
   <style>
     body,
@@ -38,6 +49,28 @@
       background-size: cover;
       background-position: center top 150px;
       z-index: -2;
+    }
+
+    .video-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-image: url("https://static.vecteezy.com/system/resources/previews/007/596/744/non_2x/abstract-digital-glossy-particles-and-lines-connected-3d-illustration-on-black-background-free-photo.jpg");
+      background-size: cover;
+      background-position: center top 150px;
+      z-index: -2;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.75);
+      z-index: -1;
     }
 
     .overlay {
@@ -328,6 +361,12 @@
     .qa-table-wrap,
     .thesis-table-wrap {
       max-height: 340px;
+      overflow-y: auto;
+      overflow-x: auto;
+    }
+
+    .chapter-cards-table-wrap {
+      height: 300px;
       overflow-y: auto;
       overflow-x: auto;
     }
@@ -628,59 +667,64 @@
   <div class="video-background"></div>
   <div class="overlay"></div>
 
-  <div class="w-full max-w-[40rem] relative z-10 mx-auto mt-6 md:mt-10" x-data="loginApp()" x-show="!loggedIn">
-    <div class="header-text">
-      <img src="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
-        alt="Ramos Law Book Builder" />
-      <h1>Ramos Law Book Builder</h1>
-      <p>Secure Access for Authorized Ramos Law Users</p>
-    </div>
+  <body class="min-h-screen p-4">
+    <div class="video-background"></div>
+    <div class="overlay"></div>
 
-    <div class="dark-theme-card p-6 space-y-5">
-      <h2 class="text-[36px] font-extrabold uppercase tracking-[0.5px] text-center text-[#f1c40f] mt-0 mb-0">
-        Login
-      </h2>
-
-      <div>
-        <label class="block text-[#f1c40f] font-semibold mb-2">Email</label>
-        <input type="email" placeholder="Enter your email" x-model="email" @keydown.enter="email && password && login()"
-          class="w-full p-3 dark-theme-input font-medium text-[15px] leading-[28px]" />
-      </div>
-      <div>
-        <label class="block text-[#f1c40f] font-semibold mb-2">Password</label>
-        <input type="password" placeholder="Enter your password" x-model="password"
-          @keydown.enter="email && password && login()"
-          class="w-full p-3 dark-theme-input font-medium text-[15px] leading-[28px]" />
+    <div class="w-full max-w-[40rem] relative z-10 mx-auto mt-6 md:mt-10" x-data="loginApp()" x-show="!loggedIn">
+      <div class="header-text">
+        <img src="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
+          alt="Ramos Law Book Builder" />
+        <h1>Ramos Law Book Builder</h1>
+        <p>Secure Access for Authorized Ramos Law Users</p>
       </div>
 
-      <p x-show="error" x-text="error" class="error-message"></p>
+      <div class="dark-theme-card p-6 space-y-5">
+        <h2 class="text-[36px] font-extrabold uppercase tracking-[0.5px] text-center text-[#f1c40f] mt-0 mb-0">
+          Login
+        </h2>
 
-      <button @click="login()" :disabled="!email || !password"
-        :class="email && password ? 'dark-theme-btn-primary w-full py-3 font-medium transition' : 'opacity-50 cursor-not-allowed dark-theme-btn-primary w-full py-3 font-medium transition'">
-        <span x-show="!loggingIn">Login</span>
-        <span x-show="loggingIn">Logging in...</span>
-      </button>
+        <div>
+          <label class="block text-[#f1c40f] font-semibold mb-2">Email</label>
+          <input type="email" placeholder="Enter your email" x-model="email"
+            @keydown.enter="email && password && login()"
+            class="w-full p-3 dark-theme-input font-medium text-[15px] leading-[28px]" />
+        </div>
+        <div>
+          <label class="block text-[#f1c40f] font-semibold mb-2">Password</label>
+          <input type="password" placeholder="Enter your password" x-model="password"
+            @keydown.enter="email && password && login()"
+            class="w-full p-3 dark-theme-input font-medium text-[15px] leading-[28px]" />
+        </div>
+
+        <p x-show="error" x-text="error" class="error-message"></p>
+
+        <button @click="login()" :disabled="!email || !password"
+          :class="email && password ? 'dark-theme-btn-primary w-full py-3 font-medium transition' : 'opacity-50 cursor-not-allowed dark-theme-btn-primary w-full py-3 font-medium transition'">
+          <span x-show="!loggingIn">Login</span>
+          <span x-show="loggingIn">Logging in...</span>
+        </button>
+      </div>
     </div>
-  </div>
 
-  <div class="w-full max-w-none relative z-10 px-1 sm:px-5" x-data="bookBuilderApp()" x-show="isLoggedIn">
-    <div class="header-bar">
-      <div class="flex justify-between items-center header-layout">
-        <div class="flex items-center gap-3 top-logo-area">
-          <img src="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
-            alt="Ramos Law Book Builder" style="max-height: 40px" />
-          <h2 class="mb-0 text-[#f1c40f]" style="font-size: 20px; font-weight: 600">
-            Ramos Law Book Builder
-          </h2>
-          <button id="active-users-btn" onclick="toggleActiveUsers()"
-            class="flex items-center gap-2 text-xs font-semibold px-2 py-1 rounded hover:bg-yellow-500/10"
-            title="Active users">
-            <span class="w-2 h-2 bg-green-500 rounded-full shadow"></span>
-            <span id="active-user-count">0</span>
-            Active Users
-          </button>
-          <div id="active-users-popover" class="active-user-popover">
-            <div style="
+    <div class="w-full max-w-none relative z-10 px-1 sm:px-5" x-data="bookBuilderApp()" x-show="isLoggedIn">
+      <div class="header-bar">
+        <div class="flex justify-between items-center header-layout">
+          <div class="flex items-center gap-3 top-logo-area">
+            <img src="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
+              alt="Ramos Law Book Builder" style="max-height: 40px" />
+            <h2 class="mb-0 text-[#f1c40f]" style="font-size: 20px; font-weight: 600">
+              Ramos Law Book Builder
+            </h2>
+            <button id="active-users-btn" onclick="toggleActiveUsers()"
+              class="flex items-center gap-2 text-xs font-semibold px-2 py-1 rounded hover:bg-yellow-500/10"
+              title="Active users">
+              <span class="w-2 h-2 bg-green-500 rounded-full shadow"></span>
+              <span id="active-user-count">0</span>
+              Active Users
+            </button>
+            <div id="active-users-popover" class="active-user-popover">
+              <div style="
                   padding: 8px 0;
                   margin-bottom: 8px;
                   border-bottom: 1px solid rgba(241, 196, 15, 0.3);
@@ -688,93 +732,93 @@
                   font-size: 12px;
                   font-weight: 600;
                 ">
-              Active Users
+                Active Users
+              </div>
+              <div id="active-users-list"></div>
             </div>
-            <div id="active-users-list"></div>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <div class="text-right text-[0.9rem] text-[#aaa] hidden sm:block">
+              <span class="block text-[#f1c40f] font-semibold heading-top-mail" x-text="userEmail"></span>
+              <span class="text-[0.85rem]">Logged in</span>
+            </div>
+            <div class="menu-container" x-data="{ menuOpen: false }">
+              <button class="menu-button" @click="menuOpen = !menuOpen">
+                ⋮
+              </button>
+              <div class="menu-popover" x-show="menuOpen" @click.outside="menuOpen = false">
+                <button @click="logout()">Logout</button>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div class="flex items-center gap-4">
-          <div class="text-right text-[0.9rem] text-[#aaa] hidden sm:block">
-            <span class="block text-[#f1c40f] font-semibold heading-top-mail" x-text="userEmail"></span>
-            <span class="text-[0.85rem]">Logged in</span>
-          </div>
-          <div class="menu-container" x-data="{ menuOpen: false }">
-            <button class="menu-button" @click="menuOpen = !menuOpen">
-              ⋮
+      <div class="pt-32 sm:pt-28 pb-10 space-y-6">
+        <div class="section-card">
+          <div class="section-header">
+            <h3 class="section-title">Concept List</h3>
+            <button class="dark-theme-btn-primary px-4 py-2 text-sm" @click="openCreateConceptModal()">
+              Create Concept
             </button>
-            <div class="menu-popover" x-show="menuOpen" @click.outside="menuOpen = false">
-              <button @click="logout()">Logout</button>
+          </div>
+
+          <div class="project-table-wrap">
+            <table class="project-table" x-show="concepts.length > 0">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Working Title</th>
+                  <th>Concept Brief</th>
+                  <th class="concept-thesis-col">Thesis Statement</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="(concept, idx) in concepts" :key="concept.id">
+                  <tr @click="selectProject(concept.project_id)" class="cursor-pointer"
+                    :class="selectedProjectId === concept.project_id ? 'bg-[rgba(241,196,15,0.14)]' : ''">
+                    <td x-text="idx + 1"></td>
+                    <td x-text="concept.working_title || '-'"></td>
+                    <td x-text="concept.concept_brief || '-'"></td>
+                    <td class="concept-thesis-col">
+                      <span class="long-text-preview" :class="expandedThesisStatements[concept.id] ? '' : 'clamped'"
+                        x-text="concept.thesis_statement || '-'"></span>
+                      <button x-show="(concept.thesis_statement || '').length > 120"
+                        @click.stop="toggleThesisStatement(concept.id)"
+                        class="dark-theme-btn-primary px-2 py-1 text-xs mt-2">
+                        <span x-text="expandedThesisStatements[concept.id] ? 'Hide' : 'Show'"></span>
+                      </button>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+          <div class="project-empty" x-show="!loadingConcepts && concepts.length === 0">
+            No concepts found.
+          </div>
+          <div class="project-empty" x-show="loadingConcepts">
+            Loading concepts...
+          </div>
+          <div class="project-empty !text-red-400" x-show="projectError" x-text="projectError"></div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-header">
+            <h3 class="section-title">Screens</h3>
+          </div>
+          <div class="p-4">
+            <div class="screen-tabs">
+              <template x-for="screen in screens" :key="screen.id">
+                <button class="screen-tab" :class="activeScreen === screen.id ? 'active' : ''"
+                  @click="activeScreen = screen.id" x-text="screen.label"></button>
+              </template>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
 
-    <div class="pt-32 sm:pt-28 pb-10 space-y-6">
-      <div class="section-card">
-        <div class="section-header">
-          <h3 class="section-title">Concept List</h3>
-          <button class="dark-theme-btn-primary px-4 py-2 text-sm" @click="openCreateConceptModal()">
-            Create Concept
-          </button>
-        </div>
-
-        <div class="project-table-wrap">
-          <table class="project-table" x-show="concepts.length > 0">
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Working Title</th>
-                <th>Concept Brief</th>
-                <th class="concept-thesis-col">Thesis Statement</th>
-              </tr>
-            </thead>
-            <tbody>
-              <template x-for="(concept, idx) in concepts" :key="concept.id">
-                <tr @click="selectProject(concept.project_id)" class="cursor-pointer"
-                  :class="selectedProjectId === concept.project_id ? 'bg-[rgba(241,196,15,0.14)]' : ''">
-                  <td x-text="idx + 1"></td>
-                  <td x-text="concept.working_title || '-'"></td>
-                  <td x-text="concept.concept_brief || '-'"></td>
-                  <td class="concept-thesis-col">
-                    <span class="long-text-preview" :class="expandedThesisStatements[concept.id] ? '' : 'clamped'"
-                      x-text="concept.thesis_statement || '-'"></span>
-                    <button x-show="(concept.thesis_statement || '').length > 120"
-                      @click.stop="toggleThesisStatement(concept.id)"
-                      class="dark-theme-btn-primary px-2 py-1 text-xs mt-2">
-                      <span x-text="expandedThesisStatements[concept.id] ? 'Hide' : 'Show'"></span>
-                    </button>
-                  </td>
-                </tr>
-              </template>
-            </tbody>
-          </table>
-        </div>
-        <div class="project-empty" x-show="!loadingConcepts && concepts.length === 0">
-          No concepts found.
-        </div>
-        <div class="project-empty" x-show="loadingConcepts">
-          Loading concepts...
-        </div>
-        <div class="project-empty !text-red-400" x-show="projectError" x-text="projectError"></div>
-      </div>
-
-      <div class="section-card">
-        <div class="section-header">
-          <h3 class="section-title">Screens</h3>
-        </div>
-        <div class="p-4">
-          <div class="screen-tabs">
-            <template x-for="screen in screens" :key="screen.id">
-              <button class="screen-tab" :class="activeScreen === screen.id ? 'active' : ''"
-                @click="activeScreen = screen.id" x-text="screen.label"></button>
-            </template>
-          </div>
-        </div>
-
-        <div x-show="activeScreen === 'screen1'" class="screen-one-grid">
-          <!-- <div class="screen-one-panel">
+          <div x-show="activeScreen === 'screen1'" class="screen-one-grid">
+            <!-- <div class="screen-one-panel">
             <h4>generated guided questions that would be helpful in refining the thesis</h4>
             <button class="dark-theme-btn-primary px-4 py-2 text-sm" :disabled="!selectedProjectId || loadingQuestions"
               @click="openQuestionModal()">
@@ -785,1656 +829,1883 @@
           refineThesis()
           -->
 
-          <div class="screen-one-panel">
-            <h4>Refine your thesis</h4>
-            <div class="flex items-center gap-2 mb-3">
-              <button class="dark-theme-btn-primary px-4 py-2 text-sm" :disabled="!selectedProjectId || refiningThesis"
-                @click="openQuestionModal()">
-                <span x-show="!refiningThesis">Refine</span>
-                <span x-show="refiningThesis">Refining...</span>
-              </button>
+            <div class="screen-one-panel">
+              <h4>Refine your thesis</h4>
+              <div class="flex items-center gap-2 mb-3">
+                <button class="dark-theme-btn-primary px-4 py-2 text-sm"
+                  :disabled="!selectedProjectId || refiningThesis" @click="openQuestionModal()">
+                  <span x-show="!refiningThesis">Refine</span>
+                  <span x-show="refiningThesis">Refining...</span>
+                </button>
+              </div>
+              <div class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
+                x-text="refinedThesisText || 'Refined thesis will appear here.'"></div>
             </div>
-            <div class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
-              x-text="refinedThesisText || 'Refined thesis will appear here.'"></div>
           </div>
-        </div>
-        <div x-show="activeScreen === 'screen2'" class="screen-one-grid">
-          <div class="section-card">
-            <div class="section-header">
-              <h3 class="section-title">Novelty scan list</h3>
-              <button class="dark-theme-btn-primary px-4 py-2 text-sm"
-                :disabled="!selectedProjectId || loadingNoveltyScan" @click="runNoveltyScan()">
-                <span x-show="!loadingNoveltyScan">Run Novelty</span>
-                <span x-show="loadingNoveltyScan">Running...</span>
-              </button>
-            </div>
-
-            <div class="p-4">
-              <div x-show="loadingNoveltyScan" class="flex flex-col items-center justify-center py-10 gap-3">
-                <div class="loader"></div>
-                <div class="text-[#f1c40f] text-sm font-semibold">
-                  Fetching novelty results...
-                </div>
+          <div x-show="activeScreen === 'screen2'" class="screen-one-grid">
+            <div class="section-card">
+              <div class="section-header">
+                <h3 class="section-title">Novelty scan list</h3>
+                <button class="dark-theme-btn-primary px-4 py-2 text-sm"
+                  :disabled="!selectedProjectId || loadingNoveltyScan" @click="runNoveltyScan()">
+                  <span x-show="!loadingNoveltyScan">Run Novelty</span>
+                  <span x-show="loadingNoveltyScan">Running...</span>
+                </button>
               </div>
 
-              <div class="project-empty" x-show="!loadingNoveltyScan && noveltyScanError" x-text="noveltyScanError">
-              </div>
-
-              <div class="project-empty"
-                x-show="!loadingNoveltyScan && !noveltyScanError && noveltyScanItems.length === 0">
-                No novelty results yet.
-              </div>
-
-              <div class="space-y-4 max-h-[55vh] overflow-y-auto pr-2"
-                x-show="!loadingNoveltyScan && noveltyScanItems.length > 0">
-                <template x-for="(item, idx) in noveltyScanItems" :key="idx">
-                  <div class="dark-theme-card p-4 space-y-3">
-                    <div class="text-[#f1c40f] font-semibold text-sm" x-text="`Result ${idx + 1}`"></div>
-
-                    <div x-show="item.query_context">
-                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                        Query context
-                      </div>
-                      <div class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
-                        x-text="item.query_context"></div>
-                    </div>
-
-                    <div x-show="item.adjacent_books && item.adjacent_books.length">
-                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                        Adjacent books
-                      </div>
-                      <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
-                        <template x-for="(book, bidx) in item.adjacent_books" :key="bidx">
-                          <li x-text="book"></li>
-                        </template>
-                      </ul>
-                    </div>
-
-                    <div x-show="item.derivative_risk">
-                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                        Derivative risk
-                      </div>
-                      <div class="text-[#ddd] text-sm" x-text="item.derivative_risk"></div>
-                    </div>
-
-                    <div x-show="item.recommendations && item.recommendations.length">
-                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                        Recommendations
-                      </div>
-                      <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
-                        <template x-for="(rec, ridx) in item.recommendations" :key="ridx">
-                          <li x-text="rec"></li>
-                        </template>
-                      </ul>
-                    </div>
-
-                    <div x-show="item.gap_analysis">
-                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                        Gap analysis
-                      </div>
-                      <div class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
-                        x-text="item.gap_analysis"></div>
-                    </div>
-
-                    <div x-show="item.overlapping_titles && item.overlapping_titles.length">
-                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                        Overlapping titles
-                      </div>
-                      <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-2">
-                        <template x-for="(ot, tidx) in item.overlapping_titles" :key="tidx">
-                          <li class="space-y-0.5">
-                            <div class="font-semibold text-sm" x-text="typeof ot === 'string' ? ot : (ot.title || '-')">
-                            </div>
-                            <div class="text-xs text-[#aaa]" x-show="typeof ot !== 'string' && ot.author"
-                              x-text="ot.author"></div>
-                            <div class="text-xs text-[#aaa] leading-5 whitespace-pre-wrap break-words"
-                              x-show="typeof ot !== 'string' && ot.overlap" x-text="ot.overlap"></div>
-                          </li>
-                        </template>
-                      </ul>
-                    </div>
-
-                    <div x-show="item.uniqueness_summary">
-                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                        Uniqueness summary
-                      </div>
-                      <div class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
-                        x-text="item.uniqueness_summary"></div>
-                    </div>
-
-                    <div x-show="item.created_at">
-                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                        Created at
-                      </div>
-                      <div class="text-[#ddd] text-sm" x-text="item.created_at"></div>
-                    </div>
+              <div class="p-4">
+                <div x-show="loadingNoveltyScan" class="flex flex-col items-center justify-center py-10 gap-3">
+                  <div class="loader"></div>
+                  <div class="text-[#f1c40f] text-sm font-semibold">
+                    Fetching novelty results...
                   </div>
-                </template>
-              </div>
-            </div>
-          </div>
-          <div class="section-card">
-            <div class="section-header">
-              <h3 class="section-title">Authority map</h3>
-              <button class="dark-theme-btn-primary px-4 py-2 text-sm"
-                :disabled="!selectedProjectId || loadingAuthorityMap" @click="runAuthorityMap()">
-                <span x-show="!loadingAuthorityMap">Run Authority</span>
-                <span x-show="loadingAuthorityMap">Running...</span>
-              </button>
-            </div>
-
-            <div class="p-4">
-              <div x-show="loadingAuthorityMap" class="flex flex-col items-center justify-center py-10 gap-3">
-                <div class="loader"></div>
-                <div class="text-[#f1c40f] text-sm font-semibold">
-                  Fetching authority results...
                 </div>
-              </div>
 
-              <div class="project-empty" x-show="!loadingAuthorityMap && authorityMapError" x-text="authorityMapError">
-              </div>
+                <div class="project-empty" x-show="!loadingNoveltyScan && noveltyScanError" x-text="noveltyScanError">
+                </div>
 
-              <div class="project-empty"
-                x-show="!loadingAuthorityMap && !authorityMapError && authorityMapItems.length === 0">
-                No authority results yet.
-              </div>
+                <div class="project-empty"
+                  x-show="!loadingNoveltyScan && !noveltyScanError && noveltyScanItems.length === 0">
+                  No novelty results yet.
+                </div>
 
-              <div class="space-y-4 max-h-[35vh] overflow-y-auto pr-2"
-                x-show="!loadingAuthorityMap && authorityMapItems.length > 0">
-                <template x-for="(item, idx) in authorityMapItems" :key="idx">
-                  <div class="dark-theme-card p-4 space-y-3">
-                    <div class="text-[#f1c40f] font-semibold text-sm" x-text="`Result ${idx + 1}`"></div>
+                <div class="space-y-4 max-h-[55vh] overflow-y-auto pr-2"
+                  x-show="!loadingNoveltyScan && noveltyScanItems.length > 0">
+                  <template x-for="(item, idx) in noveltyScanItems" :key="idx">
+                    <div class="dark-theme-card p-4 space-y-3">
+                      <div class="text-[#f1c40f] font-semibold text-sm" x-text="`Result ${idx + 1}`"></div>
 
-                    <div x-show="item.why_author_credible">
-                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                        Why author credible
+                      <div x-show="item.query_context">
+                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                          Query context
+                        </div>
+                        <div class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
+                          x-text="item.query_context"></div>
                       </div>
 
-                      <template x-if="getParsedStringListBullets(item.why_author_credible).length > 0">
+                      <div x-show="item.adjacent_books && item.adjacent_books.length">
+                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                          Adjacent books
+                        </div>
                         <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
-                          <template x-for="(v, i) in getParsedStringListBullets(item.why_author_credible)" :key="i">
-                            <li x-text="v"></li>
+                          <template x-for="(book, bidx) in item.adjacent_books" :key="bidx">
+                            <li x-text="book"></li>
                           </template>
                         </ul>
-                      </template>
-
-                      <div class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
-                        x-text="item.why_author_credible"
-                        x-show="getParsedStringListBullets(item.why_author_credible).length === 0"></div>
-                    </div>
-
-                    <div x-show="item.weak_areas && item.weak_areas.length">
-                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                        Weak areas
-                      </div>
-                      <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
-                        <template x-for="(v, i) in item.weak_areas" :key="i">
-                          <li x-text="v"></li>
-                        </template>
-                      </ul>
-                    </div>
-
-                    <div x-show="item.experience_areas && item.experience_areas.length">
-                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                        Experience areas
-                      </div>
-                      <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
-                        <template x-for="(v, i) in item.experience_areas" :key="i">
-                          <li x-text="v"></li>
-                        </template>
-                      </ul>
-                    </div>
-
-                    <div x-show="item.caution_flags">
-                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                        Caution flags
                       </div>
 
-                      <template x-if="getParsedStringListBullets(item.caution_flags).length > 0">
+                      <div x-show="item.derivative_risk">
+                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                          Derivative risk
+                        </div>
+                        <div class="text-[#ddd] text-sm" x-text="item.derivative_risk"></div>
+                      </div>
+
+                      <div x-show="item.recommendations && item.recommendations.length">
+                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                          Recommendations
+                        </div>
                         <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
-                          <template x-for="(v, i) in getParsedStringListBullets(item.caution_flags)" :key="i">
-                            <li x-text="v"></li>
+                          <template x-for="(rec, ridx) in item.recommendations" :key="ridx">
+                            <li x-text="rec"></li>
                           </template>
                         </ul>
-                      </template>
-
-                      <div class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
-                        x-text="item.caution_flags"
-                        x-show="getParsedStringListBullets(item.caution_flags).length === 0"></div>
-                    </div>
-
-                    <div x-show="item.created_at">
-                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                        Created at
                       </div>
-                      <div class="text-[#ddd] text-sm" x-text="item.created_at"></div>
+
+                      <div x-show="item.gap_analysis">
+                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                          Gap analysis
+                        </div>
+                        <div class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
+                          x-text="item.gap_analysis"></div>
+                      </div>
+
+                      <div x-show="item.overlapping_titles && item.overlapping_titles.length">
+                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                          Overlapping titles
+                        </div>
+                        <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-2">
+                          <template x-for="(ot, tidx) in item.overlapping_titles" :key="tidx">
+                            <li class="space-y-0.5">
+                              <div class="font-semibold text-sm"
+                                x-text="typeof ot === 'string' ? ot : (ot.title || '-')">
+                              </div>
+                              <div class="text-xs text-[#aaa]" x-show="typeof ot !== 'string' && ot.author"
+                                x-text="ot.author"></div>
+                              <div class="text-xs text-[#aaa] leading-5 whitespace-pre-wrap break-words"
+                                x-show="typeof ot !== 'string' && ot.overlap" x-text="ot.overlap"></div>
+                            </li>
+                          </template>
+                        </ul>
+                      </div>
+
+                      <div x-show="item.uniqueness_summary">
+                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                          Uniqueness summary
+                        </div>
+                        <div class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
+                          x-text="item.uniqueness_summary"></div>
+                      </div>
+
+                      <div x-show="item.created_at">
+                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                          Created at
+                        </div>
+                        <div class="text-[#ddd] text-sm" x-text="item.created_at"></div>
+                      </div>
                     </div>
-                  </div>
-                </template>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- ================= SCREEN 3 ================= -->
-        <div x-show="activeScreen === 'screen3'" class="p-4">
-          <div class="section-card">
-            <div class="section-header">
-              <h3 class="section-title">Principle</h3>
-              <button class="dark-theme-btn-primary px-4 py-2 text-sm"
-                :disabled="!selectedProjectId || generatingPrinciples" @click="generatePrinciples()">
-                <span x-show="!generatingPrinciples">Create Principle</span>
-                <span x-show="generatingPrinciples">Generating...</span>
-              </button>
-            </div>
-            <div class="project-table-wrap" style="max-height: 220px; overflow-y: auto;">
-              <table class="project-table" x-show="screen3Principles.length > 0">
-                <thead>
-                  <tr>
-                    <th>No</th>
-                    <th class="concept-thesis-col">Principle</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <template x-for="(p, idx) in screen3Principles" :key="p.id">
-                    <tr class="cursor-pointer">
-                      <td x-text="idx + 1"></td>
-                      <td class="concept-thesis-col">
-                        <span class="long-text-preview" :class="expandedPrincipleTexts[p.id] ? '' : 'clamped'"
-                          x-text="p.text || '-'"></span>
-                        <button x-show="(p.text || '').length > 120" @click.stop="togglePrincipleText(p.id)"
-                          class="dark-theme-btn-primary px-2 py-1 text-xs mt-2">
-                          <span x-text="expandedPrincipleTexts[p.id] ? 'Hide' : 'Show'"></span>
-                        </button>
-                      </td>
-                      <td x-text="p.status || '-'"></td>
-                      <td @click.stop>
-                        <button class="dark-theme-btn-primary px-3 py-1 text-xs"
-                          :disabled="p.status === 'approved' || approvingPrincipleId === p.id" @click="approvePrinciple(p.id)">
-                          <span x-show="p.status === 'approved'">Approved</span>
-                          <span x-show="p.status !== 'approved' && approvingPrincipleId !== p.id">Approve</span>
-                          <span x-show="p.status !== 'approved' && approvingPrincipleId === p.id">Approving...</span>
-                        </button>
-                      </td>
-                    </tr>
                   </template>
-                </tbody>
-              </table>
+                </div>
+              </div>
             </div>
-            <div class="project-empty" x-show="!selectedProjectId">Select a concept to view principles.</div>
-            <div class="project-empty" x-show="loadingPrinciples">Loading principles...</div>
-            <div class="project-empty"
-              x-show="selectedProjectId && !loadingPrinciples && screen3Principles.length === 0">No principles found.
-            </div>
-            <div class="project-empty !text-red-400" x-show="principlesError" x-text="principlesError"></div>
-          </div>
-
-          <!-- Story Bank -->
-          <div class="section-card mt-4">
-            <div class="section-header">
-              <h3 class="section-title">Story Bank</h3>
-              <button class="dark-theme-btn-primary px-4 py-2 text-sm"
-                :disabled="!selectedProjectId || generatingStories" @click="generateStory()">
-                <span x-show="!generatingStories">Create Story</span>
-                <span x-show="generatingStories">Generating...</span>
-              </button>
-            </div>
-            <div class="p-4">
-              <div x-show="loadingStories" class="flex flex-col items-center justify-center py-10 gap-3">
-                <div class="loader"></div>
-                <div class="text-[#f1c40f] text-sm font-semibold">Loading stories...</div>
+            <div class="section-card">
+              <div class="section-header">
+                <h3 class="section-title">Authority map</h3>
+                <button class="dark-theme-btn-primary px-4 py-2 text-sm"
+                  :disabled="!selectedProjectId || loadingAuthorityMap" @click="runAuthorityMap()">
+                  <span x-show="!loadingAuthorityMap">Run Authority</span>
+                  <span x-show="loadingAuthorityMap">Running...</span>
+                </button>
               </div>
 
-              <div class="project-empty" x-show="!selectedProjectId && !loadingStories">Select a concept to view
-                stories.</div>
+              <div class="p-4">
+                <div x-show="loadingAuthorityMap" class="flex flex-col items-center justify-center py-10 gap-3">
+                  <div class="loader"></div>
+                  <div class="text-[#f1c40f] text-sm font-semibold">
+                    Fetching authority results...
+                  </div>
+                </div>
 
+                <div class="project-empty" x-show="!loadingAuthorityMap && authorityMapError"
+                  x-text="authorityMapError">
+                </div>
+
+                <div class="project-empty"
+                  x-show="!loadingAuthorityMap && !authorityMapError && authorityMapItems.length === 0">
+                  No authority results yet.
+                </div>
+
+                <div class="space-y-4 max-h-[35vh] overflow-y-auto pr-2"
+                  x-show="!loadingAuthorityMap && authorityMapItems.length > 0">
+                  <template x-for="(item, idx) in authorityMapItems" :key="idx">
+                    <div class="dark-theme-card p-4 space-y-3">
+                      <div class="text-[#f1c40f] font-semibold text-sm" x-text="`Result ${idx + 1}`"></div>
+
+                      <div x-show="item.why_author_credible">
+                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                          Why author credible
+                        </div>
+
+                        <template x-if="getParsedStringListBullets(item.why_author_credible).length > 0">
+                          <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
+                            <template x-for="(v, i) in getParsedStringListBullets(item.why_author_credible)" :key="i">
+                              <li x-text="v"></li>
+                            </template>
+                          </ul>
+                        </template>
+
+                        <div class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
+                          x-text="item.why_author_credible"
+                          x-show="getParsedStringListBullets(item.why_author_credible).length === 0"></div>
+                      </div>
+
+                      <div x-show="item.weak_areas && item.weak_areas.length">
+                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                          Weak areas
+                          <<<<<<< Updated upstream </div>
+                            <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
+                              <template x-for="(v, i) in item.weak_areas" :key="i">
+                                <li x-text="v"></li>
+                              </template>
+                            </ul>
+                        </div>
+
+                        <div x-show="item.experience_areas && item.experience_areas.length">
+                          <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                            Experience areas
+                          </div>
+                          <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
+                            <template x-for="(v, i) in item.experience_areas" :key="i">
+                              <li x-text="v"></li>
+                            </template>
+                          </ul>
+                        </div>
+
+                        <div x-show="item.caution_flags">
+                          <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                            Caution flags
+                          </div>
+
+                          <template x-if="getParsedStringListBullets(item.caution_flags).length > 0">
+                            <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
+                              <template x-for="(v, i) in getParsedStringListBullets(item.caution_flags)" :key="i">
+                                <li x-text="v"></li>
+                              </template>
+                            </ul>
+                          </template>
+
+                          <div class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
+                            x-text="item.caution_flags"
+                            x-show="getParsedStringListBullets(item.caution_flags).length === 0"></div>
+                        </div>
+
+                        <div x-show="item.created_at">
+                          <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                            Created at
+                          </div>
+                          <div class="text-[#ddd] text-sm" x-text="item.created_at"></div>
+                        </div>
+                      </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- ================= SCREEN 3 ================= -->
+          <div x-show="activeScreen === 'screen3'" class="p-4">
+            <div class="section-card">
+              <div class="section-header">
+                <h3 class="section-title">Principle</h3>
+                <button class="dark-theme-btn-primary px-4 py-2 text-sm"
+                  :disabled="!selectedProjectId || generatingPrinciples" @click="generatePrinciples()">
+                  <span x-show="!generatingPrinciples">Create Principle</span>
+                  <span x-show="generatingPrinciples">Generating...</span>
+                </button>
+              </div>
+              <div class="project-table-wrap" style="max-height: 220px; overflow-y: auto;">
+                <table class="project-table" x-show="screen3Principles.length > 0">
+                  <thead>
+                    <tr>
+                      <th>No</th>
+                      <th class="concept-thesis-col">Principle</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template x-for="(p, idx) in screen3Principles" :key="p.id">
+                      <tr class="cursor-pointer">
+                        <td x-text="idx + 1"></td>
+                        <td class="concept-thesis-col">
+                          <span class="long-text-preview" :class="expandedPrincipleTexts[p.id] ? '' : 'clamped'"
+                            x-text="p.text || '-'"></span>
+                          <button x-show="(p.text || '').length > 120" @click.stop="togglePrincipleText(p.id)"
+                            class="dark-theme-btn-primary px-2 py-1 text-xs mt-2">
+                            <span x-text="expandedPrincipleTexts[p.id] ? 'Hide' : 'Show'"></span>
+                          </button>
+                        </td>
+                        <td x-text="p.status || '-'"></td>
+                        <td @click.stop>
+                          <button class="dark-theme-btn-primary px-3 py-1 text-xs"
+                            :disabled="p.status === 'approved' || approvingPrincipleId === p.id"
+                            @click="approvePrinciple(p.id)">
+                            <span x-show="p.status === 'approved'">Approved</span>
+                            <span x-show="p.status !== 'approved' && approvingPrincipleId !== p.id">Approve</span>
+                            <span x-show="p.status !== 'approved' && approvingPrincipleId === p.id">Approving...</span>
+                          </button>
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+              <div class="project-empty" x-show="!selectedProjectId">Select a concept to view principles.</div>
+              <div class="project-empty" x-show="loadingPrinciples">Loading principles...</div>
               <div class="project-empty"
-                x-show="selectedProjectId && !loadingStories && storyBankItems.length === 0 && !storiesError">No stories
-                found.</div>
+                x-show="selectedProjectId && !loadingPrinciples && screen3Principles.length === 0">
+                No principles found.
+              </div>
+              <div class="project-empty !text-red-400" x-show="principlesError" x-text="principlesError"></div>
+            </div>
 
-              <div class="project-empty !text-red-400" x-show="storiesError" x-text="storiesError"></div>
+            <!-- Story Bank -->
+            <div class="section-card mt-4">
+              <div class="section-header">
+                <h3 class="section-title">Story Bank</h3>
+                <button class="dark-theme-btn-primary px-4 py-2 text-sm"
+                  :disabled="!selectedProjectId || generatingStories" @click="generateStory()">
+                  <span x-show="!generatingStories">Create Story</span>
+                  <span x-show="generatingStories">Generating...</span>
+                </button>
+              </div>
+              <div class="p-4">
+                <div x-show="loadingStories" class="flex flex-col items-center justify-center py-10 gap-3">
+                  <div class="loader"></div>
+                  <div class="text-[#f1c40f] text-sm font-semibold">Loading stories...</div>
+                </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[55vh] overflow-y-auto pr-2"
-                x-show="!loadingStories && storyBankItems.length > 0">
-                <template x-for="(story, idx) in storyBankItems" :key="story.id || idx">
-                  <div class="dark-theme-card p-4 space-y-3">
-                    <div class="flex items-center justify-between gap-3">
-                      <div class="text-[#f1c40f] font-semibold text-sm" x-text="story.title || `Story ${idx + 1}`">
+                <div class="project-empty" x-show="!selectedProjectId && !loadingStories">Select a concept to view
+                  stories.</div>
+
+                <div class="project-empty"
+                  x-show="selectedProjectId && !loadingStories && storyBankItems.length === 0 && !storiesError">No
+                  stories
+                  found.</div>
+
+                <div class="project-empty !text-red-400" x-show="storiesError" x-text="storiesError"></div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[55vh] overflow-y-auto pr-2"
+                  x-show="!loadingStories && storyBankItems.length > 0">
+                  <template x-for="(story, idx) in storyBankItems" :key="story.id || idx">
+                    <div class="dark-theme-card p-4 space-y-3">
+                      <div class="flex items-center justify-between gap-3">
+                        <div class="text-[#f1c40f] font-semibold text-sm" x-text="story.title || `Story ${idx + 1}`">
+                        </div>
+                        <div class="flex items-center gap-2 text-xs">
+                          <button class="dark-theme-btn-primary px-3 py-1 text-xs"
+                            :disabled="story.approved || approvingStoryId === story.id" @click="approveStory(story.id)">
+                            <span x-show="story.approved">Approved</span>
+                            <span x-show="!story.approved && approvingStoryId !== story.id">Approve</span>
+                            <span x-show="!story.approved && approvingStoryId === story.id">Approving...</span>
+                          </button>
+                          =======
+
+                          <div class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
+                            x-text="item.caution_flags"
+                            x-show="getParsedStringListBullets(item.caution_flags).length === 0"></div>
+                        </div>
+
+                        <div x-show="item.created_at">
+                          <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                            Created at
+                            >>>>>>> Stashed changes
+                          </div>
+                          <div class="text-[#ddd] text-sm" x-text="item.created_at"></div>
+                        </div>
+                        <<<<<<< Updated upstream <div x-show="story.content || story.text || story.story_text"
+                          class="text-[#ddd] text-sm leading-6 break-words text-left">
+                          <span class="text-left"
+                            x-text="(story.content || story.text || story.story_text || '-').trim()"></span>
                       </div>
-                      <div class="flex items-center gap-2 text-xs">
-                        <button 
-                          class="dark-theme-btn-primary px-3 py-1 text-xs" 
-                          :disabled="story.approved || approvingStoryId === story.id" 
-                          @click="approveStory(story.id)"
-                        >
-                          <span x-show="story.approved">Approved</span>
-                          <span x-show="!story.approved && approvingStoryId !== story.id">Approve</span>
-                          <span x-show="!story.approved && approvingStoryId === story.id">Approving...</span>
-                        </button>
+                      <div x-show="story.principle_text" class="text-xs text-[#aaa] leading-5">
+                        <span class="text-[#f1c40f] font-semibold">Principle:</span>
+                        <span x-text="story.principle_text"></span>
                       </div>
+                      <div class="text-xs mt-1 text-[#aaa]">
+                        <span>Status:</span>
+                        <span :class="story.approved ? 'text-green-500' : 'text-yellow-500'" class="font-semibold"
+                          x-text="story.approved ? 'Approved' : 'Pending'"></span>
+                      </div>
+                      =======
+                      >>>>>>> Stashed changes
                     </div>
-                    <div x-show="story.content || story.text || story.story_text"
-                      class="text-[#ddd] text-sm leading-6 break-words text-left">
-                      <span class="text-left"
-                        x-text="(story.content || story.text || story.story_text || '-').trim()"></span>
-                    </div>
-                    <div x-show="story.principle_text" class="text-xs text-[#aaa] leading-5">
-                      <span class="text-[#f1c40f] font-semibold">Principle:</span>
-                      <span x-text="story.principle_text"></span>
-                    </div>
-                    <div class="text-xs mt-1 text-[#aaa]">
-                      <span>Status:</span>
-                      <span :class="story.approved ? 'text-green-500' : 'text-yellow-500'" class="font-semibold" x-text="story.approved ? 'Approved' : 'Pending'"></span>
-                    </div>
-                  </div>
-                </template>
+                  </template>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <!-- ================= SCREEN 4 ================= -->
-        <div x-show="activeScreen === 'screen4'" class="p-4">
-          <div class="section-card">
-            <!-- Header -->
-            <div class="section-header flex justify-between items-center flex-wrap gap-3">
-              <h3 class="section-title">Structure List</h3>
-              <div class="flex flex-wrap gap-3 items-center">
-                <!-- Select Box -->
-                <select x-model="selectedStructureId" class="dark-theme-input px-3 py-2 text-sm min-w-[260px]">
-                  <option value="">Select Structure</option>
-                  <template x-for="item in structures" :key="item.id">
-                    <option :value="item.id" x-text="item.option_name"></option>
-                  </template>
-                </select>
-                <!-- Generate Button -->
-                <button class="dark-theme-btn-primary px-4 py-2 text-sm" @click="generateStructures()"
-                  :disabled="!selectedProjectId || loadingStructures">
-                  <span x-show="!loadingStructures">Generate</span>
-                  <span x-show="loadingStructures">Generating...</span>
-                </button>
-                <!-- Select Button -->
-                <button class="dark-theme-btn-primary px-4 py-2 text-sm" @click="selectStructure()"
-                  :disabled="!selectedStructureId">
-                  Select
-                </button>
+          <!-- ================= SCREEN 4 ================= -->
+          <div x-show="activeScreen === 'screen4'" class="p-4">
+            <div class="section-card">
+              <!-- Header -->
+              <div class="section-header flex justify-between items-center flex-wrap gap-3">
+                <h3 class="section-title">Structure List</h3>
+                <div class="flex flex-wrap gap-3 items-center">
+                  <!-- Select Box -->
+                  <select x-model="selectedStructureId" class="dark-theme-input px-3 py-2 text-sm min-w-[260px]">
+                    <option value="">Select Structure</option>
+                    <template x-for="item in structures" :key="item.id">
+                      <option :value="item.id" x-text="item.option_name"></option>
+                    </template>
+                  </select>
+                  <!-- Generate Button -->
+                  <button class="dark-theme-btn-primary px-4 py-2 text-sm" @click="generateStructures()"
+                    :disabled="!selectedProjectId || loadingStructures">
+                    <span x-show="!loadingStructures">Generate</span>
+                    <span x-show="loadingStructures">Generating...</span>
+                  </button>
+                  <!-- Select Button -->
+                  <button class="dark-theme-btn-primary px-4 py-2 text-sm" @click="selectStructure()"
+                    :disabled="!selectedStructureId">
+                    Select
+                  </button>
+                </div>
               </div>
-            </div>
-            <!-- Table -->
-            <div class="project-table-wrap">
-              <table class="project-table" x-show="structures.length > 0">
-                <thead>
-                  <tr>
-                    <th>No</th>
-                    <th>Structure Name</th>
-                    <th>Structure Summary</th>
-                    <th>Why Fit</th>
-                    <th>Chapter Count</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <template x-for="(item,index) in structures" :key="item.id">
-                    <tr class="cursor-pointer" @click="selectedStructureId = item.id"
-                      :class="selectedStructureId === item.id ? 'bg-[rgba(241,196,15,0.14)]' : ''">
-                      <td x-text="index + 1"></td>
-                      <td x-text="item.option_name"></td>
-                      <td>
-                        <span class="long-text-preview"
-                          :class="expandedStructures[item.id + '_summary'] ? '' : 'clamped'"
-                          x-text="item.option_summary || '-'"></span>
-
-                        <button x-show="(item.option_summary || '').length > 120"
-                          @click.stop="toggleStructureText(item.id + '_summary')"
-                          class="dark-theme-btn-primary px-2 py-1 text-xs mt-2">
-                          <span x-text="expandedStructures[item.id + '_summary'] ? 'Hide' : 'Show'"></span>
-                        </button>
-                      </td>
-                      <td>
-                        <span class="long-text-preview" :class="expandedStructures[item.id + '_fit'] ? '' : 'clamped'"
-                          x-text="item.why_this_structure_fits || '-'"></span>
-
-                        <button x-show="(item.why_this_structure_fits || '').length > 120"
-                          @click.stop="toggleStructureText(item.id + '_fit')"
-                          class="dark-theme-btn-primary px-2 py-1 text-xs mt-2">
-                          <span x-text="expandedStructures[item.id + '_fit'] ? 'Hide' : 'Show'"></span>
-                        </button>
-                      </td>
-                      <td x-text="item.chapter_count_estimate"></td>
+              <!-- Table -->
+              <div class="project-table-wrap">
+                <table class="project-table" x-show="structures.length > 0">
+                  <thead>
+                    <tr>
+                      <th>No</th>
+                      <th>Structure Name</th>
+                      <th>Structure Summary</th>
+                      <th>Why Fit</th>
+                      <th>Chapter Count</th>
                     </tr>
+                  </thead>
+                  <tbody>
+                    <template x-for="(item,index) in structures" :key="item.id">
+                      <tr class="cursor-pointer" @click="selectedStructureId = item.id"
+                        :class="selectedStructureId === item.id ? 'bg-[rgba(241,196,15,0.14)]' : ''">
+                        <td x-text="index + 1"></td>
+                        <td x-text="item.option_name"></td>
+                        <td>
+                          <span class="long-text-preview"
+                            :class="expandedStructures[item.id + '_summary'] ? '' : 'clamped'"
+                            x-text="item.option_summary || '-'"></span>
+
+                          <button x-show="(item.option_summary || '').length > 120"
+                            @click.stop="toggleStructureText(item.id + '_summary')"
+                            class="dark-theme-btn-primary px-2 py-1 text-xs mt-2">
+                            <span x-text="expandedStructures[item.id + '_summary'] ? 'Hide' : 'Show'"></span>
+                          </button>
+                        </td>
+                        <td>
+                          <span class="long-text-preview" :class="expandedStructures[item.id + '_fit'] ? '' : 'clamped'"
+                            x-text="item.why_this_structure_fits || '-'"></span>
+
+                          <button x-show="(item.why_this_structure_fits || '').length > 120"
+                            @click.stop="toggleStructureText(item.id + '_fit')"
+                            class="dark-theme-btn-primary px-2 py-1 text-xs mt-2">
+                            <span x-text="expandedStructures[item.id + '_fit'] ? 'Hide' : 'Show'"></span>
+                          </button>
+                        </td>
+                        <td x-text="item.chapter_count_estimate"></td>
+                        <<<<<<< Updated upstream </tr>
+                    </template>
+                  </tbody>
+                </table>
+                <div class="project-empty" x-show="structures.length === 0 && !loadingStructures">
+                  No structures found.
+                </div>
+                <div class="project-empty" x-show="loadingStructures">
+                  Loading structures...
+                  =======
+                  </tr>
                   </template>
-                </tbody>
-              </table>
-              <div class="project-empty" x-show="structures.length === 0 && !loadingStructures">
-                No structures found.
+                  </tbody>
+                  </table>
+                  <div class="project-empty" x-show="structures.length === 0 && !loadingStructures">
+                    No structures found.
+                  </div>
+                  <div class="project-empty" x-show="loadingStructures">
+                    Loading structures...
+                  </div>
+                </div>
               </div>
-              <div class="project-empty" x-show="loadingStructures">
-                Loading structures...
+            </div>
+
+            <div x-show="activeScreen === 'screen5'" class="p-4">
+              <div class="section-card">
+                <!-- Header -->
+                <div class="section-header flex justify-between items-center flex-wrap gap-3">
+                  <h3 class="section-title">Chapter Cards List</h3>
+
+                  <button class="dark-theme-btn-primary px-4 py-2 text-sm" @click="generateChapterCards()"
+                    :disabled="!selectedProjectId || loadingChapterCards">
+                    <span x-show="!loadingChapterCards">Generate Chapter</span>
+                    <span x-show="loadingChapterCards">Generating...</span>
+                  </button>
+                </div>
+
+                <!-- Table -->
+                <div class="p-4">
+                  <div class="project-table-wrap chapter-cards-table-wrap">
+                    <table class="project-table" x-show="chapterCards.length > 0">
+                      <thead>
+                        <tr>
+                          <th>No</th>
+                          <th>Chapter Name</th>
+                          <th>Summary</th>
+                          <th>Count</th>
+                          <th>Status</th>
+                          <th width="150">Action</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        <template x-for="(card,index) in chapterCards" :key="card.id">
+                          <tr>
+                            <td x-text="index + 1"></td>
+
+                            <td x-text="card.title_placeholder || '-'"></td>
+
+                            <td class="whitespace-normal align-top">
+                              <span class="long-text-preview" :class="expandedChapterSummary[card.id] ? '' : 'clamped'"
+                                x-text="card.main_claim || '-'"></span>
+
+                              <button x-show="(card.main_claim || '').length > 120"
+                                @click="toggleChapterSummary(card.id)"
+                                class="dark-theme-btn-primary px-2 py-1 text-xs mt-2">
+                                <span x-text="expandedChapterSummary[card.id] ? 'Hide' : 'Show'"></span>
+                              </button>
+                            </td>
+
+                            <td x-text="card.rough_word_target || '0'"></td>
+
+                            <!-- STATUS COLUMN -->
+                            <td>
+                              <span class="text-xs font-semibold"
+                                :class="card.approved ? 'text-green-400' : 'text-yellow-400'"
+                                x-text="card.approved ? 'Approved' : 'Pending'"></span>
+                            </td>
+
+                            <!-- ACTION COLUMN -->
+                            <td>
+                              <button x-show="!card.approved" class="dark-theme-btn-primary px-3 py-2 text-xs w-full"
+                                @click="approveChapterCard(card.id)" :disabled="approvingChapterId === card.id">
+                                <span x-show="approvingChapterId !== card.id">
+                                  Approve
+                                </span>
+
+                                <span x-show="approvingChapterId === card.id">
+                                  Approving...
+                                </span>
+                              </button>
+                            </td>
+                          </tr>
+                        </template>
+                      </tbody>
+                    </table>
+
+                    <div class="project-empty" x-show="chapterCards.length === 0 && !loadingChapterCards">
+                      No chapter cards found.
+                    </div>
+
+                    <div class="project-empty" x-show="loadingChapterCards">
+                      Loading chapter cards...
+                    </div>
+                    >>>>>>> Stashed changes
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div class="modal-backdrop" x-show="showCreateConceptModal" x-transition.opacity
-        @click="closeCreateConceptModal()">
-        <div class="create-project-modal" @click.stop>
-          <div class="flex items-start justify-between gap-3 mb-5">
-            <h4 class="text-2xl font-bold text-[#f1c40f]">Create Concept</h4>
-            <button class="text-[#8f9bb3] text-xl leading-none" @click="closeCreateConceptModal()">
-              ×
-            </button>
-          </div>
-          <div class="space-y-4">
-            <div>
-              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Working
-                Title</label>
-              <input type="text" x-model.trim="newConceptWorkingTitle" placeholder="Enter working title"
-                class="w-full p-3 dark-theme-input text-sm" />
-            </div>
-            <div>
-              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Concept
-                Brief</label>
-              <textarea x-model.trim="newConceptBrief" placeholder="Enter concept brief" rows="3"
-                class="w-full p-3 dark-theme-input text-sm resize-none"></textarea>
-            </div>
-            <div>
-              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Rough
-                Thesis</label>
-              <textarea x-model.trim="newConceptRoughThesis" placeholder="Enter rough thesis" rows="5"
-                class="w-full p-3 dark-theme-input text-sm resize-none"></textarea>
-            </div>
-            <p x-show="createProjectError" class="error-message mt-0" x-text="createProjectError"></p>
-            <button @click="submitConcept()" :disabled="creatingConcept"
-              class="dark-theme-btn-primary w-full py-3 text-lg font-bold">
-              <span x-show="!creatingConcept">Submit</span>
-              <span x-show="creatingConcept">Submitting...</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Generated Question Modal -->
-      <div class="modal-backdrop" x-show="showQuestionModal" x-transition.opacity>
-        <div class="create-project-modal question-list-modal" @click.stop>
-          <!-- Choice View -->
-          <div x-show="modalView === 'choice'" class="py-6 space-y-6">
-            <div class="flex justify-between items-center mb-4">
-              <h4 class="text-2xl font-bold text-[#f1c40f]">Refine Thesis</h4>
-              <button class="text-[#8f9bb3] text-2xl leading-none" @click="closeQuestionModal()">
-                ×
-              </button>
-            </div>
-            <p class="text-[#ddd] text-center mb-6">
-              How would you like to refine your thesis?
-            </p>
-            <div class="grid grid-cols-1 gap-4">
-              <button @click="refineThesis()" class="dark-theme-btn-primary py-4 text-lg font-bold shadow-lg"
-                :disabled="refiningThesis">
-                <span x-show="!refiningThesis">Refine Directly</span>
-                <span x-show="refiningThesis">Refining...</span>
-              </button>
-              <div class="text-center text-[#555] font-bold">OR</div>
-              <button @click="startQuestionGeneration()"
-                class="border-2 border-[#f1c40f] text-[#f1c40f] hover:bg-[#f1c40f]/10 py-4 rounded-xl text-lg font-bold transition-all">
-                Generate Questions First
-              </button>
-            </div>
-          </div>
-
-          <!-- Questions View -->
-          <div x-show="modalView === 'questions'">
-            <div
-              class="flex items-center justify-between gap-3 sticky top-[-20px] bg-[#111] z-10 -mx-5 px-5 py-4 border-b border-[rgba(241,196,15,0.25)] mb-5 rounded-t-xl">
-              <h4 class="text-2xl font-bold text-[#f1c40f]">
-                Generated Questions
-              </h4>
-              <div class="flex items-center gap-3">
-                <button class="dark-theme-btn-primary px-4 py-1.5 text-sm" @click="submitBulkAnswers()"
-                  :disabled="refiningThesis">
-                  <span x-show="!refiningThesis">Save</span>
-                  <span x-show="refiningThesis">Saving...</span>
-                </button>
-                <button class="text-[#8f9bb3] text-2xl leading-none" @click="closeQuestionModal()">
+          <div class="modal-backdrop" x-show="showCreateConceptModal" x-transition.opacity
+            @click="closeCreateConceptModal()">
+            <div class="create-project-modal" @click.stop>
+              <div class="flex items-start justify-between gap-3 mb-5">
+                <h4 class="text-2xl font-bold text-[#f1c40f]">Create Concept</h4>
+                <button class="text-[#8f9bb3] text-xl leading-none" @click="closeCreateConceptModal()">
                   ×
                 </button>
               </div>
-            </div>
-            <div class="space-y-4">
-              <p x-show="questionError" class="error-message mt-0" x-text="questionError"></p>
-
-              <div x-show="loadingQuestions" class="flex flex-col items-center justify-center py-10">
-                <div class="loader"></div>
-                <p class="text-[#f1c40f] text-sm mt-3 animate-pulse">
-                  Generating questions...
-                </p>
-              </div>
-
-              <template x-for="(question, idx) in generatedQuestions" :key="question.id">
-                <div class="dark-theme-card p-4 space-y-3">
-                  <div class="text-[#f1c40f] font-semibold text-sm" x-text="`${idx + 1}. ${question.question || '-'}`">
-                  </div>
-                  <textarea rows="3" x-model.trim="questionAnswers[question.id]" placeholder="Enter answer"
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Working
+                    Title</label>
+                  <input type="text" x-model.trim="newConceptWorkingTitle" placeholder="Enter working title"
+                    class="w-full p-3 dark-theme-input text-sm" />
+                </div>
+                <div>
+                  <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Concept
+                    Brief</label>
+                  <textarea x-model.trim="newConceptBrief" placeholder="Enter concept brief" rows="3"
                     class="w-full p-3 dark-theme-input text-sm resize-none"></textarea>
                 </div>
-              </template>
-              <div class="project-empty" x-show="!loadingQuestions && generatedQuestions.length === 0">
-                No questions found.
+                <div>
+                  <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Rough
+                    Thesis</label>
+                  <textarea x-model.trim="newConceptRoughThesis" placeholder="Enter rough thesis" rows="5"
+                    class="w-full p-3 dark-theme-input text-sm resize-none"></textarea>
+                </div>
+                <p x-show="createProjectError" class="error-message mt-0" x-text="createProjectError"></p>
+                <button @click="submitConcept()" :disabled="creatingConcept"
+                  class="dark-theme-btn-primary w-full py-3 text-lg font-bold">
+                  <span x-show="!creatingConcept">Submit</span>
+                  <span x-show="creatingConcept">Submitting...</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Generated Question Modal -->
+          <div class="modal-backdrop" x-show="showQuestionModal" x-transition.opacity>
+            <div class="create-project-modal question-list-modal" @click.stop>
+              <!-- Choice View -->
+              <div x-show="modalView === 'choice'" class="py-6 space-y-6">
+                <div class="flex justify-between items-center mb-4">
+                  <h4 class="text-2xl font-bold text-[#f1c40f]">Refine Thesis</h4>
+                  <button class="text-[#8f9bb3] text-2xl leading-none" @click="closeQuestionModal()">
+                    ×
+                  </button>
+                </div>
+                <p class="text-[#ddd] text-center mb-6">
+                  How would you like to refine your thesis?
+                </p>
+                <div class="grid grid-cols-1 gap-4">
+                  <button @click="refineThesis()" class="dark-theme-btn-primary py-4 text-lg font-bold shadow-lg"
+                    :disabled="refiningThesis">
+                    <span x-show="!refiningThesis">Refine Directly</span>
+                    <span x-show="refiningThesis">Refining...</span>
+                  </button>
+                  <div class="text-center text-[#555] font-bold">OR</div>
+                  <button @click="startQuestionGeneration()"
+                    class="border-2 border-[#f1c40f] text-[#f1c40f] hover:bg-[#f1c40f]/10 py-4 rounded-xl text-lg font-bold transition-all">
+                    Generate Questions First
+                  </button>
+                </div>
+              </div>
+
+              <!-- Questions View -->
+              <div x-show="modalView === 'questions'">
+                <div
+                  class="flex items-center justify-between gap-3 sticky top-[-20px] bg-[#111] z-10 -mx-5 px-5 py-4 border-b border-[rgba(241,196,15,0.25)] mb-5 rounded-t-xl">
+                  <h4 class="text-2xl font-bold text-[#f1c40f]">
+                    Generated Questions
+                  </h4>
+                  <div class="flex items-center gap-3">
+                    <button class="dark-theme-btn-primary px-4 py-1.5 text-sm" @click="submitBulkAnswers()"
+                      :disabled="refiningThesis">
+                      <span x-show="!refiningThesis">Save</span>
+                      <span x-show="refiningThesis">Saving...</span>
+                    </button>
+                    <button class="text-[#8f9bb3] text-2xl leading-none" @click="closeQuestionModal()">
+                      ×
+                    </button>
+                  </div>
+                </div>
+                <div class="space-y-4">
+                  <p x-show="questionError" class="error-message mt-0" x-text="questionError"></p>
+
+                  <div x-show="loadingQuestions" class="flex flex-col items-center justify-center py-10">
+                    <div class="loader"></div>
+                    <p class="text-[#f1c40f] text-sm mt-3 animate-pulse">
+                      Generating questions...
+                    </p>
+                  </div>
+
+                  <template x-for="(question, idx) in generatedQuestions" :key="question.id">
+                    <div class="dark-theme-card p-4 space-y-3">
+                      <div class="text-[#f1c40f] font-semibold text-sm"
+                        x-text="`${idx + 1}. ${question.question || '-'}`"></div>
+                      <textarea rows="3" x-model.trim="questionAnswers[question.id]" placeholder="Enter answer"
+                        class="w-full p-3 dark-theme-input text-sm resize-none"></textarea>
+                    </div>
+                  </template>
+                  <div class="project-empty" x-show="!loadingQuestions && generatedQuestions.length === 0">
+                    No questions found.
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <script>
-      const API_BASE_URL = "https://slimy-leonia-kyphotic.ngrok-free.dev";
+        <script>
+          const API_BASE_URL = "https://slimy-leonia-kyphotic.ngrok-free.dev";
 
-      function requireToken() {
-        const token = localStorage.getItem("bookBuilderToken");
-        if (!token) {
-          alert(
-            "Your session has expired or you are not logged in. Please log in first.",
-          );
-          localStorage.removeItem("bookBuilderToken");
-          localStorage.removeItem("bookBuilderEmail");
-          window.dispatchEvent(new Event("logout-success"));
-          location.reload();
-          return null;
-        }
-        return token;
-      }
-
-      function handle401() {
-        alert("Your session has expired. Please log in again.");
-        localStorage.removeItem("bookBuilderToken");
-        localStorage.removeItem("bookBuilderEmail");
-        window.dispatchEvent(new Event("logout-success"));
-        location.reload();
-      }
-
-      function loginApp() {
-        return {
-          email: "",
-          password: "",
-          error: "",
-          loggedIn: false,
-          loggingIn: false,
-
-          init() {
+          function requireToken() {
             const token = localStorage.getItem("bookBuilderToken");
-            const savedEmail = localStorage.getItem("bookBuilderEmail");
-            if (token && savedEmail) {
-              this.loggedIn = true;
-              this.email = savedEmail;
+            if (!token) {
+              alert(
+                "Your session has expired or you are not logged in. Please log in first.",
+              );
+              localStorage.removeItem("bookBuilderToken");
+              localStorage.removeItem("bookBuilderEmail");
+              window.dispatchEvent(new Event("logout-success"));
+              location.reload();
+              return null;
             }
+            return token;
+          }
 
-            window.addEventListener("logout-success", () => {
-              this.loggedIn = false;
-              this.email = "";
-              this.password = "";
-              this.error = "";
-            });
-          },
-
-          login() {
-            if (!this.email || !this.email.includes("@")) {
-              this.error = "Please enter a valid email";
-              return;
-            }
-            if (!this.password) {
-              this.error = "Please enter your password";
-              return;
-            }
-
-            this.loggingIn = true;
-            this.error = "";
-
-            const data = new FormData();
-            data.append("username", this.email);
-            data.append("password", this.password);
-
-            fetch(`${API_BASE_URL}/bookbuilder/login`, {
-              method: "POST",
-              body: data,
-              headers: { "ngrok-skip-browser-warning": "true" },
-            })
-              .then((res) => {
-                if (!res.ok) throw new Error("Unauthorized email");
-                return res.json();
-              })
-              .then((json) => {
-                localStorage.setItem("bookBuilderToken", json.access_token);
-                localStorage.setItem("bookBuilderEmail", this.email);
-                this.password = "";
-                this.loggedIn = true;
-                this.error = "";
-                this.loggingIn = false;
-                window.dispatchEvent(new CustomEvent("login-success"));
-              })
-              .catch((err) => {
-                this.error = err.message;
-                this.loggingIn = false;
-              });
-          },
-        };
-      }
-
-      function bookBuilderApp() {
-        return {
-          isLoggedIn: false,
-          userEmail: "",
-          concepts: [],
-          expandedThesisStatements: {},
-          selectedProjectId: "",
-          screens: [
-            { id: "screen1", label: "Concept Dashboard" },
-            { id: "screen2", label: "Novelty and Positioning" },
-            { id: "screen3", label: "Principles and Story Bank" },
-            { id: "screen4", label: "Structure Options" },
-            { id: "screen5", label: "Chapter Cards" },
-            { id: "screen6", label: "Chapter Lab" },
-          ],
-          activeScreen: "screen1",
-          loadingConcepts: false,
-          projectError: "",
-          showCreateConceptModal: false,
-          newConceptWorkingTitle: "",
-          newConceptBrief: "",
-          newConceptRoughThesis: "",
-          creatingConcept: false,
-          createProjectError: "",
-          showQuestionModal: false,
-          generatedQuestions: [],
-          questionAnswers: {},
-          loadingQuestions: false,
-          questionError: "",
-          submittingAnswerId: "",
-          refiningThesis: false,
-          refinedThesisText: "",
-          modalView: "choice",
-          structures: [],
-          selectedStructureId: "",
-          loadingStructures: false,
-          expandedStructures: {},
-
-          // Screen 2: Novelty scan
-          noveltyScanItems: [],
-          loadingNoveltyScan: false,
-          noveltyScanError: "",
-          noveltyScanLastProjectId: "",
-
-          // Screen 2: Authority map
-          authorityMapItems: [],
-          loadingAuthorityMap: false,
-          authorityMapError: "",
-          authorityMapLastProjectId: "",
-
-          // Screen 3: Principles
-          screen3Principles: [],
-          loadingPrinciples: false,
-          principlesError: "",
-          expandedPrincipleTexts: {},
-          generatingPrinciples: false,
-          approvingPrincipleId: "",
-
-          // Screen 3: Story Bank
-          storyBankItems: [],
-          loadingStories: false,
-          storiesError: "",
-          expandedStoryTexts: {},
-          generatingStories: false,
-          approvingStoryId: "",
-
-          init() {
-            const token = localStorage.getItem("bookBuilderToken");
-            const email = localStorage.getItem("bookBuilderEmail");
-            if (token && email) {
-              this.isLoggedIn = true;
-              this.userEmail = email;
-              loadActiveUsers();
-              this.loadConcepts();
-            }
-
-            window.addEventListener("login-success", () => {
-              this.isLoggedIn = true;
-              this.userEmail = localStorage.getItem("bookBuilderEmail") || "";
-              loadActiveUsers();
-              this.loadConcepts();
-            });
-
-            window.addEventListener("logout-success", () => {
-              this.isLoggedIn = false;
-              this.userEmail = "";
-            });
-
-            // Auto-load Screen 2 results when user opens that tab.
-            this.$watch("activeScreen", (value) => {
-              if (value === "screen2") {
-                this.loadNoveltyScanList();
-                this.loadAuthorityMapList();
-              }
-              if (value === "screen3") {
-                this.loadPrinciples();
-                this.loadStories();
-              }
-            });
-          },
-
-          logout() {
+          function handle401() {
+            alert("Your session has expired. Please log in again.");
             localStorage.removeItem("bookBuilderToken");
             localStorage.removeItem("bookBuilderEmail");
-            this.isLoggedIn = false;
-            this.userEmail = "";
             window.dispatchEvent(new Event("logout-success"));
-          },
+            location.reload();
+          }
 
-          getAuthHeaders(extra = {}) {
-            const token = requireToken();
-            if (!token) return null;
+          function loginApp() {
             return {
-              ...extra,
-              Authorization: `Bearer ${token}`,
-              "ngrok-skip-browser-warning": "true",
+              email: "",
+              password: "",
+              error: "",
+              loggedIn: false,
+              loggingIn: false,
+
+              init() {
+                const token = localStorage.getItem("bookBuilderToken");
+                const savedEmail = localStorage.getItem("bookBuilderEmail");
+                if (token && savedEmail) {
+                  this.loggedIn = true;
+                  this.email = savedEmail;
+                }
+
+                window.addEventListener("logout-success", () => {
+                  this.loggedIn = false;
+                  this.email = "";
+                  this.password = "";
+                  this.error = "";
+                });
+              },
+
+              login() {
+                if (!this.email || !this.email.includes("@")) {
+                  this.error = "Please enter a valid email";
+                  return;
+                }
+                if (!this.password) {
+                  this.error = "Please enter your password";
+                  return;
+                }
+
+                this.loggingIn = true;
+                this.error = "";
+
+                const data = new FormData();
+                data.append("username", this.email);
+                data.append("password", this.password);
+
+                fetch(`${API_BASE_URL}/bookbuilder/login`, {
+                  method: "POST",
+                  body: data,
+                  headers: { "ngrok-skip-browser-warning": "true" },
+                })
+                  .then((res) => {
+                    if (!res.ok) throw new Error("Unauthorized email");
+                    return res.json();
+                  })
+                  .then((json) => {
+                    localStorage.setItem("bookBuilderToken", json.access_token);
+                    localStorage.setItem("bookBuilderEmail", this.email);
+                    this.password = "";
+                    this.loggedIn = true;
+                    this.error = "";
+                    this.loggingIn = false;
+                    window.dispatchEvent(new CustomEvent("login-success"));
+                  })
+                  .catch((err) => {
+                    this.error = err.message;
+                    this.loggingIn = false;
+                  });
+              },
             };
-          },
-
-          formatDate(value) {
-            if (!value) return "-";
-            const date = new Date(value);
-            if (Number.isNaN(date.getTime())) return "-";
-            return date.toLocaleString("en-US", {
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-              hour12: false,
-            });
-          },
-
-          async loadConcepts() {
-            this.loadingConcepts = true;
-            this.projectError = "";
-            try {
-              const headers = this.getAuthHeaders();
-              if (!headers) return;
-              const res = await fetch(`${API_BASE_URL}/bookbuilder/concepts`, {
-                headers,
-              });
-              if (res.status === 401 || res.status === 403) {
-                handle401();
-                return;
-              }
-              if (!res.ok) throw new Error("Failed to fetch concepts");
-              const data = await res.json();
-              this.concepts = Array.isArray(data) ? data : [];
-              this.expandedThesisStatements = {};
-              if (this.concepts.length > 0) {
-                this.selectProject(
-                  this.selectedProjectId || this.concepts[0].project_id,
-                );
-              } else {
-                this.selectedProjectId = "";
-              }
-            } catch (err) {
-              this.projectError = err.message || "Unable to load concepts";
-              this.concepts = [];
-            } finally {
-              this.loadingConcepts = false;
-            }
-          },
-
-          async loadRefinedThesis() {
-            if (!this.selectedProjectId) return;
-            try {
-              const headers = this.getAuthHeaders({
-                "ngrok-skip-browser-warning": "true",
-              });
-              if (!headers) return;
-              const res = await fetch(
-                `${API_BASE_URL}/bookbuilder/concept/${this.selectedProjectId}/refine-thesis`,
-                {
-                  method: "GET",
-                  headers,
-                },
-              );
-              if (res.ok) {
-                const data = await res.json();
-                this.refinedThesisText = data.refined_thesis || "";
-              }
-            } catch (err) {
-              console.error("Failed to load refined thesis", err);
-            }
-          },
-
-          selectProject(projectId) {
-            if (!projectId || this.selectedProjectId === projectId) return;
-            this.selectedProjectId = projectId;
-            this.refinedThesisText = "";
-            this.loadRefinedThesis();
-
-            // Keep Screen 2 in sync with the selected project.
-            if (this.activeScreen === "screen2") {
-              this.loadNoveltyScanList({ force: false });
-              this.loadAuthorityMapList({ force: false });
-            }
-          },
-
-          openCreateConceptModal() {
-            this.showCreateConceptModal = true;
-            this.createProjectError = "";
-          },
-
-          closeCreateConceptModal() {
-            this.showCreateConceptModal = false;
-            this.newConceptWorkingTitle = "";
-            this.newConceptBrief = "";
-            this.newConceptRoughThesis = "";
-            this.createProjectError = "";
-          },
-
-          toggleThesisStatement(conceptId) {
-            this.expandedThesisStatements = {
-              ...this.expandedThesisStatements,
-              [conceptId]: !this.expandedThesisStatements[conceptId],
-            };
-          },
-
-          async submitConcept() {
-            if (!this.newConceptWorkingTitle) {
-              this.createProjectError = "Working title is required";
-              return;
-            }
-            if (!this.newConceptBrief) {
-              this.createProjectError = "Concept brief is required";
-              return;
-            }
-            if (!this.newConceptRoughThesis) {
-              this.createProjectError = "Rough thesis is required";
-              return;
-            }
-
-            this.creatingConcept = true;
-            this.createProjectError = "";
-            try {
-              const headers = this.getAuthHeaders({
-                "Content-Type": "application/json",
-              });
-              if (!headers) return;
-              const payload = {
-                working_title: this.newConceptWorkingTitle,
-                concept_brief: this.newConceptBrief,
-                rough_thesis: this.newConceptRoughThesis,
-              };
-
-              const res = await fetch(`${API_BASE_URL}/bookbuilder/concept`, {
-                method: "POST",
-                headers,
-                body: JSON.stringify(payload),
-              });
-              if (res.status === 401 || res.status === 403) {
-                handle401();
-                return;
-              }
-
-              if (!res.ok) {
-                const errorJson = await res.json().catch(() => ({}));
-                throw new Error(errorJson.detail || "Failed to create concept");
-              }
-
-              const responseData = await res.json().catch(() => ({}));
-              if (responseData && responseData.project_id) {
-                this.selectedProjectId = responseData.project_id;
-                localStorage.setItem(
-                  "bookBuilderProjectId",
-                  responseData.project_id,
-                );
-              }
-              await this.loadConcepts();
-              this.closeCreateConceptModal();
-            } catch (err) {
-              this.createProjectError =
-                err.message || "Unable to create concept";
-            } finally {
-              this.creatingConcept = false;
-            }
-          },
-
-          async openQuestionModal() {
-            if (!this.selectedProjectId) {
-              this.projectError = "Please select a concept row first";
-              return;
-            }
-            this.showQuestionModal = true;
-            this.modalView = "choice";
-            this.questionError = "";
-          },
-
-          async startQuestionGeneration() {
-            this.modalView = "questions";
-            this.loadingQuestions = true;
-            this.questionError = "";
-            this.generatedQuestions = [];
-            this.questionAnswers = {};
-            try {
-              const headers = this.getAuthHeaders();
-              if (!headers) return;
-              const res = await fetch(
-                `${API_BASE_URL}/bookbuilder/concept/${this.selectedProjectId}/questions`,
-                {
-                  method: "POST",
-                  headers,
-                },
-              );
-              if (res.status === 401 || res.status === 403) {
-                handle401();
-                return;
-              }
-              if (!res.ok) throw new Error("Failed to generate questions");
-              const data = await res.json();
-              this.generatedQuestions = Array.isArray(data) ? data : [];
-              this.generatedQuestions.forEach((q) => {
-                this.questionAnswers[q.id] = "";
-              });
-            } catch (err) {
-              this.questionError = err.message || "Unable to load questions";
-            } finally {
-              this.loadingQuestions = false;
-            }
-          },
-
-          closeQuestionModal() {
-            this.showQuestionModal = false;
-          },
-
-          async submitQuestionAnswer(questionId) {
-            if (!this.selectedProjectId || !questionId) return;
-            const answer = (this.questionAnswers[questionId] || "").trim();
-            if (!answer) {
-              this.questionError = "Please enter an answer before submitting.";
-              return;
-            }
-            this.submittingAnswerId = questionId;
-            this.questionError = "";
-            try {
-              const headers = this.getAuthHeaders({
-                "Content-Type": "application/json",
-                "ngrok-skip-browser-warning": "true",
-              });
-              if (!headers) return;
-              const res = await fetch(
-                `${API_BASE_URL}/bookbuilder/concept/${this.selectedProjectId}/answer/${questionId}`,
-                {
-                  method: "POST",
-                  headers,
-                  body: JSON.stringify({ answer }),
-                },
-              );
-              if (res.status === 401 || res.status === 403) {
-                handle401();
-                return;
-              }
-              if (!res.ok) {
-                const errorJson = await res.json().catch(() => ({}));
-                throw new Error(errorJson.detail || "Failed to submit answer");
-              }
-              this.generatedQuestions = this.generatedQuestions.map((q) =>
-                q.id === questionId ? { ...q, is_answered: true } : q,
-              );
-            } catch (err) {
-              this.questionError = err.message || "Unable to submit answer";
-            } finally {
-              this.submittingAnswerId = "";
-            }
-          },
-
-          async submitBulkAnswers() {
-            if (!this.selectedProjectId) return;
-            const answers = Object.entries(this.questionAnswers)
-              .filter(([_, text]) => text.trim() !== "")
-              .map(([id, text]) => ({ question_id: id, answer: text.trim() }));
-
-            if (answers.length === 0) {
-              this.questionError =
-                "Please provide at least one answer before saving.";
-              return;
-            }
-
-            this.refiningThesis = true;
-            this.questionError = "";
-            try {
-              const headers = this.getAuthHeaders({
-                "Content-Type": "application/json",
-                "ngrok-skip-browser-warning": "true",
-              });
-              if (!headers) return;
-              const res = await fetch(
-                `${API_BASE_URL}/bookbuilder/concept/${this.selectedProjectId}/answers/bulk`,
-                {
-                  method: "POST",
-                  headers,
-                  body: JSON.stringify({ answers }),
-                },
-              );
-              if (res.status === 401 || res.status === 403) {
-                handle401();
-                return;
-              }
-              if (!res.ok) {
-                const errorJson = await res.json().catch(() => ({}));
-                throw new Error(errorJson.detail || "Failed to submit answers");
-              }
-              await this.refineThesis();
-            } catch (err) {
-              this.questionError = err.message || "Unable to save answers";
-            } finally {
-              this.refiningThesis = false;
-            }
-          },
-
-          async refineThesis() {
-            if (!this.selectedProjectId) return;
-            this.refiningThesis = true;
-            this.projectError = "";
-            try {
-              const headers = this.getAuthHeaders({
-                "ngrok-skip-browser-warning": "true",
-              });
-              if (!headers) return;
-              const res = await fetch(
-                `${API_BASE_URL}/bookbuilder/concept/${this.selectedProjectId}/refine-thesis`,
-                {
-                  method: "POST",
-                  headers,
-                },
-              );
-              if (res.status === 401 || res.status === 403) {
-                handle401();
-                return;
-              }
-              if (!res.ok) throw new Error("Failed to refine thesis");
-              await this.loadRefinedThesis();
-              this.closeQuestionModal();
-            } catch (err) {
-              this.projectError = err.message || "Unable to refine thesis";
-            } finally {
-              this.refiningThesis = false;
-            }
-          },
-          stripIds(value) {
-            // Remove ids from the API response (including nested ones).
-            if (Array.isArray(value)) return value.map((v) => this.stripIds(v));
-            if (value && typeof value === "object") {
-              const out = {};
-              for (const [k, v] of Object.entries(value)) {
-                if (k === "id" || k === "project_id") continue;
-                out[k] = this.stripIds(v);
-              }
-              return out;
-            }
-            return value;
-          },
-
-          formatNoveltyItem(item) {
-            try {
-              return JSON.stringify(item, null, 2);
-            } catch (_) {
-              return String(item);
-            }
-          },
-
-          getParsedStringListBullets(value) {
-            // The API sometimes returns list-like strings such as:
-            // "['a', \"b\", 'c']"
-            if (typeof value !== "string") return [];
-            const trimmed = value.trim();
-            if (!trimmed) return [];
-
-            // Capture both single-quoted and double-quoted list items.
-            const regex = /'([^']*)'|"([^"]*)"/g;
-            const out = [];
-            let match = null;
-            while ((match = regex.exec(trimmed)) !== null) {
-              const v = (match[1] ?? match[2] ?? "").trim();
-              if (v) out.push(v);
-            }
-            return out;
-          },
-
-          async loadNoveltyScanList({ force = false } = {}) {
-            if (!this.selectedProjectId) return;
-            if (!force && this.noveltyScanLastProjectId === this.selectedProjectId) return;
-
-            this.loadingNoveltyScan = true;
-            this.noveltyScanError = "";
-
-            try {
-              const headers = this.getAuthHeaders({
-                "ngrok-skip-browser-warning": "true",
-                "Accept": "application/json",
-              });
-              if (!headers) return;
-
-              const url = `${API_BASE_URL}/bookbuilder/research/${this.selectedProjectId}/novelty-scan`;
-              const res = await fetch(url, { headers });
-
-              if (res.status === 401 || res.status === 403) {
-                handle401();
-                return;
-              }
-              if (!res.ok) {
-                const errorJson = await res.json().catch(() => ({}));
-                throw new Error(errorJson.detail || "Failed to fetch novelty results");
-              }
-
-              const data = await res.json().catch(() => []);
-              const list = Array.isArray(data) ? data : [];
-              this.noveltyScanItems = list.map((item) => this.stripIds(item));
-              this.noveltyScanLastProjectId = this.selectedProjectId;
-            } catch (err) {
-              this.noveltyScanError = err.message || "Unable to load novelty results";
-              this.noveltyScanItems = [];
-            } finally {
-              this.loadingNoveltyScan = false;
-            }
-          },
-
-          async runNoveltyScan() {
-            if (!this.selectedProjectId) return;
-            this.loadingNoveltyScan = true;
-            this.noveltyScanError = "";
-
-            try {
-              const headers = this.getAuthHeaders({
-                "Accept": "application/json",
-              });
-              if (!headers) return;
-
-              const url = `${API_BASE_URL}/bookbuilder/research/${this.selectedProjectId}/novelty-scan`;
-
-              // 1) Trigger novelty scan generation
-              const postRes = await fetch(url, { method: "POST", headers });
-              if (postRes.status === 401 || postRes.status === 403) {
-                handle401();
-                return;
-              }
-              if (!postRes.ok) {
-                const errorJson = await postRes.json().catch(() => ({}));
-                throw new Error(errorJson.detail || "Failed to run novelty scan");
-              }
-
-              // 2) Fetch list to display
-              await this.loadNoveltyScanList({ force: true });
-            } catch (err) {
-              this.noveltyScanError = err.message || "Unable to run novelty scan";
-              this.noveltyScanItems = [];
-            } finally {
-              this.loadingNoveltyScan = false;
-            }
-          },
-
-          async loadAuthorityMapList({ force = false } = {}) {
-            if (!this.selectedProjectId) return;
-            if (!force && this.authorityMapLastProjectId === this.selectedProjectId) return;
-
-            this.loadingAuthorityMap = true;
-            this.authorityMapError = "";
-
-            try {
-              const headers = this.getAuthHeaders({
-                "ngrok-skip-browser-warning": "true",
-                Accept: "application/json",
-              });
-              if (!headers) return;
-
-              const url = `${API_BASE_URL}/bookbuilder/research/${this.selectedProjectId}/authority-map`;
-              const res = await fetch(url, { headers });
-
-              if (res.status === 401 || res.status === 403) {
-                handle401();
-                return;
-              }
-              if (!res.ok) {
-                const errorJson = await res.json().catch(() => ({}));
-                throw new Error(
-                  errorJson.detail || "Failed to fetch authority results",
-                );
-              }
-
-              const data = await res.json().catch(() => []);
-              const list = Array.isArray(data) ? data : [];
-              this.authorityMapItems = list.map((item) => this.stripIds(item));
-              this.authorityMapLastProjectId = this.selectedProjectId;
-            } catch (err) {
-              this.authorityMapError =
-                err.message || "Unable to load authority results";
-              this.authorityMapItems = [];
-            } finally {
-              this.loadingAuthorityMap = false;
-            }
-          },
-
-          async runAuthorityMap() {
-            if (!this.selectedProjectId) return;
-            this.loadingAuthorityMap = true;
-            this.authorityMapError = "";
-
-            try {
-              const headers = this.getAuthHeaders({
-                Accept: "application/json",
-              });
-              if (!headers) return;
-
-              const url = `${API_BASE_URL}/bookbuilder/research/${this.selectedProjectId}/authority-map`;
-
-              // 1) Trigger authority map generation
-              const postRes = await fetch(url, { method: "POST", headers });
-              if (postRes.status === 401 || postRes.status === 403) {
-                handle401();
-                return;
-              }
-              if (!postRes.ok) {
-                const errorJson = await postRes.json().catch(() => ({}));
-                throw new Error(
-                  errorJson.detail || "Failed to run authority map",
-                );
-              }
-
-              // 2) Fetch list to display
-              await this.loadAuthorityMapList({ force: true });
-            } catch (err) {
-              this.authorityMapError =
-                err.message || "Unable to run authority map";
-              this.authorityMapItems = [];
-            } finally {
-              this.loadingAuthorityMap = false;
-            }
-          },
-          /* ==========================
-            LOAD STRUCTURES
-          ========================== */
-          async loadStructures() {
-            if (!this.selectedProjectId) return;
-            this.loadingStructures = true;
-            try {
-              const headers = this.getAuthHeaders();
-              if (!headers) return;
-              const res = await fetch(
-                `${API_BASE_URL}/bookbuilder/structure/${this.selectedProjectId}`,
-                {
-                  method: "GET",
-                  headers
-                }
-              );
-              if (!res.ok) {
-                throw new Error("Failed to load structures");
-              }
-              const data = await res.json();
-              this.structures = Array.isArray(data) ? data : [];
-            } catch (error) {
-              this.structures = [];
-            } finally {
-              this.loadingStructures = false;
-            }
-          },
-          /* ==========================
-          GENERATE STRUCTURES
-          ========================== */
-          async generateStructures() {
-            if (!this.selectedProjectId) return;
-            this.loadingStructures = true;
-            try {
-              const headers = this.getAuthHeaders();
-              if (!headers) return;
-              await fetch(
-                `${API_BASE_URL}/bookbuilder/structure/${this.selectedProjectId}/generate`,
-                {
-                  method: "POST",
-                  headers
-                }
-              );
-              await this.loadStructures();
-            } catch (error) {
-              alert("Failed to generate structures");
-            } finally {
-              this.loadingStructures = false;
-            }
-          },
-          /* ==========================
-          SELECT STRUCTURE
-          ========================== */
-          async selectStructure() {
-            if (!this.selectedProjectId || !this.selectedStructureId) return;
-            try {
-              const headers = this.getAuthHeaders();
-              if (!headers) return;
-              await fetch(
-                `${API_BASE_URL}/bookbuilder/structure/${this.selectedProjectId}/select/${this.selectedStructureId}`,
-                {
-                  method: "POST",
-                  headers
-                }
-              );
-              alert("Structure Selected Successfully");
-            } catch (error) {
-              alert("Failed to select structure");
-            }
-          },
-          /* ==========================
-          SELECT PROJECT
-          ========================== */
-          selectProject(projectId) {
-            if (!projectId) return;
-            this.selectedProjectId = projectId;
-            this.refinedThesisText = "";
-            this.loadRefinedThesis();
-            this.selectedStructureId = "";
-            this.loadStructures(); // auto load screen4 data
-
-            // Keep Screen 2 in sync with the selected project.
-            if (this.activeScreen === "screen2") {
-              this.loadNoveltyScanList({ force: false });
-              this.loadAuthorityMapList({ force: false });
-            }
-            this.loadPrinciples();
-            this.loadStories();
-          },
-          toggleStructureText(key) {
-            this.expandedStructures = {
-              ...this.expandedStructures,
-              [key]: !this.expandedStructures[key]
-            };
-          },
-
-          // ── Screen 3 methods ──
-          async loadPrinciples() {
-            if (!this.selectedProjectId) return;
-            this.loadingPrinciples = true;
-            this.principlesError = "";
-            try {
-              const headers = this.getAuthHeaders();
-              if (!headers) return;
-              const res = await fetch(
-                `${API_BASE_URL}/bookbuilder/principles/${this.selectedProjectId}`,
-                { headers }
-              );
-              if (res.status === 401 || res.status === 403) {
-                handle401();
-                return;
-              }
-              if (!res.ok) throw new Error("Failed to fetch principles");
-              const data = await res.json();
-              this.screen3Principles = Array.isArray(data) ? data : [];
-            } catch (err) {
-              this.principlesError = err.message || "Unable to load principles";
-              this.screen3Principles = [];
-            } finally {
-              this.loadingPrinciples = false;
-            }
-          },
-
-          togglePrincipleText(principleId) {
-            this.expandedPrincipleTexts = {
-              ...this.expandedPrincipleTexts,
-              [principleId]: !this.expandedPrincipleTexts[principleId],
-            };
-          },
-
-          async generatePrinciples() {
-            if (!this.selectedProjectId) return;
-            this.generatingPrinciples = true;
-            this.principlesError = "";
-            try {
-              const headers = this.getAuthHeaders();
-              if (!headers) return;
-              const res = await fetch(
-                `${API_BASE_URL}/bookbuilder/principles/${this.selectedProjectId}/generate`,
-                {
-                  method: "POST",
-                  headers,
-                }
-              );
-              if (res.status === 401 || res.status === 403) {
-                handle401();
-                return;
-              }
-              if (!res.ok) {
-                const errorJson = await res.json().catch(() => ({}));
-                throw new Error(errorJson.detail || "Failed to generate principles");
-              }
-              await this.loadPrinciples();
-            } catch (err) {
-              this.principlesError = err.message || "Unable to generate principles";
-            } finally {
-              this.generatingPrinciples = false;
-            }
-          },
-
-          async approvePrinciple(principleId) {
-            if (!principleId) return;
-            this.approvingPrincipleId = principleId;
-            this.principlesError = "";
-            try {
-              const headers = this.getAuthHeaders();
-              if (!headers) return;
-              const res = await fetch(
-                `${API_BASE_URL}/bookbuilder/principles/${principleId}/approve`,
-                {
-                  method: "POST",
-                  headers,
-                }
-              );
-              if (res.status === 401 || res.status === 403) {
-                handle401();
-                return;
-              }
-              if (!res.ok) {
-                const errorJson = await res.json().catch(() => ({}));
-                throw new Error(errorJson.detail || "Failed to approve principle");
-              }
-              await this.loadPrinciples();
-            } catch (err) {
-              this.principlesError = err.message || "Unable to approve principle";
-            } finally {
-              this.approvingPrincipleId = "";
-            }
-          },
-
-          // ── Screen 3: Story Bank methods ──
-          async loadStories() {
-            if (!this.selectedProjectId) return;
-            this.loadingStories = true;
-            this.storiesError = "";
-            try {
-              const headers = this.getAuthHeaders();
-              if (!headers) return;
-              const res = await fetch(
-                `${API_BASE_URL}/bookbuilder/stories/${this.selectedProjectId}`,
-                { headers }
-              );
-              if (res.status === 401 || res.status === 403) {
-                handle401();
-                return;
-              }
-              if (!res.ok) throw new Error("Failed to fetch stories");
-              const data = await res.json();
-              this.storyBankItems = Array.isArray(data) ? data : [];
-            } catch (err) {
-              this.storiesError = err.message || "Unable to load stories";
-              this.storyBankItems = [];
-            } finally {
-              this.loadingStories = false;
-            }
-          },
-
-          toggleStoryText(storyId) {
-            this.expandedStoryTexts = {
-              ...this.expandedStoryTexts,
-              [storyId]: !this.expandedStoryTexts[storyId],
-            };
-          },
-
-          async generateStory() {
-            if (!this.selectedProjectId) return;
-            this.generatingStories = true;
-            this.storiesError = "";
-            try {
-              const headers = this.getAuthHeaders();
-              if (!headers) return;
-              const res = await fetch(
-                `${API_BASE_URL}/bookbuilder/stories/${this.selectedProjectId}/generate`,
-                {
-                  method: "POST",
-                  headers,
-                }
-              );
-              if (res.status === 401 || res.status === 403) {
-                handle401();
-                return;
-              }
-              if (!res.ok) {
-                const errorJson = await res.json().catch(() => ({}));
-                throw new Error(errorJson.detail || "Failed to generate story");
-              }
-              await this.loadStories();
-            } catch (err) {
-              this.storiesError = err.message || "Unable to generate story";
-            } finally {
-              this.generatingStories = false;
-            }
-          },
-
-          async approveStory(storyId) {
-            if (!storyId) return;
-            this.approvingStoryId = storyId;
-            this.storiesError = "";
-            try {
-              const headers = this.getAuthHeaders();
-              if (!headers) return;
-              const res = await fetch(
-                `${API_BASE_URL}/bookbuilder/stories/${storyId}/approve`,
-                {
-                  method: "POST",
-                  headers,
-                }
-              );
-              if (res.status === 401 || res.status === 403) {
-                handle401();
-                return;
-              }
-              if (!res.ok) {
-                const errorJson = await res.json().catch(() => ({}));
-                throw new Error(errorJson.detail || "Failed to approve story");
-              }
-              await this.loadStories();
-            } catch (err) {
-              this.storiesError = err.message || "Unable to approve story";
-            } finally {
-              this.approvingStoryId = "";
-            }
-          },
-        };
-      }
-
-      function toggleActiveUsers() {
-        const popover = document.getElementById("active-users-popover");
-        const isOpening = popover.style.display !== "block";
-        if (isOpening) {
-          loadActiveUsers();
-        }
-        popover.style.display = isOpening ? "block" : "none";
-      }
-
-      async function loadActiveUsers() {
-        const token = requireToken();
-        if (!token) return;
-        try {
-          const res = await fetch(`${API_BASE_URL}/bookbuilder/active-today`, {
-            headers: {
-              Authorization: token ? `Bearer ${token}` : "",
-              "ngrok-skip-browser-warning": "true",
-            },
-          });
-
-          if (res.status === 401 || res.status === 403) {
-            handle401();
-            return;
-          }
-          if (!res.ok) throw new Error("Failed to fetch active users");
-
-          const data = await res.json();
-          const users = Array.isArray(data) ? data : [];
-          document.getElementById("active-user-count").innerText = users.length;
-
-          const list = document.getElementById("active-users-list");
-          list.innerHTML = "";
-          if (users.length === 0) {
-            list.innerHTML =
-              "<p style='color:#aaa; font-size:13px'>No active users</p>";
-            return;
           }
 
-          users.forEach((user) => {
-            const div = document.createElement("div");
-            div.style.padding = "10px 8px";
-            div.style.fontSize = "13px";
-            div.style.borderBottom = "1px solid #333";
-            div.style.display = "flex";
-            div.style.justifyContent = "space-between";
-            div.style.alignItems = "center";
-            div.style.gap = "16px";
+          function bookBuilderApp() {
+            return {
+              isLoggedIn: false,
+              userEmail: "",
+              concepts: [],
+              expandedThesisStatements: {},
+              selectedProjectId: "",
+              screens: [
+                { id: "screen1", label: "Concept Dashboard" },
+                { id: "screen2", label: "Novelty and Positioning" },
+                { id: "screen3", label: "Principles and Story Bank" },
+                { id: "screen4", label: "Structure Options" },
+                { id: "screen5", label: "Chapter Cards" },
+                { id: "screen6", label: "Chapter Lab" },
+              ],
+              activeScreen: "screen1",
+              loadingConcepts: false,
+              projectError: "",
+              showCreateConceptModal: false,
+              newConceptWorkingTitle: "",
+              newConceptBrief: "",
+              newConceptRoughThesis: "",
+              creatingConcept: false,
+              createProjectError: "",
+              showQuestionModal: false,
+              generatedQuestions: [],
+              questionAnswers: {},
+              loadingQuestions: false,
+              questionError: "",
+              submittingAnswerId: "",
+              refiningThesis: false,
+              refinedThesisText: "",
+              modalView: "choice",
+              structures: [],
+              selectedStructureId: "",
+              loadingStructures: false,
+              expandedStructures: {},
 
-            const emailSpan = document.createElement("span");
-            emailSpan.style.color = "#f1c40f";
-            emailSpan.style.fontWeight = "500";
-            emailSpan.style.flex = "1";
-            emailSpan.innerText = user.email || "";
+              // Screen 2: Novelty scan
+              noveltyScanItems: [],
+              loadingNoveltyScan: false,
+              noveltyScanError: "",
+              noveltyScanLastProjectId: "",
 
-            const timeSpan = document.createElement("span");
-            timeSpan.style.color = "#aaa";
-            timeSpan.style.fontSize = "12px";
-            timeSpan.style.whiteSpace = "nowrap";
-            timeSpan.style.flexShrink = "0";
-            timeSpan.innerText = formatLastActive(user.last_active);
+              // Screen 2: Authority map
+              authorityMapItems: [],
+              loadingAuthorityMap: false,
+              authorityMapError: "",
+              authorityMapLastProjectId: "",
 
-            div.appendChild(emailSpan);
-            div.appendChild(timeSpan);
-            list.appendChild(div);
+              // Screen 3: Principles
+              screen3Principles: [],
+              loadingPrinciples: false,
+              principlesError: "",
+              expandedPrincipleTexts: {},
+              generatingPrinciples: false,
+              approvingPrincipleId: "",
+
+              // Screen 3: Story Bank
+              storyBankItems: [],
+              loadingStories: false,
+              storiesError: "",
+              expandedStoryTexts: {},
+              generatingStories: false,
+              approvingStoryId: "",
+              chapterCards: [],
+              loadingChapterCards: false,
+              expandedChapterSummary: {},
+              approvingChapterId: "",
+
+              init() {
+                const token = localStorage.getItem("bookBuilderToken");
+                const email = localStorage.getItem("bookBuilderEmail");
+                if (token && email) {
+                  this.isLoggedIn = true;
+                  this.userEmail = email;
+                  loadActiveUsers();
+                  this.loadConcepts();
+                }
+
+                window.addEventListener("login-success", () => {
+                  this.isLoggedIn = true;
+                  this.userEmail = localStorage.getItem("bookBuilderEmail") || "";
+                  loadActiveUsers();
+                  this.loadConcepts();
+                });
+
+                window.addEventListener("logout-success", () => {
+                  this.isLoggedIn = false;
+                  this.userEmail = "";
+                });
+
+                // Auto-load Screen 2 results when user opens that tab.
+                this.$watch("activeScreen", (value) => {
+                  if (value === "screen2") {
+                    this.loadNoveltyScanList();
+                    this.loadAuthorityMapList();
+                  }
+                  if (value === "screen3") {
+                    this.loadPrinciples();
+                    this.loadStories();
+                  }
+                });
+              },
+
+              logout() {
+                localStorage.removeItem("bookBuilderToken");
+                localStorage.removeItem("bookBuilderEmail");
+                this.isLoggedIn = false;
+                this.userEmail = "";
+                window.dispatchEvent(new Event("logout-success"));
+              },
+
+              getAuthHeaders(extra = {}) {
+                const token = requireToken();
+                if (!token) return null;
+                return {
+                  ...extra,
+                  Authorization: `Bearer ${token}`,
+                  "ngrok-skip-browser-warning": "true",
+                };
+              },
+
+              formatDate(value) {
+                if (!value) return "-";
+                const date = new Date(value);
+                if (Number.isNaN(date.getTime())) return "-";
+                return date.toLocaleString("en-US", {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                  hour12: false,
+                });
+              },
+
+              async loadConcepts() {
+                this.loadingConcepts = true;
+                this.projectError = "";
+                try {
+                  const headers = this.getAuthHeaders();
+                  if (!headers) return;
+                  const res = await fetch(`${API_BASE_URL}/bookbuilder/concepts`, {
+                    headers,
+                  });
+                  if (res.status === 401 || res.status === 403) {
+                    handle401();
+                    return;
+                  }
+                  if (!res.ok) throw new Error("Failed to fetch concepts");
+                  const data = await res.json();
+                  this.concepts = Array.isArray(data) ? data : [];
+                  this.expandedThesisStatements = {};
+                  if (this.concepts.length > 0) {
+                    this.selectProject(
+                      this.selectedProjectId || this.concepts[0].project_id,
+                    );
+                  } else {
+                    this.selectedProjectId = "";
+                  }
+                } catch (err) {
+                  this.projectError = err.message || "Unable to load concepts";
+                  this.concepts = [];
+                } finally {
+                  this.loadingConcepts = false;
+                }
+              },
+
+              async loadRefinedThesis() {
+                if (!this.selectedProjectId) return;
+                try {
+                  const headers = this.getAuthHeaders({
+                    "ngrok-skip-browser-warning": "true",
+                  });
+                  if (!headers) return;
+                  const res = await fetch(
+                    `${API_BASE_URL}/bookbuilder/concept/${this.selectedProjectId}/refine-thesis`,
+                    {
+                      method: "GET",
+                      headers,
+                    },
+                  );
+                  if (res.ok) {
+                    const data = await res.json();
+                    this.refinedThesisText = data.refined_thesis || "";
+                  }
+                } catch (err) {
+                  console.error("Failed to load refined thesis", err);
+                }
+              },
+
+              selectProject(projectId) {
+                if (!projectId || this.selectedProjectId === projectId) return;
+                this.selectedProjectId = projectId;
+                this.refinedThesisText = "";
+                this.loadRefinedThesis();
+
+                // Keep Screen 2 in sync with the selected project.
+                if (this.activeScreen === "screen2") {
+                  this.loadNoveltyScanList({ force: false });
+                  this.loadAuthorityMapList({ force: false });
+                }
+              },
+
+              openCreateConceptModal() {
+                this.showCreateConceptModal = true;
+                this.createProjectError = "";
+              },
+
+              closeCreateConceptModal() {
+                this.showCreateConceptModal = false;
+                this.newConceptWorkingTitle = "";
+                this.newConceptBrief = "";
+                this.newConceptRoughThesis = "";
+                this.createProjectError = "";
+              },
+
+              toggleThesisStatement(conceptId) {
+                this.expandedThesisStatements = {
+                  ...this.expandedThesisStatements,
+                  [conceptId]: !this.expandedThesisStatements[conceptId],
+                };
+              },
+
+              async submitConcept() {
+                if (!this.newConceptWorkingTitle) {
+                  this.createProjectError = "Working title is required";
+                  return;
+                }
+                if (!this.newConceptBrief) {
+                  this.createProjectError = "Concept brief is required";
+                  return;
+                }
+                if (!this.newConceptRoughThesis) {
+                  this.createProjectError = "Rough thesis is required";
+                  return;
+                }
+
+                this.creatingConcept = true;
+                this.createProjectError = "";
+                try {
+                  const headers = this.getAuthHeaders({
+                    "Content-Type": "application/json",
+                  });
+                  if (!headers) return;
+                  const payload = {
+                    working_title: this.newConceptWorkingTitle,
+                    concept_brief: this.newConceptBrief,
+                    rough_thesis: this.newConceptRoughThesis,
+                  };
+
+                  const res = await fetch(`${API_BASE_URL}/bookbuilder/concept`, {
+                    method: "POST",
+                    headers,
+                    body: JSON.stringify(payload),
+                  });
+                  if (res.status === 401 || res.status === 403) {
+                    handle401();
+                    return;
+                  }
+
+                  if (!res.ok) {
+                    const errorJson = await res.json().catch(() => ({}));
+                    throw new Error(errorJson.detail || "Failed to create concept");
+                  }
+
+                  const responseData = await res.json().catch(() => ({}));
+                  if (responseData && responseData.project_id) {
+                    this.selectedProjectId = responseData.project_id;
+                    localStorage.setItem(
+                      "bookBuilderProjectId",
+                      responseData.project_id,
+                    );
+                  }
+                  await this.loadConcepts();
+                  this.closeCreateConceptModal();
+                } catch (err) {
+                  this.createProjectError =
+                    err.message || "Unable to create concept";
+                } finally {
+                  this.creatingConcept = false;
+                }
+              },
+
+              async openQuestionModal() {
+                if (!this.selectedProjectId) {
+                  this.projectError = "Please select a concept row first";
+                  return;
+                }
+                this.showQuestionModal = true;
+                this.modalView = "choice";
+                this.questionError = "";
+              },
+
+              async startQuestionGeneration() {
+                this.modalView = "questions";
+                this.loadingQuestions = true;
+                this.questionError = "";
+                this.generatedQuestions = [];
+                this.questionAnswers = {};
+                try {
+                  const headers = this.getAuthHeaders();
+                  if (!headers) return;
+                  const res = await fetch(
+                    `${API_BASE_URL}/bookbuilder/concept/${this.selectedProjectId}/questions`,
+                    {
+                      method: "POST",
+                      headers,
+                    },
+                  );
+                  if (res.status === 401 || res.status === 403) {
+                    handle401();
+                    return;
+                  }
+                  if (!res.ok) throw new Error("Failed to generate questions");
+                  const data = await res.json();
+                  this.generatedQuestions = Array.isArray(data) ? data : [];
+                  this.generatedQuestions.forEach((q) => {
+                    this.questionAnswers[q.id] = "";
+                  });
+                } catch (err) {
+                  this.questionError = err.message || "Unable to load questions";
+                } finally {
+                  this.loadingQuestions = false;
+                }
+              },
+
+              closeQuestionModal() {
+                this.showQuestionModal = false;
+              },
+
+              async submitQuestionAnswer(questionId) {
+                if (!this.selectedProjectId || !questionId) return;
+                const answer = (this.questionAnswers[questionId] || "").trim();
+                if (!answer) {
+                  this.questionError = "Please enter an answer before submitting.";
+                  return;
+                }
+                this.submittingAnswerId = questionId;
+                this.questionError = "";
+                try {
+                  const headers = this.getAuthHeaders({
+                    "Content-Type": "application/json",
+                    "ngrok-skip-browser-warning": "true",
+                  });
+                  if (!headers) return;
+                  const res = await fetch(
+                    `${API_BASE_URL}/bookbuilder/concept/${this.selectedProjectId}/answer/${questionId}`,
+                    {
+                      method: "POST",
+                      headers,
+                      body: JSON.stringify({ answer }),
+                    },
+                  );
+                  if (res.status === 401 || res.status === 403) {
+                    handle401();
+                    return;
+                  }
+                  if (!res.ok) {
+                    const errorJson = await res.json().catch(() => ({}));
+                    throw new Error(errorJson.detail || "Failed to submit answer");
+                  }
+                  this.generatedQuestions = this.generatedQuestions.map((q) =>
+                    q.id === questionId ? { ...q, is_answered: true } : q,
+                  );
+                } catch (err) {
+                  this.questionError = err.message || "Unable to submit answer";
+                } finally {
+                  this.submittingAnswerId = "";
+                }
+              },
+
+              async submitBulkAnswers() {
+                if (!this.selectedProjectId) return;
+                const answers = Object.entries(this.questionAnswers)
+                  .filter(([_, text]) => text.trim() !== "")
+                  .map(([id, text]) => ({ question_id: id, answer: text.trim() }));
+
+                if (answers.length === 0) {
+                  this.questionError =
+                    "Please provide at least one answer before saving.";
+                  return;
+                }
+
+                this.refiningThesis = true;
+                this.questionError = "";
+                try {
+                  const headers = this.getAuthHeaders({
+                    "Content-Type": "application/json",
+                    "ngrok-skip-browser-warning": "true",
+                  });
+                  if (!headers) return;
+                  const res = await fetch(
+                    `${API_BASE_URL}/bookbuilder/concept/${this.selectedProjectId}/answers/bulk`,
+                    {
+                      method: "POST",
+                      headers,
+                      body: JSON.stringify({ answers }),
+                    },
+                  );
+                  if (res.status === 401 || res.status === 403) {
+                    handle401();
+                    return;
+                  }
+                  if (!res.ok) {
+                    const errorJson = await res.json().catch(() => ({}));
+                    throw new Error(errorJson.detail || "Failed to submit answers");
+                  }
+                  await this.refineThesis();
+                } catch (err) {
+                  this.questionError = err.message || "Unable to save answers";
+                } finally {
+                  this.refiningThesis = false;
+                }
+              },
+
+              async refineThesis() {
+                if (!this.selectedProjectId) return;
+                this.refiningThesis = true;
+                this.projectError = "";
+                try {
+                  const headers = this.getAuthHeaders({
+                    "ngrok-skip-browser-warning": "true",
+                  });
+                  if (!headers) return;
+                  const res = await fetch(
+                    `${API_BASE_URL}/bookbuilder/concept/${this.selectedProjectId}/refine-thesis`,
+                    {
+                      method: "POST",
+                      headers,
+                    },
+                  );
+                  if (res.status === 401 || res.status === 403) {
+                    handle401();
+                    return;
+                  }
+                  if (!res.ok) throw new Error("Failed to refine thesis");
+                  await this.loadRefinedThesis();
+                  this.closeQuestionModal();
+                } catch (err) {
+                  this.projectError = err.message || "Unable to refine thesis";
+                } finally {
+                  this.refiningThesis = false;
+                }
+              },
+              stripIds(value) {
+                // Remove ids from the API response (including nested ones).
+                if (Array.isArray(value)) return value.map((v) => this.stripIds(v));
+                if (value && typeof value === "object") {
+                  const out = {};
+                  for (const [k, v] of Object.entries(value)) {
+                    if (k === "id" || k === "project_id") continue;
+                    out[k] = this.stripIds(v);
+                  }
+                  return out;
+                }
+                return value;
+              },
+
+              formatNoveltyItem(item) {
+                try {
+                  return JSON.stringify(item, null, 2);
+                } catch (_) {
+                  return String(item);
+                }
+              },
+
+              getParsedStringListBullets(value) {
+                // The API sometimes returns list-like strings such as:
+                // "['a', \"b\", 'c']"
+                if (typeof value !== "string") return [];
+                const trimmed = value.trim();
+                if (!trimmed) return [];
+
+                // Capture both single-quoted and double-quoted list items.
+                const regex = /'([^']*)'|"([^"]*)"/g;
+                const out = [];
+                let match = null;
+                while ((match = regex.exec(trimmed)) !== null) {
+                  const v = (match[1] ?? match[2] ?? "").trim();
+                  if (v) out.push(v);
+                }
+                return out;
+              },
+
+              async loadNoveltyScanList({ force = false } = {}) {
+                if (!this.selectedProjectId) return;
+                if (!force && this.noveltyScanLastProjectId === this.selectedProjectId) return;
+
+                this.loadingNoveltyScan = true;
+                this.noveltyScanError = "";
+
+                try {
+                  const headers = this.getAuthHeaders({
+                    "ngrok-skip-browser-warning": "true",
+                    "Accept": "application/json",
+                  });
+                  if (!headers) return;
+
+                  const url = `${API_BASE_URL}/bookbuilder/research/${this.selectedProjectId}/novelty-scan`;
+                  const res = await fetch(url, { headers });
+
+                  if (res.status === 401 || res.status === 403) {
+                    handle401();
+                    return;
+                  }
+                  if (!res.ok) {
+                    const errorJson = await res.json().catch(() => ({}));
+                    throw new Error(errorJson.detail || "Failed to fetch novelty results");
+                  }
+
+                  const data = await res.json().catch(() => []);
+                  const list = Array.isArray(data) ? data : [];
+                  this.noveltyScanItems = list.map((item) => this.stripIds(item));
+                  this.noveltyScanLastProjectId = this.selectedProjectId;
+                } catch (err) {
+                  this.noveltyScanError = err.message || "Unable to load novelty results";
+                  this.noveltyScanItems = [];
+                } finally {
+                  this.loadingNoveltyScan = false;
+                }
+              },
+
+              async runNoveltyScan() {
+                if (!this.selectedProjectId) return;
+                this.loadingNoveltyScan = true;
+                this.noveltyScanError = "";
+
+                try {
+                  const headers = this.getAuthHeaders({
+                    "Accept": "application/json",
+                  });
+                  if (!headers) return;
+
+                  const url = `${API_BASE_URL}/bookbuilder/research/${this.selectedProjectId}/novelty-scan`;
+
+                  // 1) Trigger novelty scan generation
+                  const postRes = await fetch(url, { method: "POST", headers });
+                  if (postRes.status === 401 || postRes.status === 403) {
+                    handle401();
+                    return;
+                  }
+                  if (!postRes.ok) {
+                    const errorJson = await postRes.json().catch(() => ({}));
+                    throw new Error(errorJson.detail || "Failed to run novelty scan");
+                  }
+
+                  // 2) Fetch list to display
+                  await this.loadNoveltyScanList({ force: true });
+                } catch (err) {
+                  this.noveltyScanError = err.message || "Unable to run novelty scan";
+                  this.noveltyScanItems = [];
+                } finally {
+                  this.loadingNoveltyScan = false;
+                }
+              },
+
+              async loadAuthorityMapList({ force = false } = {}) {
+                if (!this.selectedProjectId) return;
+                if (!force && this.authorityMapLastProjectId === this.selectedProjectId) return;
+
+                this.loadingAuthorityMap = true;
+                this.authorityMapError = "";
+
+                try {
+                  const headers = this.getAuthHeaders({
+                    "ngrok-skip-browser-warning": "true",
+                    Accept: "application/json",
+                  });
+                  if (!headers) return;
+
+                  const url = `${API_BASE_URL}/bookbuilder/research/${this.selectedProjectId}/authority-map`;
+                  const res = await fetch(url, { headers });
+
+                  if (res.status === 401 || res.status === 403) {
+                    handle401();
+                    return;
+                  }
+                  if (!res.ok) {
+                    const errorJson = await res.json().catch(() => ({}));
+                    throw new Error(
+                      errorJson.detail || "Failed to fetch authority results",
+                    );
+                  }
+
+                  const data = await res.json().catch(() => []);
+                  const list = Array.isArray(data) ? data : [];
+                  this.authorityMapItems = list.map((item) => this.stripIds(item));
+                  this.authorityMapLastProjectId = this.selectedProjectId;
+                } catch (err) {
+                  this.authorityMapError =
+                    err.message || "Unable to load authority results";
+                  this.authorityMapItems = [];
+                } finally {
+                  this.loadingAuthorityMap = false;
+                }
+              },
+
+              async runAuthorityMap() {
+                if (!this.selectedProjectId) return;
+                this.loadingAuthorityMap = true;
+                this.authorityMapError = "";
+
+                try {
+                  const headers = this.getAuthHeaders({
+                    Accept: "application/json",
+                  });
+                  if (!headers) return;
+
+                  const url = `${API_BASE_URL}/bookbuilder/research/${this.selectedProjectId}/authority-map`;
+
+                  // 1) Trigger authority map generation
+                  const postRes = await fetch(url, { method: "POST", headers });
+                  if (postRes.status === 401 || postRes.status === 403) {
+                    handle401();
+                    return;
+                  }
+                  if (!postRes.ok) {
+                    const errorJson = await postRes.json().catch(() => ({}));
+                    throw new Error(
+                      errorJson.detail || "Failed to run authority map",
+                    );
+                  }
+
+                  // 2) Fetch list to display
+                  await this.loadAuthorityMapList({ force: true });
+                } catch (err) {
+                  this.authorityMapError =
+                    err.message || "Unable to run authority map";
+                  this.authorityMapItems = [];
+                } finally {
+                  this.loadingAuthorityMap = false;
+                }
+              },
+              /* ==========================
+                LOAD STRUCTURES
+              ========================== */
+              async loadStructures() {
+                if (!this.selectedProjectId) return;
+                this.loadingStructures = true;
+                try {
+                  const headers = this.getAuthHeaders();
+                  if (!headers) return;
+                  const res = await fetch(
+                    `${API_BASE_URL}/bookbuilder/structure/${this.selectedProjectId}`,
+                    {
+                      method: "GET",
+                      headers
+                    }
+                  );
+                  if (!res.ok) {
+                    throw new Error("Failed to load structures");
+                  }
+                  const data = await res.json();
+                  this.structures = Array.isArray(data) ? data : [];
+                } catch (error) {
+                  this.structures = [];
+                } finally {
+                  this.loadingStructures = false;
+                }
+              },
+              /* ==========================
+              GENERATE STRUCTURES
+              ========================== */
+              async generateStructures() {
+                if (!this.selectedProjectId) return;
+                this.loadingStructures = true;
+                try {
+                  const headers = this.getAuthHeaders();
+                  if (!headers) return;
+                  await fetch(
+                    `${API_BASE_URL}/bookbuilder/structure/${this.selectedProjectId}/generate`,
+                    {
+                      method: "POST",
+                      headers
+                    }
+                  );
+                  await this.loadStructures();
+                } catch (error) {
+                  alert("Failed to generate structures");
+                } finally {
+                  this.loadingStructures = false;
+                }
+              },
+              /* ==========================
+              SELECT STRUCTURE
+              ========================== */
+              async selectStructure() {
+                if (!this.selectedProjectId || !this.selectedStructureId) return;
+                try {
+                  const headers = this.getAuthHeaders();
+                  if (!headers) return;
+                  await fetch(
+                    `${API_BASE_URL}/bookbuilder/structure/${this.selectedProjectId}/select/${this.selectedStructureId}`,
+                    {
+                      method: "POST",
+                      headers
+                    }
+                  );
+                  alert("Structure Selected Successfully");
+                } catch (error) {
+                  alert("Failed to select structure");
+                }
+              },
+              /* ==========================
+              SELECT PROJECT
+              ========================== */
+              selectProject(projectId) {
+                if (!projectId) return;
+                this.selectedProjectId = projectId;
+                this.refinedThesisText = "";
+                this.loadRefinedThesis();
+                this.selectedStructureId = "";
+                this.loadStructures(); // auto load screen4 data
+
+                // Keep Screen 2 in sync with the selected project.
+                if (this.activeScreen === "screen2") {
+                  this.loadNoveltyScanList({ force: false });
+                  this.loadAuthorityMapList({ force: false });
+                }
+                this.loadPrinciples();
+                this.loadStories();
+              },
+              /* -==========================
+              LOAD CHAPTER CARD LIST FIRST
+              (GET API)
+              -========================== */
+              async loadChapterCards() {
+                if (!this.selectedProjectId) return;
+
+                this.loadingChapterCards = true;
+
+                try {
+                  const headers = this.getAuthHeaders();
+                  if (!headers) return;
+
+                  const res = await fetch(
+                    `${API_BASE_URL}/bookbuilder/chapters/${this.selectedProjectId}/cards`,
+                    {
+                      method: "GET",
+                      headers
+                    }
+                  );
+
+                  if (!res.ok) {
+                    throw new Error("Failed to load chapter cards");
+                  }
+
+                  const data = await res.json();
+
+                  this.chapterCards = Array.isArray(data) ? data : [];
+
+                } catch (error) {
+                  this.chapterCards = [];
+                } finally {
+                  this.loadingChapterCards = false;
+                }
+              },
+
+              /* -==========================
+              GENERATE CHAPTER CARDS
+              (POST API)
+              -========================== */
+              async generateChapterCards() {
+                if (!this.selectedProjectId) return;
+
+                this.loadingChapterCards = true;
+
+                try {
+                  const headers = this.getAuthHeaders();
+                  if (!headers) return;
+
+                  const res = await fetch(
+                    `${API_BASE_URL}/bookbuilder/structure/${this.selectedProjectId}/chapter-cards`,
+                    {
+                      method: "POST",
+                      headers
+                    }
+                  );
+
+                  if (!res.ok) {
+                    throw new Error("Failed to generate");
+                  }
+
+                  /* after generate reload list */
+                  await this.loadChapterCards();
+
+                } catch (error) {
+                  alert("Failed to generate chapter cards");
+                } finally {
+                  this.loadingChapterCards = false;
+                }
+              },
+              /* -==========================
+              APPROVE ONE ROW
+              -========================== */
+              async approveChapterCard(cardId) {
+                if (!cardId) return;
+
+                this.approvingChapterId = cardId;
+
+                try {
+                  const headers = this.getAuthHeaders();
+                  if (!headers) return;
+
+                  const res = await fetch(
+                    `${API_BASE_URL}/bookbuilder/chapter-card/${cardId}/approve`,
+                    {
+                      method: "POST",
+                      headers
+                    }
+                  );
+
+                  if (!res.ok) {
+                    throw new Error("Failed");
+                  }
+
+                  /* refresh list after approve */
+                  await this.loadChapterCards();
+
+                } catch (error) {
+                  alert("Failed to approve chapter");
+                } finally {
+                  this.approvingChapterId = "";
+                }
+              },
+              toggleStructureText(key) {
+                this.expandedStructures = {
+                  ...this.expandedStructures,
+                  [key]: !this.expandedStructures[key]
+                };
+              },
+              /* -======= */
+              toggleChapterSummary(id) {
+                this.expandedChapterSummary = {
+                  ...this.expandedChapterSummary,
+                  [id]: !this.expandedChapterSummary[id]
+                };
+              },
+
+              // ── Screen 3 methods ──
+              async loadPrinciples() {
+                if (!this.selectedProjectId) return;
+                this.loadingPrinciples = true;
+                this.principlesError = "";
+                try {
+                  const headers = this.getAuthHeaders();
+                  if (!headers) return;
+                  const res = await fetch(
+                    `${API_BASE_URL}/bookbuilder/principles/${this.selectedProjectId}`,
+                    { headers }
+                  );
+                  if (res.status === 401 || res.status === 403) {
+                    handle401();
+                    return;
+                  }
+                  if (!res.ok) throw new Error("Failed to fetch principles");
+                  const data = await res.json();
+                  this.screen3Principles = Array.isArray(data) ? data : [];
+                } catch (err) {
+                  this.principlesError = err.message || "Unable to load principles";
+                  this.screen3Principles = [];
+                } finally {
+                  this.loadingPrinciples = false;
+                }
+              },
+
+              togglePrincipleText(principleId) {
+                this.expandedPrincipleTexts = {
+                  ...this.expandedPrincipleTexts,
+                  [principleId]: !this.expandedPrincipleTexts[principleId],
+                };
+              },
+
+              async generatePrinciples() {
+                if (!this.selectedProjectId) return;
+                this.generatingPrinciples = true;
+                this.principlesError = "";
+                try {
+                  const headers = this.getAuthHeaders();
+                  if (!headers) return;
+                  const res = await fetch(
+                    `${API_BASE_URL}/bookbuilder/principles/${this.selectedProjectId}/generate`,
+                    {
+                      method: "POST",
+                      headers,
+                    }
+                  );
+                  if (res.status === 401 || res.status === 403) {
+                    handle401();
+                    return;
+                  }
+                  if (!res.ok) {
+                    const errorJson = await res.json().catch(() => ({}));
+                    throw new Error(errorJson.detail || "Failed to generate principles");
+                  }
+                  await this.loadPrinciples();
+                } catch (err) {
+                  this.principlesError = err.message || "Unable to generate principles";
+                } finally {
+                  this.generatingPrinciples = false;
+                }
+              },
+
+              async approvePrinciple(principleId) {
+                if (!principleId) return;
+                this.approvingPrincipleId = principleId;
+                this.principlesError = "";
+                try {
+                  const headers = this.getAuthHeaders();
+                  if (!headers) return;
+                  const res = await fetch(
+                    `${API_BASE_URL}/bookbuilder/principles/${principleId}/approve`,
+                    {
+                      method: "POST",
+                      headers,
+                    }
+                  );
+                  if (res.status === 401 || res.status === 403) {
+                    handle401();
+                    return;
+                  }
+                  if (!res.ok) {
+                    const errorJson = await res.json().catch(() => ({}));
+                    throw new Error(errorJson.detail || "Failed to approve principle");
+                  }
+                  await this.loadPrinciples();
+                } catch (err) {
+                  this.principlesError = err.message || "Unable to approve principle";
+                } finally {
+                  this.approvingPrincipleId = "";
+                }
+              },
+
+              // ── Screen 3: Story Bank methods ──
+              async loadStories() {
+                if (!this.selectedProjectId) return;
+                this.loadingStories = true;
+                this.storiesError = "";
+                try {
+                  const headers = this.getAuthHeaders();
+                  if (!headers) return;
+                  const res = await fetch(
+                    `${API_BASE_URL}/bookbuilder/stories/${this.selectedProjectId}`,
+                    { headers }
+                  );
+                  if (res.status === 401 || res.status === 403) {
+                    handle401();
+                    return;
+                  }
+                  if (!res.ok) throw new Error("Failed to fetch stories");
+                  const data = await res.json();
+                  this.storyBankItems = Array.isArray(data) ? data : [];
+                } catch (err) {
+                  this.storiesError = err.message || "Unable to load stories";
+                  this.storyBankItems = [];
+                } finally {
+                  this.loadingStories = false;
+                }
+              },
+
+              toggleStoryText(storyId) {
+                this.expandedStoryTexts = {
+                  ...this.expandedStoryTexts,
+                  [storyId]: !this.expandedStoryTexts[storyId],
+                };
+              },
+
+              async generateStory() {
+                if (!this.selectedProjectId) return;
+                this.generatingStories = true;
+                this.storiesError = "";
+                try {
+                  const headers = this.getAuthHeaders();
+                  if (!headers) return;
+                  const res = await fetch(
+                    `${API_BASE_URL}/bookbuilder/stories/${this.selectedProjectId}/generate`,
+                    {
+                      method: "POST",
+                      headers,
+                    }
+                  );
+                  if (res.status === 401 || res.status === 403) {
+                    handle401();
+                    return;
+                  }
+                  if (!res.ok) {
+                    const errorJson = await res.json().catch(() => ({}));
+                    throw new Error(errorJson.detail || "Failed to generate story");
+                  }
+                  await this.loadStories();
+                } catch (err) {
+                  this.storiesError = err.message || "Unable to generate story";
+                } finally {
+                  this.generatingStories = false;
+                }
+              },
+
+              async approveStory(storyId) {
+                if (!storyId) return;
+                this.approvingStoryId = storyId;
+                this.storiesError = "";
+                try {
+                  const headers = this.getAuthHeaders();
+                  if (!headers) return;
+                  const res = await fetch(
+                    `${API_BASE_URL}/bookbuilder/stories/${storyId}/approve`,
+                    {
+                      method: "POST",
+                      headers,
+                    }
+                  );
+                  if (res.status === 401 || res.status === 403) {
+                    handle401();
+                    return;
+                  }
+                  if (!res.ok) {
+                    const errorJson = await res.json().catch(() => ({}));
+                    throw new Error(errorJson.detail || "Failed to approve story");
+                  }
+                  await this.loadStories();
+                } catch (err) {
+                  this.storiesError = err.message || "Unable to approve story";
+                } finally {
+                  this.approvingStoryId = "";
+                }
+              },
+            };
+          }
+
+          function toggleActiveUsers() {
+            const popover = document.getElementById("active-users-popover");
+            const isOpening = popover.style.display !== "block";
+            if (isOpening) {
+              loadActiveUsers();
+            }
+            popover.style.display = isOpening ? "block" : "none";
+          }
+
+          async function loadActiveUsers() {
+            const token = requireToken();
+            if (!token) return;
+            try {
+              const res = await fetch(`${API_BASE_URL}/bookbuilder/active-today`, {
+                headers: {
+                  Authorization: token ? `Bearer ${token}` : "",
+                  "ngrok-skip-browser-warning": "true",
+                },
+              });
+
+              if (res.status === 401 || res.status === 403) {
+                handle401();
+                return;
+              }
+              if (!res.ok) throw new Error("Failed to fetch active users");
+
+              const data = await res.json();
+              const users = Array.isArray(data) ? data : [];
+              document.getElementById("active-user-count").innerText = users.length;
+
+              const list = document.getElementById("active-users-list");
+              list.innerHTML = "";
+              if (users.length === 0) {
+                list.innerHTML =
+                  "<p style='color:#aaa; font-size:13px'>No active users</p>";
+                return;
+              }
+
+              users.forEach((user) => {
+                const div = document.createElement("div");
+                div.style.padding = "10px 8px";
+                div.style.fontSize = "13px";
+                div.style.borderBottom = "1px solid #333";
+                div.style.display = "flex";
+                div.style.justifyContent = "space-between";
+                div.style.alignItems = "center";
+                div.style.gap = "16px";
+
+                const emailSpan = document.createElement("span");
+                emailSpan.style.color = "#f1c40f";
+                emailSpan.style.fontWeight = "500";
+                emailSpan.style.flex = "1";
+                emailSpan.innerText = user.email || "";
+
+                const timeSpan = document.createElement("span");
+                timeSpan.style.color = "#aaa";
+                timeSpan.style.fontSize = "12px";
+                timeSpan.style.whiteSpace = "nowrap";
+                timeSpan.style.flexShrink = "0";
+                timeSpan.innerText = formatLastActive(user.last_active);
+
+                div.appendChild(emailSpan);
+                div.appendChild(timeSpan);
+                list.appendChild(div);
+              });
+            } catch (err) {
+              console.error("Active users fetch failed", err);
+            }
+          }
+
+          function formatLastActive(dateStr) {
+            try {
+              const date = new Date(dateStr);
+              const now = new Date();
+              const diffMs = now - date;
+              const diffMins = Math.floor(diffMs / 60000);
+              const diffHours = Math.floor(diffMs / 3600000);
+              const diffDays = Math.floor(diffMs / 86400000);
+
+              if (diffMins < 1) return "just now";
+              if (diffMins < 60) return `${diffMins}m ago`;
+              if (diffHours < 24) return `${diffHours}h ago`;
+              return `${diffDays}d ago`;
+            } catch (e) {
+              return "";
+            }
+          }
+
+          document.addEventListener("click", (event) => {
+            const popover = document.getElementById("active-users-popover");
+            const button = document.getElementById("active-users-btn");
+            if (!popover || !button) return;
+            if (popover.style.display !== "block") return;
+            if (!popover.contains(event.target) && !button.contains(event.target)) {
+              popover.style.display = "none";
+            }
           });
-        } catch (err) {
-          console.error("Active users fetch failed", err);
-        }
-      }
-
-      function formatLastActive(dateStr) {
-        try {
-          const date = new Date(dateStr);
-          const now = new Date();
-          const diffMs = now - date;
-          const diffMins = Math.floor(diffMs / 60000);
-          const diffHours = Math.floor(diffMs / 3600000);
-          const diffDays = Math.floor(diffMs / 86400000);
-
-          if (diffMins < 1) return "just now";
-          if (diffMins < 60) return `${diffMins}m ago`;
-          if (diffHours < 24) return `${diffHours}h ago`;
-          return `${diffDays}d ago`;
-        } catch (e) {
-          return "";
-        }
-      }
-
-      document.addEventListener("click", (event) => {
-        const popover = document.getElementById("active-users-popover");
-        const button = document.getElementById("active-users-btn");
-        if (!popover || !button) return;
-        if (popover.style.display !== "block") return;
-        if (!popover.contains(event.target) && !button.contains(event.target)) {
-          popover.style.display = "none";
-        }
-      });
-    </script>
-</body>
+        </script>
+  </body>
 
 </html>
