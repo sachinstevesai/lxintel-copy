@@ -1,855 +1,780 @@
 <!doctype html>
 <html lang="en" class="scroll-smooth">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ramos Law Book Builder</title>
-    <link
-      rel="icon"
-      type="image/webp"
-      href="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
-    />
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap"
-      rel="stylesheet"
-    />
-    <script>
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: { fontFamily: { sans: ["Montserrat", "system-ui"] } },
-        },
-      };
-    </script>
-    <script
-      defer
-      src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"
-    ></script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ramos Law Book Builder</title>
+  <link rel="icon" type="image/webp"
+    href="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp" />
 
-    <style>
-      body,
-      html {
-        font-family: "Montserrat", sans-serif;
-        background-color: #111;
-        color: #f1c40f;
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: { fontFamily: { sans: ["Montserrat", "system-ui"] } },
+      },
+    };
+  </script>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <style>
+    body,
+    html {
+      font-family: "Montserrat", sans-serif;
+      background-color: #111;
+      color: #f1c40f;
+    }
+
+    .video-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-image: url("https://static.vecteezy.com/system/resources/previews/007/596/744/non_2x/abstract-digital-glossy-particles-and-lines-connected-3d-illustration-on-black-background-free-photo.jpg");
+      background-size: cover;
+      background-position: center top 150px;
+      z-index: -2;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.75);
+      z-index: -1;
+    }
+
+    .dark-theme-card {
+      background-color: #111;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(241, 196, 15, 0.1);
+      border: 1px solid #333;
+      color: #f1c40f;
+    }
+
+    .dark-theme-input {
+      background-color: #000 !important;
+      color: #fff !important;
+      border: 1px solid #444 !important;
+      border-radius: 6px !important;
+    }
+
+    .dark-theme-input::placeholder {
+      color: #777 !important;
+      opacity: 0.7;
+    }
+
+    .dark-theme-btn-primary {
+      background-color: #f1c40f !important;
+      color: #000 !important;
+      font-weight: bold !important;
+      border: none !important;
+      border-radius: 6px !important;
+    }
+
+    .dark-theme-btn-primary:hover {
+      background-color: #d4ac0d !important;
+    }
+
+    .dark-theme-btn-primary:disabled {
+      background-color: #a08209 !important;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    .error-message {
+      color: #e74c3c;
+      background-color: rgba(231, 76, 60, 0.1);
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 10px;
+    }
+
+    .email-status {
+      display: flex;
+      align-items: center;
+      margin-top: 8px;
+      font-size: 0.85rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .email-status.visible {
+      opacity: 1;
+    }
+
+    .email-status .status-icon {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    .email-status .status-icon.checking {
+      background-color: #3498db;
+      animation: pulse 1.5s infinite;
+    }
+
+    .email-status .status-icon.valid {
+      background-color: #2ecc71;
+    }
+
+    .email-status .status-icon.invalid {
+      background-color: #e74c3c;
+    }
+
+    @keyframes pulse {
+      0% {
+        opacity: 0.6;
       }
 
-      .video-background {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-image: url("https://static.vecteezy.com/system/resources/previews/007/596/744/non_2x/abstract-digital-glossy-particles-and-lines-connected-3d-illustration-on-black-background-free-photo.jpg");
-        background-size: cover;
-        background-position: center top 150px;
-        z-index: -2;
-      }
-
-      .overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-color: rgba(0, 0, 0, 0.75);
-        z-index: -1;
-      }
-
-      .dark-theme-card {
-        background-color: #111;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(241, 196, 15, 0.1);
-        border: 1px solid #333;
-        color: #f1c40f;
-      }
-
-      .dark-theme-input {
-        background-color: #000 !important;
-        color: #fff !important;
-        border: 1px solid #444 !important;
-        border-radius: 6px !important;
-      }
-
-      .dark-theme-input::placeholder {
-        color: #777 !important;
-        opacity: 0.7;
-      }
-
-      .dark-theme-btn-primary {
-        background-color: #f1c40f !important;
-        color: #000 !important;
-        font-weight: bold !important;
-        border: none !important;
-        border-radius: 6px !important;
-      }
-
-      .dark-theme-btn-primary:hover {
-        background-color: #d4ac0d !important;
-      }
-
-      .dark-theme-btn-primary:disabled {
-        background-color: #a08209 !important;
-        cursor: not-allowed;
-        opacity: 0.7;
-      }
-
-      .error-message {
-        color: #e74c3c;
-        background-color: rgba(231, 76, 60, 0.1);
-        padding: 10px;
-        border-radius: 6px;
-        margin-top: 10px;
-      }
-
-      .email-status {
-        display: flex;
-        align-items: center;
-        margin-top: 8px;
-        font-size: 0.85rem;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-
-      .email-status.visible {
+      50% {
         opacity: 1;
       }
 
-      .email-status .status-icon {
-        display: inline-block;
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        margin-right: 8px;
+      100% {
+        opacity: 0.6;
+      }
+    }
+
+    .loader {
+      border: 3px solid rgba(241, 196, 15, 0.1);
+      border-radius: 50%;
+      border-top: 3px solid #f1c40f;
+      width: 32px;
+      height: 32px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
       }
 
-      .email-status .status-icon.checking {
-        background-color: #3498db;
-        animation: pulse 1.5s infinite;
+      100% {
+        transform: rotate(360deg);
       }
+    }
 
-      .email-status .status-icon.valid {
-        background-color: #2ecc71;
-      }
+    .header-text {
+      text-align: center;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-      .email-status .status-icon.invalid {
-        background-color: #e74c3c;
-      }
+    .header-text img {
+      max-height: 120px;
+      margin-bottom: 1rem;
+    }
 
-      @keyframes pulse {
-        0% {
-          opacity: 0.6;
-        }
+    .header-text h1 {
+      font-size: 3rem;
+      letter-spacing: 1px;
+      text-shadow: 1px 1px 8px rgba(241, 196, 15, 0.6);
+      color: #f1c40f;
+      margin: 0;
+    }
 
-        50% {
-          opacity: 1;
-        }
+    .header-text p {
+      color: #aaa;
+      margin: 0;
+      font-size: 1.1rem;
+    }
 
-        100% {
-          opacity: 0.6;
-        }
-      }
+    .header-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      background-color: rgba(17, 17, 17, 0.95);
+      color: #f1c40f;
+      padding: 15px 20px;
+      border-bottom: 1px solid #333;
+      z-index: 100;
+    }
 
-      .loader {
-        border: 3px solid rgba(241, 196, 15, 0.1);
-        border-radius: 50%;
-        border-top: 3px solid #f1c40f;
-        width: 32px;
-        height: 32px;
-        animation: spin 1s linear infinite;
-      }
+    .menu-container {
+      position: relative;
+    }
 
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
+    .menu-button {
+      background: none;
+      border: none;
+      color: #f1c40f;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+    }
 
-      .header-text {
-        text-align: center;
-        margin-top: 10px;
-        margin-bottom: 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
+    .menu-popover {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background-color: #222;
+      border: 1px solid #333;
+      border-radius: 6px;
+      margin-top: 8px;
+      z-index: 200;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      min-width: 140px;
+    }
 
-      .header-text img {
-        max-height: 120px;
-        margin-bottom: 1rem;
-      }
+    .menu-popover button {
+      display: block;
+      width: 100%;
+      padding: 12px 20px;
+      background: none;
+      border: none;
+      color: #e74c3c;
+      text-align: left;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.2s;
+    }
 
-      .header-text h1 {
-        font-size: 3rem;
-        letter-spacing: 1px;
-        text-shadow: 1px 1px 8px rgba(241, 196, 15, 0.6);
-        color: #f1c40f;
-        margin: 0;
-      }
+    .menu-popover button:hover {
+      background-color: rgba(231, 76, 60, 0.1);
+    }
 
-      .header-text p {
-        color: #aaa;
-        margin: 0;
-        font-size: 1.1rem;
-      }
+    .active-user-popover {
+      position: fixed;
+      top: 85px;
+      left: 260px;
+      background-color: #1a1a1a;
+      border: 1px solid rgba(241, 196, 15, 0.4);
+      border-radius: 8px;
+      padding: 12px;
+      min-width: 220px;
+      z-index: 2000;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      display: none;
+    }
 
-      .header-bar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        background-color: rgba(17, 17, 17, 0.95);
-        color: #f1c40f;
-        padding: 15px 20px;
-        border-bottom: 1px solid #333;
-        z-index: 100;
-      }
+    .section-card {
+      background: rgba(17, 17, 17, 0.95);
+      border: 1px solid rgba(241, 196, 15, 0.35);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+    }
 
-      .menu-container {
-        position: relative;
-      }
-
-      .menu-button {
-        background: none;
-        border: none;
-        color: #f1c40f;
-        font-size: 24px;
-        cursor: pointer;
-        padding: 0;
-        line-height: 1;
-      }
-
-      .menu-popover {
-        position: absolute;
-        top: 100%;
-        right: 0;
-        background-color: #222;
-        border: 1px solid #333;
-        border-radius: 6px;
-        margin-top: 8px;
-        z-index: 200;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-        min-width: 140px;
-      }
-
-      .menu-popover button {
-        display: block;
-        width: 100%;
-        padding: 12px 20px;
-        background: none;
-        border: none;
-        color: #e74c3c;
-        text-align: left;
-        cursor: pointer;
-        font-size: 14px;
-        transition: background-color 0.2s;
-      }
-
-      .menu-popover button:hover {
-        background-color: rgba(231, 76, 60, 0.1);
-      }
-
-      .active-user-popover {
-        position: fixed;
-        top: 85px;
-        left: 260px;
-        background-color: #1a1a1a;
-        border: 1px solid rgba(241, 196, 15, 0.4);
-        border-radius: 8px;
-        padding: 12px;
-        min-width: 220px;
-        z-index: 2000;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-        display: none;
-      }
-
-      .section-card {
-        background: rgba(17, 17, 17, 0.95);
-        border: 1px solid rgba(241, 196, 15, 0.35);
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
-      }
-
-      .section-header {
-        padding: 14px 16px;
-        border-bottom: 1px solid rgba(241, 196, 15, 0.25);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        background: linear-gradient(
-          to bottom,
+    .section-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(241, 196, 15, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: linear-gradient(to bottom,
           rgba(241, 196, 15, 0.07),
-          rgba(241, 196, 15, 0.02)
-        );
-      }
+          rgba(241, 196, 15, 0.02));
+    }
 
-      .section-title {
-        font-size: 15px;
-        font-weight: 700;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        color: #f1c40f;
-      }
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #f1c40f;
+    }
 
-      .project-table-wrap {
-        overflow-x: auto;
-        scrollbar-width: thin;
-        scrollbar-color: #f1c40f73 #2c2c2c;
-      }
+    .project-table-wrap {
+      overflow-x: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #f1c40f73 #2c2c2c;
+    }
 
-      .project-table {
-        width: 100%;
-        min-width: 760px;
-        border-collapse: collapse;
-        color: #ddd;
-      }
+    .project-table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: collapse;
+      color: #ddd;
+    }
 
-      .project-table th,
-      .project-table td {
+    .project-table th,
+    .project-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(241, 196, 15, 0.14);
+      text-align: left;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .project-table th {
+      color: #a9a9a9;
+      font-size: 11px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      font-weight: 700;
+      background: rgba(0, 0, 0, 0.35);
+    }
+
+    .project-table tbody tr:hover {
+      background: rgba(241, 196, 15, 0.08);
+    }
+
+    .qa-table-wrap,
+    .thesis-table-wrap {
+      max-height: 340px;
+      overflow-y: auto;
+      overflow-x: auto;
+    }
+
+    .qa-table th,
+    .qa-table td,
+    .thesis-table th,
+    .thesis-table td {
+      white-space: normal;
+      vertical-align: top;
+    }
+
+    .qa-table .qa-question-col,
+    .qa-table .qa-answer-col {
+      width: 30%;
+    }
+
+    .qa-table .qa-flag-col,
+    .qa-table .qa-order-col {
+      width: 10%;
+    }
+
+    .thesis-table .thesis-version-col {
+      width: 10%;
+    }
+
+    .thesis-table .thesis-text-col {
+      width: 70%;
+    }
+
+    .thesis-table .thesis-action-col {
+      width: 20%;
+    }
+
+    .long-text-preview {
+      display: block;
+      max-width: 320px;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+
+    .long-text-preview.clamped {
+      display: -webkit-box;
+      line-clamp: 2;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .draft-cards-wrap {
+      padding: 14px 16px;
+      max-height: 360px;
+      overflow-y: auto;
+    }
+
+    .draft-cards-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    }
+
+    .draft-card {
+      position: relative;
+      border: 1px solid rgba(241, 196, 15, 0.22);
+      border-radius: 10px;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.35);
+      cursor: pointer;
+    }
+
+    .draft-card:hover {
+      border-color: rgba(241, 196, 15, 0.5);
+      background: rgba(241, 196, 15, 0.06);
+    }
+
+    .draft-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(241, 196, 15, 0.18);
+      color: #f1c40f;
+      border: 1px solid rgba(241, 196, 15, 0.35);
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 700;
+    }
+
+    .draft-preview {
+      color: #d6d6d6;
+      font-size: 13px;
+      line-height: 1.45;
+      margin-top: 24px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .section-seed-table th,
+    .section-seed-table td {
+      white-space: normal;
+      vertical-align: top;
+    }
+
+    .section-seed-current-thesis {
+      width: 180px;
+      max-width: 180px;
+    }
+
+    .section-seed-current-thesis .long-text-preview {
+      max-width: 170px;
+    }
+
+    .concept-thesis-col {
+      min-width: 340px;
+      max-width: 340px;
+      white-space: normal !important;
+      vertical-align: top;
+    }
+
+    .screen-tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .screen-tab {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(241, 196, 15, 0.35);
+      background: rgba(0, 0, 0, 0.25);
+      color: #f1c40f;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .screen-tab.active {
+      background: rgba(241, 196, 15, 0.18);
+    }
+
+    .screen-one-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .screen-one-panel {
+      border: 1px solid rgba(241, 196, 15, 0.28);
+      border-radius: 10px;
+      padding: 14px;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .screen-one-panel h4 {
+      color: #f1c40f;
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0 0 12px 0;
+      text-transform: capitalize;
+    }
+
+    .question-list-modal {
+      max-height: 82vh;
+      overflow-y: auto;
+    }
+
+    @media (max-width: 900px) {
+      .screen-one-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .project-empty {
+      padding: 24px 16px;
+      text-align: center;
+      color: #9b9b9b;
+      font-size: 14px;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 1100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+    }
+
+    .create-project-modal {
+      width: 100%;
+      max-width: 560px;
+      background: #111;
+      border: 1px solid rgba(241, 196, 15, 0.35);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+    }
+
+    .upload-source-modal {
+      max-height: 78vh;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #f1c40f73 #2c2c2c;
+    }
+
+    .toast-success {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 2100;
+      background: rgba(26, 26, 26, 0.97);
+      color: #2ecc71;
+      border: 1px solid rgba(46, 204, 113, 0.55);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+    }
+
+    @media (max-width: 768px) {
+      .header-bar {
         padding: 12px 14px;
-        border-bottom: 1px solid rgba(241, 196, 15, 0.14);
-        text-align: left;
-        font-size: 13px;
-        white-space: nowrap;
       }
 
-      .project-table th {
-        color: #a9a9a9;
-        font-size: 11px;
-        letter-spacing: 0.8px;
-        text-transform: uppercase;
-        font-weight: 700;
-        background: rgba(0, 0, 0, 0.35);
-      }
-
-      .project-table tbody tr:hover {
-        background: rgba(241, 196, 15, 0.08);
-      }
-
-      .qa-table-wrap,
-      .thesis-table-wrap {
-        max-height: 340px;
-        overflow-y: auto;
-        overflow-x: auto;
-      }
-
-      .qa-table th,
-      .qa-table td,
-      .thesis-table th,
-      .thesis-table td {
-        white-space: normal;
-        vertical-align: top;
-      }
-
-      .qa-table .qa-question-col,
-      .qa-table .qa-answer-col {
-        width: 30%;
-      }
-
-      .qa-table .qa-flag-col,
-      .qa-table .qa-order-col {
-        width: 10%;
-      }
-
-      .thesis-table .thesis-version-col {
-        width: 10%;
-      }
-
-      .thesis-table .thesis-text-col {
-        width: 70%;
-      }
-
-      .thesis-table .thesis-action-col {
-        width: 20%;
-      }
-
-      .long-text-preview {
-        display: block;
-        max-width: 320px;
-        line-height: 1.35;
-        word-break: break-word;
-      }
-
-      .long-text-preview.clamped {
-        display: -webkit-box;
-        line-clamp: 2;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
-
-      .draft-cards-wrap {
-        padding: 14px 16px;
-        max-height: 360px;
-        overflow-y: auto;
-      }
-
-      .draft-cards-grid {
-        display: grid;
-        gap: 12px;
-        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      }
-
-      .draft-card {
-        position: relative;
-        border: 1px solid rgba(241, 196, 15, 0.22);
-        border-radius: 10px;
-        padding: 12px;
-        background: rgba(0, 0, 0, 0.35);
-        cursor: pointer;
-      }
-
-      .draft-card:hover {
-        border-color: rgba(241, 196, 15, 0.5);
-        background: rgba(241, 196, 15, 0.06);
-      }
-
-      .draft-badge {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: rgba(241, 196, 15, 0.18);
-        color: #f1c40f;
-        border: 1px solid rgba(241, 196, 15, 0.35);
-        border-radius: 999px;
-        padding: 2px 8px;
-        font-size: 10px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-weight: 700;
-      }
-
-      .draft-preview {
-        color: #d6d6d6;
-        font-size: 13px;
-        line-height: 1.45;
-        margin-top: 24px;
-        white-space: pre-wrap;
-        word-break: break-word;
-      }
-
-      .section-seed-table th,
-      .section-seed-table td {
-        white-space: normal;
-        vertical-align: top;
-      }
-
-      .section-seed-current-thesis {
-        width: 180px;
-        max-width: 180px;
-      }
-
-      .section-seed-current-thesis .long-text-preview {
-        max-width: 170px;
-      }
-
-      .concept-thesis-col {
-        min-width: 340px;
-        max-width: 340px;
-        white-space: normal !important;
-        vertical-align: top;
-      }
-
-      .screen-tabs {
-        display: flex;
+      .header-layout {
         gap: 10px;
+      }
+
+      .top-logo-area {
+        gap: 8px !important;
         flex-wrap: wrap;
       }
 
-      .screen-tab {
-        padding: 8px 14px;
-        border-radius: 8px;
-        border: 1px solid rgba(241, 196, 15, 0.35);
-        background: rgba(0, 0, 0, 0.25);
-        color: #f1c40f;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
+      .top-logo-area img {
+        max-height: 34px !important;
       }
 
-      .screen-tab.active {
-        background: rgba(241, 196, 15, 0.18);
+      .top-logo-area h2 {
+        font-size: 15px !important;
       }
 
-      .screen-one-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 16px;
-        padding: 16px;
+      .heading-top-mail {
+        font-size: 13px !important;
       }
 
-      .screen-one-panel {
-        border: 1px solid rgba(241, 196, 15, 0.28);
-        border-radius: 10px;
-        padding: 14px;
-        background: rgba(0, 0, 0, 0.2);
+      .active-user-popover {
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        top: 150px !important;
+        width: 260px !important;
+        max-width: 90% !important;
+        min-width: unset !important;
       }
 
-      .screen-one-panel h4 {
-        color: #f1c40f;
-        font-size: 16px;
-        font-weight: 700;
-        margin: 0 0 12px 0;
-        text-transform: capitalize;
+      .header-text h1 {
+        font-size: 2.2rem;
       }
 
-      .question-list-modal {
-        max-height: 82vh;
-        overflow-y: auto;
-      }
-
-      @media (max-width: 900px) {
-        .screen-one-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      .project-empty {
-        padding: 24px 16px;
-        text-align: center;
-        color: #9b9b9b;
-        font-size: 14px;
-      }
-
-      .modal-backdrop {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.6);
-        z-index: 1100;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 14px;
+      .header-text p {
+        font-size: 1rem;
       }
 
       .create-project-modal {
-        width: 100%;
-        max-width: 560px;
-        background: #111;
-        border: 1px solid rgba(241, 196, 15, 0.35);
-        border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+        padding: 16px;
       }
 
       .upload-source-modal {
-        max-height: 78vh;
-        overflow-y: auto;
-        scrollbar-width: thin;
-        scrollbar-color: #f1c40f73 #2c2c2c;
+        max-height: 82vh;
       }
+    }
 
-      .toast-success {
-        position: fixed;
-        right: 18px;
-        bottom: 18px;
-        z-index: 2100;
-        background: rgba(26, 26, 26, 0.97);
-        color: #2ecc71;
-        border: 1px solid rgba(46, 204, 113, 0.55);
-        border-radius: 8px;
-        padding: 10px 14px;
-        font-size: 13px;
-        font-weight: 600;
-        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
-      }
+    .long-text-preview {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      line-height: 1.45;
+      white-space: normal;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
 
-      @media (max-width: 768px) {
-        .header-bar {
-          padding: 12px 14px;
-        }
+    .long-text-preview.clamped {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  </style>
+</head>
 
-        .header-layout {
-          gap: 10px;
-        }
+<body class="min-h-screen p-4">
+  <div class="video-background"></div>
+  <div class="overlay"></div>
 
-        .top-logo-area {
-          gap: 8px !important;
-          flex-wrap: wrap;
-        }
-
-        .top-logo-area img {
-          max-height: 34px !important;
-        }
-
-        .top-logo-area h2 {
-          font-size: 15px !important;
-        }
-
-        .heading-top-mail {
-          font-size: 13px !important;
-        }
-
-        .active-user-popover {
-          left: 50% !important;
-          transform: translateX(-50%) !important;
-          top: 150px !important;
-          width: 260px !important;
-          max-width: 90% !important;
-          min-width: unset !important;
-        }
-
-        .header-text h1 {
-          font-size: 2.2rem;
-        }
-
-        .header-text p {
-          font-size: 1rem;
-        }
-
-        .create-project-modal {
-          padding: 16px;
-        }
-
-        .upload-source-modal {
-          max-height: 82vh;
-        }
-      }
-      .long-text-preview {
-        display: block;
-        width: 100%;
-        max-width: 100%;
-        line-height: 1.45;
-        white-space: normal;
-        word-break: break-word;
-        overflow-wrap: anywhere;
-      }
-      .long-text-preview.clamped {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
-    </style>
-  </head>
-
-  <body class="min-h-screen p-4">
-    <div class="video-background"></div>
-    <div class="overlay"></div>
-
-    <div
-      class="w-full max-w-[40rem] relative z-10 mx-auto mt-6 md:mt-10"
-      x-data="loginApp()"
-      x-show="!loggedIn"
-    >
-      <div class="header-text">
-        <img
-          src="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
-          alt="Ramos Law Book Builder"
-        />
-        <h1>Ramos Law Book Builder</h1>
-        <p>Secure Access for Authorized Ramos Law Users</p>
-      </div>
-
-      <div class="dark-theme-card p-6 space-y-5">
-        <h2
-          class="text-[36px] font-extrabold uppercase tracking-[0.5px] text-center text-[#f1c40f] mt-0 mb-0"
-        >
-          Login
-        </h2>
-
-        <div>
-          <label class="block text-[#f1c40f] font-semibold mb-2">Email</label>
-          <input
-            type="email"
-            placeholder="Enter your email"
-            x-model="email"
-            @keydown.enter="email && password && login()"
-            class="w-full p-3 dark-theme-input font-medium text-[15px] leading-[28px]"
-          />
-        </div>
-        <div>
-          <label class="block text-[#f1c40f] font-semibold mb-2"
-            >Password</label
-          >
-          <input
-            type="password"
-            placeholder="Enter your password"
-            x-model="password"
-            @keydown.enter="email && password && login()"
-            class="w-full p-3 dark-theme-input font-medium text-[15px] leading-[28px]"
-          />
-        </div>
-
-        <p x-show="error" x-text="error" class="error-message"></p>
-
-        <button
-          @click="login()"
-          :disabled="!email || !password"
-          :class="email && password ? 'dark-theme-btn-primary w-full py-3 font-medium transition' : 'opacity-50 cursor-not-allowed dark-theme-btn-primary w-full py-3 font-medium transition'"
-        >
-          <span x-show="!loggingIn">Login</span>
-          <span x-show="loggingIn">Logging in...</span>
-        </button>
-      </div>
+  <div class="w-full max-w-[40rem] relative z-10 mx-auto mt-6 md:mt-10" x-data="loginApp()" x-show="!loggedIn">
+    <div class="header-text">
+      <img src="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
+        alt="Ramos Law Book Builder" />
+      <h1>Ramos Law Book Builder</h1>
+      <p>Secure Access for Authorized Ramos Law Users</p>
     </div>
 
-    <div
-      class="w-full max-w-none relative z-10 px-1 sm:px-5"
-      x-data="bookBuilderApp()"
-      x-show="isLoggedIn"
-    >
-      <div class="header-bar">
-        <div class="flex justify-between items-center header-layout">
-          <div class="flex items-center gap-3 top-logo-area">
-            <img
-              src="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
-              alt="Ramos Law Book Builder"
-              style="max-height: 40px"
-            />
-            <h2
-              class="mb-0 text-[#f1c40f]"
-              style="font-size: 20px; font-weight: 600"
-            >
-              Ramos Law Book Builder
-            </h2>
-            <button
-              id="active-users-btn"
-              onclick="toggleActiveUsers()"
-              class="flex items-center gap-2 text-xs font-semibold px-2 py-1 rounded hover:bg-yellow-500/10"
-              title="Active users"
-            >
-              <span class="w-2 h-2 bg-green-500 rounded-full shadow"></span>
-              <span id="active-user-count">0</span>
-              Active Users
-            </button>
-            <div id="active-users-popover" class="active-user-popover">
-              <div
-                style="
+    <div class="dark-theme-card p-6 space-y-5">
+      <h2 class="text-[36px] font-extrabold uppercase tracking-[0.5px] text-center text-[#f1c40f] mt-0 mb-0">
+        Login
+      </h2>
+
+      <div>
+        <label class="block text-[#f1c40f] font-semibold mb-2">Email</label>
+        <input type="email" placeholder="Enter your email" x-model="email" @keydown.enter="email && password && login()"
+          class="w-full p-3 dark-theme-input font-medium text-[15px] leading-[28px]" />
+      </div>
+      <div>
+        <label class="block text-[#f1c40f] font-semibold mb-2">Password</label>
+        <input type="password" placeholder="Enter your password" x-model="password"
+          @keydown.enter="email && password && login()"
+          class="w-full p-3 dark-theme-input font-medium text-[15px] leading-[28px]" />
+      </div>
+
+      <p x-show="error" x-text="error" class="error-message"></p>
+
+      <button @click="login()" :disabled="!email || !password"
+        :class="email && password ? 'dark-theme-btn-primary w-full py-3 font-medium transition' : 'opacity-50 cursor-not-allowed dark-theme-btn-primary w-full py-3 font-medium transition'">
+        <span x-show="!loggingIn">Login</span>
+        <span x-show="loggingIn">Logging in...</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="w-full max-w-none relative z-10 px-1 sm:px-5" x-data="bookBuilderApp()" x-show="isLoggedIn">
+    <div class="header-bar">
+      <div class="flex justify-between items-center header-layout">
+        <div class="flex items-center gap-3 top-logo-area">
+          <img src="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
+            alt="Ramos Law Book Builder" style="max-height: 40px" />
+          <h2 class="mb-0 text-[#f1c40f]" style="font-size: 20px; font-weight: 600">
+            Ramos Law Book Builder
+          </h2>
+          <button id="active-users-btn" onclick="toggleActiveUsers()"
+            class="flex items-center gap-2 text-xs font-semibold px-2 py-1 rounded hover:bg-yellow-500/10"
+            title="Active users">
+            <span class="w-2 h-2 bg-green-500 rounded-full shadow"></span>
+            <span id="active-user-count">0</span>
+            Active Users
+          </button>
+          <div id="active-users-popover" class="active-user-popover">
+            <div style="
                   padding: 8px 0;
                   margin-bottom: 8px;
                   border-bottom: 1px solid rgba(241, 196, 15, 0.3);
                   color: #f1c40f;
                   font-size: 12px;
                   font-weight: 600;
-                "
-              >
-                Active Users
-              </div>
-              <div id="active-users-list"></div>
+                ">
+              Active Users
             </div>
+            <div id="active-users-list"></div>
           </div>
+        </div>
 
-          <div class="flex items-center gap-4">
-            <div class="text-right text-[0.9rem] text-[#aaa] hidden sm:block">
-              <span
-                class="block text-[#f1c40f] font-semibold heading-top-mail"
-                x-text="userEmail"
-              ></span>
-              <span class="text-[0.85rem]">Logged in</span>
-            </div>
-            <div class="menu-container" x-data="{ menuOpen: false }">
-              <button class="menu-button" @click="menuOpen = !menuOpen">
-                ⋮
-              </button>
-              <div
-                class="menu-popover"
-                x-show="menuOpen"
-                @click.outside="menuOpen = false"
-              >
-                <button @click="logout()">Logout</button>
-              </div>
+        <div class="flex items-center gap-4">
+          <div class="text-right text-[0.9rem] text-[#aaa] hidden sm:block">
+            <span class="block text-[#f1c40f] font-semibold heading-top-mail" x-text="userEmail"></span>
+            <span class="text-[0.85rem]">Logged in</span>
+          </div>
+          <div class="menu-container" x-data="{ menuOpen: false }">
+            <button class="menu-button" @click="menuOpen = !menuOpen">
+              ⋮
+            </button>
+            <div class="menu-popover" x-show="menuOpen" @click.outside="menuOpen = false">
+              <button @click="logout()">Logout</button>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="pt-32 sm:pt-28 pb-10 space-y-6">
-        <div class="section-card">
-          <div class="section-header">
-            <h3 class="section-title">Concept List</h3>
-            <button
-              class="dark-theme-btn-primary px-4 py-2 text-sm"
-              @click="openCreateConceptModal()"
-            >
-              Create Concept
-            </button>
-          </div>
-
-          <div class="project-table-wrap">
-            <table class="project-table" x-show="concepts.length > 0">
-              <thead>
-                <tr>
-                  <th>No</th>
-                  <th>Working Title</th>
-                  <th>Concept Brief</th>
-                  <th class="concept-thesis-col">Thesis Statement</th>
-                </tr>
-              </thead>
-              <tbody>
-                <template x-for="(concept, idx) in concepts" :key="concept.id">
-                  <tr
-                    @click="selectProject(concept.project_id)"
-                    class="cursor-pointer"
-                    :class="selectedProjectId === concept.project_id ? 'bg-[rgba(241,196,15,0.14)]' : ''"
-                  >
-                    <td x-text="idx + 1"></td>
-                    <td x-text="concept.working_title || '-'"></td>
-                    <td x-text="concept.concept_brief || '-'"></td>
-                    <td class="concept-thesis-col">
-                      <span
-                        class="long-text-preview"
-                        :class="expandedThesisStatements[concept.id] ? '' : 'clamped'"
-                        x-text="concept.thesis_statement || '-'"
-                      ></span>
-                      <button
-                        x-show="(concept.thesis_statement || '').length > 120"
-                        @click.stop="toggleThesisStatement(concept.id)"
-                        class="dark-theme-btn-primary px-2 py-1 text-xs mt-2"
-                      >
-                        <span
-                          x-text="expandedThesisStatements[concept.id] ? 'Hide' : 'Show'"
-                        ></span>
-                      </button>
-                    </td>
-                  </tr>
-                </template>
-              </tbody>
-            </table>
-          </div>
-          <div
-            class="project-empty"
-            x-show="!loadingConcepts && concepts.length === 0"
-          >
-            No concepts found.
-          </div>
-          <div class="project-empty" x-show="loadingConcepts">
-            Loading concepts...
-          </div>
-          <div
-            class="project-empty !text-red-400"
-            x-show="projectError"
-            x-text="projectError"
-          ></div>
+    <div class="pt-32 sm:pt-28 pb-10 space-y-6">
+      <div class="section-card">
+        <div class="section-header">
+          <h3 class="section-title">Concept List</h3>
+          <button class="dark-theme-btn-primary px-4 py-2 text-sm" @click="openCreateConceptModal()">
+            Create Concept
+          </button>
         </div>
 
-        <div class="section-card">
-          <div class="section-header">
-            <h3 class="section-title">Screens</h3>
-          </div>
-          <div class="p-4">
-            <div class="screen-tabs">
-              <template x-for="screen in screens" :key="screen.id">
-                <button
-                  class="screen-tab"
-                  :class="activeScreen === screen.id ? 'active' : ''"
-                  @click="activeScreen = screen.id"
-                  x-text="screen.label"
-                ></button>
+        <div class="project-table-wrap">
+          <table class="project-table" x-show="concepts.length > 0">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Working Title</th>
+                <th>Concept Brief</th>
+                <th class="concept-thesis-col">Thesis Statement</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="(concept, idx) in concepts" :key="concept.id">
+                <tr @click="selectProject(concept.project_id)" class="cursor-pointer"
+                  :class="selectedProjectId === concept.project_id ? 'bg-[rgba(241,196,15,0.14)]' : ''">
+                  <td x-text="idx + 1"></td>
+                  <td x-text="concept.working_title || '-'"></td>
+                  <td x-text="concept.concept_brief || '-'"></td>
+                  <td class="concept-thesis-col">
+                    <span class="long-text-preview" :class="expandedThesisStatements[concept.id] ? '' : 'clamped'"
+                      x-text="concept.thesis_statement || '-'"></span>
+                    <button x-show="(concept.thesis_statement || '').length > 120"
+                      @click.stop="toggleThesisStatement(concept.id)"
+                      class="dark-theme-btn-primary px-2 py-1 text-xs mt-2">
+                      <span x-text="expandedThesisStatements[concept.id] ? 'Hide' : 'Show'"></span>
+                    </button>
+                  </td>
+                </tr>
               </template>
-            </div>
-          </div>
+            </tbody>
+          </table>
+        </div>
+        <div class="project-empty" x-show="!loadingConcepts && concepts.length === 0">
+          No concepts found.
+        </div>
+        <div class="project-empty" x-show="loadingConcepts">
+          Loading concepts...
+        </div>
+        <div class="project-empty !text-red-400" x-show="projectError" x-text="projectError"></div>
+      </div>
 
-          <div x-show="activeScreen === 'screen1'" class="screen-one-grid">
-            <!-- <div class="screen-one-panel">
+      <div class="section-card">
+        <div class="section-header">
+          <h3 class="section-title">Screens</h3>
+        </div>
+        <div class="p-4">
+          <div class="screen-tabs">
+            <template x-for="screen in screens" :key="screen.id">
+              <button class="screen-tab" :class="activeScreen === screen.id ? 'active' : ''"
+                @click="activeScreen = screen.id" x-text="screen.label"></button>
+            </template>
+          </div>
+        </div>
+
+        <div x-show="activeScreen === 'screen1'" class="screen-one-grid">
+          <!-- <div class="screen-one-panel">
             <h4>generated guided questions that would be helpful in refining the thesis</h4>
             <button class="dark-theme-btn-primary px-4 py-2 text-sm" :disabled="!selectedProjectId || loadingQuestions"
               @click="openQuestionModal()">
@@ -860,627 +785,539 @@
           refineThesis()
           -->
 
-            <div class="screen-one-panel">
-              <h4>Refine your thesis</h4>
-              <div class="flex items-center gap-2 mb-3">
-                <button
-                  class="dark-theme-btn-primary px-4 py-2 text-sm"
-                  :disabled="!selectedProjectId || refiningThesis"
-                  @click="openQuestionModal()"
-                >
-                  <span x-show="!refiningThesis">Refine</span>
-                  <span x-show="refiningThesis">Refining...</span>
-                </button>
-              </div>
-              <div
-                class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
-                x-text="refinedThesisText || 'Refined thesis will appear here.'"
-              ></div>
+          <div class="screen-one-panel">
+            <h4>Refine your thesis</h4>
+            <div class="flex items-center gap-2 mb-3">
+              <button class="dark-theme-btn-primary px-4 py-2 text-sm" :disabled="!selectedProjectId || refiningThesis"
+                @click="openQuestionModal()">
+                <span x-show="!refiningThesis">Refine</span>
+                <span x-show="refiningThesis">Refining...</span>
+              </button>
             </div>
+            <div class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
+              x-text="refinedThesisText || 'Refined thesis will appear here.'"></div>
           </div>
-          <div x-show="activeScreen === 'screen2'" class="screen-one-grid">
-            <div class="section-card">
-              <div class="section-header">
-                <h3 class="section-title">Novelty scan list</h3>
-                <button
-                  class="dark-theme-btn-primary px-4 py-2 text-sm"
-                  :disabled="!selectedProjectId || loadingNoveltyScan"
-                  @click="runNoveltyScan()"
-                >
-                  <span x-show="!loadingNoveltyScan">Run Novelty</span>
-                  <span x-show="loadingNoveltyScan">Running...</span>
-                </button>
-              </div>
-
-              <div class="p-4">
-                <div
-                  x-show="loadingNoveltyScan"
-                  class="flex flex-col items-center justify-center py-10 gap-3"
-                >
-                  <div class="loader"></div>
-                  <div class="text-[#f1c40f] text-sm font-semibold">
-                    Fetching novelty results...
-                  </div>
-                </div>
-
-                <div
-                  class="project-empty"
-                  x-show="!loadingNoveltyScan && noveltyScanError"
-                  x-text="noveltyScanError"
-                ></div>
-
-                <div
-                  class="project-empty"
-                  x-show="!loadingNoveltyScan && !noveltyScanError && noveltyScanItems.length === 0"
-                >
-                  No novelty results yet.
-                </div>
-
-                <div
-                  class="space-y-4 max-h-[55vh] overflow-y-auto pr-2"
-                  x-show="!loadingNoveltyScan && noveltyScanItems.length > 0"
-                >
-                  <template
-                    x-for="(item, idx) in noveltyScanItems"
-                    :key="idx"
-                  >
-                    <div class="dark-theme-card p-4 space-y-3">
-                      <div
-                        class="text-[#f1c40f] font-semibold text-sm"
-                        x-text="`Result ${idx + 1}`"
-                      ></div>
-
-                      <div x-show="item.query_context">
-                        <div
-                          class="text-[#f1c40f] font-semibold text-sm mb-1"
-                        >
-                          Query context
-                        </div>
-                        <div
-                          class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
-                          x-text="item.query_context"
-                        ></div>
-                      </div>
-
-                      <div
-                        x-show="item.adjacent_books && item.adjacent_books.length"
-                      >
-                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                          Adjacent books
-                        </div>
-                        <ul
-                          class="list-disc pl-5 text-[#ddd] text-sm space-y-1"
-                        >
-                          <template
-                            x-for="(book, bidx) in item.adjacent_books"
-                            :key="bidx"
-                          >
-                            <li x-text="book"></li>
-                          </template>
-                        </ul>
-                      </div>
-
-                      <div x-show="item.derivative_risk">
-                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                          Derivative risk
-                        </div>
-                        <div class="text-[#ddd] text-sm" x-text="item.derivative_risk"></div>
-                      </div>
-
-                      <div
-                        x-show="item.recommendations && item.recommendations.length"
-                      >
-                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                          Recommendations
-                        </div>
-                        <ul
-                          class="list-disc pl-5 text-[#ddd] text-sm space-y-1"
-                        >
-                          <template
-                            x-for="(rec, ridx) in item.recommendations"
-                            :key="ridx"
-                          >
-                            <li x-text="rec"></li>
-                          </template>
-                        </ul>
-                      </div>
-
-                      <div x-show="item.gap_analysis">
-                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                          Gap analysis
-                        </div>
-                        <div
-                          class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
-                          x-text="item.gap_analysis"
-                        ></div>
-                      </div>
-
-                      <div
-                        x-show="item.overlapping_titles && item.overlapping_titles.length"
-                      >
-                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                          Overlapping titles
-                        </div>
-                        <ul
-                          class="list-disc pl-5 text-[#ddd] text-sm space-y-2"
-                        >
-                          <template
-                            x-for="(ot, tidx) in item.overlapping_titles"
-                            :key="tidx"
-                          >
-                            <li class="space-y-0.5">
-                              <div
-                                class="font-semibold text-sm"
-                                x-text="typeof ot === 'string' ? ot : (ot.title || '-')"
-                              ></div>
-                              <div
-                                class="text-xs text-[#aaa]"
-                                x-show="typeof ot !== 'string' && ot.author"
-                                x-text="ot.author"
-                              ></div>
-                              <div
-                                class="text-xs text-[#aaa] leading-5 whitespace-pre-wrap break-words"
-                                x-show="typeof ot !== 'string' && ot.overlap"
-                                x-text="ot.overlap"
-                              ></div>
-                            </li>
-                          </template>
-                        </ul>
-                      </div>
-
-                      <div x-show="item.uniqueness_summary">
-                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                          Uniqueness summary
-                        </div>
-                        <div
-                          class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
-                          x-text="item.uniqueness_summary"
-                        ></div>
-                      </div>
-
-                      <div x-show="item.created_at">
-                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                          Created at
-                        </div>
-                        <div class="text-[#ddd] text-sm" x-text="item.created_at"></div>
-                      </div>
-                    </div>
-                  </template>
-                </div>
-              </div>
+        </div>
+        <div x-show="activeScreen === 'screen2'" class="screen-one-grid">
+          <div class="section-card">
+            <div class="section-header">
+              <h3 class="section-title">Novelty scan list</h3>
+              <button class="dark-theme-btn-primary px-4 py-2 text-sm"
+                :disabled="!selectedProjectId || loadingNoveltyScan" @click="runNoveltyScan()">
+                <span x-show="!loadingNoveltyScan">Run Novelty</span>
+                <span x-show="loadingNoveltyScan">Running...</span>
+              </button>
             </div>
-            <div class="section-card">
-              <div class="section-header">
-                <h3 class="section-title">Authority map</h3>
-                <button
-                  class="dark-theme-btn-primary px-4 py-2 text-sm"
-                  :disabled="!selectedProjectId || loadingAuthorityMap"
-                  @click="runAuthorityMap()"
-                >
-                  <span x-show="!loadingAuthorityMap"
-                    >Run Authority</span
-                  >
-                  <span x-show="loadingAuthorityMap">Running...</span>
-                </button>
+
+            <div class="p-4">
+              <div x-show="loadingNoveltyScan" class="flex flex-col items-center justify-center py-10 gap-3">
+                <div class="loader"></div>
+                <div class="text-[#f1c40f] text-sm font-semibold">
+                  Fetching novelty results...
+                </div>
               </div>
 
-              <div class="p-4">
-                <div
-                  x-show="loadingAuthorityMap"
-                  class="flex flex-col items-center justify-center py-10 gap-3"
-                >
-                  <div class="loader"></div>
-                  <div class="text-[#f1c40f] text-sm font-semibold">
-                    Fetching authority results...
-                  </div>
-                </div>
+              <div class="project-empty" x-show="!loadingNoveltyScan && noveltyScanError" x-text="noveltyScanError">
+              </div>
 
-                <div
-                  class="project-empty"
-                  x-show="!loadingAuthorityMap && authorityMapError"
-                  x-text="authorityMapError"
-                ></div>
+              <div class="project-empty"
+                x-show="!loadingNoveltyScan && !noveltyScanError && noveltyScanItems.length === 0">
+                No novelty results yet.
+              </div>
 
-                <div
-                  class="project-empty"
-                  x-show="!loadingAuthorityMap && !authorityMapError && authorityMapItems.length === 0"
-                >
-                  No authority results yet.
-                </div>
+              <div class="space-y-4 max-h-[55vh] overflow-y-auto pr-2"
+                x-show="!loadingNoveltyScan && noveltyScanItems.length > 0">
+                <template x-for="(item, idx) in noveltyScanItems" :key="idx">
+                  <div class="dark-theme-card p-4 space-y-3">
+                    <div class="text-[#f1c40f] font-semibold text-sm" x-text="`Result ${idx + 1}`"></div>
 
-                <div
-                  class="space-y-4 max-h-[35vh] overflow-y-auto pr-2"
-                  x-show="!loadingAuthorityMap && authorityMapItems.length > 0"
-                >
-                  <template
-                    x-for="(item, idx) in authorityMapItems"
-                    :key="idx"
-                  >
-                    <div class="dark-theme-card p-4 space-y-3">
-                      <div
-                        class="text-[#f1c40f] font-semibold text-sm"
-                        x-text="`Result ${idx + 1}`"
-                      ></div>
-
-                      <div x-show="item.why_author_credible">
-                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                          Why author credible
-                        </div>
-
-                        <template
-                          x-if="getParsedStringListBullets(item.why_author_credible).length > 0"
-                        >
-                          <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
-                            <template
-                              x-for="(v, i) in getParsedStringListBullets(item.why_author_credible)"
-                              :key="i"
-                            >
-                              <li x-text="v"></li>
-                            </template>
-                          </ul>
-                        </template>
-
-                        <div
-                          class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
-                          x-text="item.why_author_credible"
-                          x-show="getParsedStringListBullets(item.why_author_credible).length === 0"
-                        ></div>
+                    <div x-show="item.query_context">
+                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                        Query context
                       </div>
-
-                      <div x-show="item.weak_areas && item.weak_areas.length">
-                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                          Weak areas
-                        </div>
-                        <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
-                          <template
-                            x-for="(v, i) in item.weak_areas"
-                            :key="i"
-                          >
-                            <li x-text="v"></li>
-                          </template>
-                        </ul>
-                      </div>
-
-                      <div x-show="item.experience_areas && item.experience_areas.length">
-                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                          Experience areas
-                        </div>
-                        <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
-                          <template
-                            x-for="(v, i) in item.experience_areas"
-                            :key="i"
-                          >
-                            <li x-text="v"></li>
-                          </template>
-                        </ul>
-                      </div>
-
-                      <div x-show="item.caution_flags">
-                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                          Caution flags
-                        </div>
-
-                        <template
-                          x-if="getParsedStringListBullets(item.caution_flags).length > 0"
-                        >
-                          <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
-                            <template
-                              x-for="(v, i) in getParsedStringListBullets(item.caution_flags)"
-                              :key="i"
-                            >
-                              <li x-text="v"></li>
-                            </template>
-                          </ul>
-                        </template>
-
-                        <div
-                          class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
-                          x-text="item.caution_flags"
-                          x-show="getParsedStringListBullets(item.caution_flags).length === 0"
-                        ></div>
-                      </div>
-
-                      <div x-show="item.created_at">
-                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
-                          Created at
-                        </div>
-                        <div class="text-[#ddd] text-sm" x-text="item.created_at"></div>
-                      </div>
+                      <div class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
+                        x-text="item.query_context"></div>
                     </div>
-                  </template>
-                </div>
+
+                    <div x-show="item.adjacent_books && item.adjacent_books.length">
+                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                        Adjacent books
+                      </div>
+                      <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
+                        <template x-for="(book, bidx) in item.adjacent_books" :key="bidx">
+                          <li x-text="book"></li>
+                        </template>
+                      </ul>
+                    </div>
+
+                    <div x-show="item.derivative_risk">
+                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                        Derivative risk
+                      </div>
+                      <div class="text-[#ddd] text-sm" x-text="item.derivative_risk"></div>
+                    </div>
+
+                    <div x-show="item.recommendations && item.recommendations.length">
+                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                        Recommendations
+                      </div>
+                      <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
+                        <template x-for="(rec, ridx) in item.recommendations" :key="ridx">
+                          <li x-text="rec"></li>
+                        </template>
+                      </ul>
+                    </div>
+
+                    <div x-show="item.gap_analysis">
+                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                        Gap analysis
+                      </div>
+                      <div class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
+                        x-text="item.gap_analysis"></div>
+                    </div>
+
+                    <div x-show="item.overlapping_titles && item.overlapping_titles.length">
+                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                        Overlapping titles
+                      </div>
+                      <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-2">
+                        <template x-for="(ot, tidx) in item.overlapping_titles" :key="tidx">
+                          <li class="space-y-0.5">
+                            <div class="font-semibold text-sm" x-text="typeof ot === 'string' ? ot : (ot.title || '-')">
+                            </div>
+                            <div class="text-xs text-[#aaa]" x-show="typeof ot !== 'string' && ot.author"
+                              x-text="ot.author"></div>
+                            <div class="text-xs text-[#aaa] leading-5 whitespace-pre-wrap break-words"
+                              x-show="typeof ot !== 'string' && ot.overlap" x-text="ot.overlap"></div>
+                          </li>
+                        </template>
+                      </ul>
+                    </div>
+
+                    <div x-show="item.uniqueness_summary">
+                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                        Uniqueness summary
+                      </div>
+                      <div class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
+                        x-text="item.uniqueness_summary"></div>
+                    </div>
+
+                    <div x-show="item.created_at">
+                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                        Created at
+                      </div>
+                      <div class="text-[#ddd] text-sm" x-text="item.created_at"></div>
+                    </div>
+                  </div>
+                </template>
               </div>
             </div>
           </div>
-          <!-- ================= SCREEN 4 ================= -->
-          <div x-show="activeScreen === 'screen4'" class="p-4">
-            <div class="section-card">
-              <!-- Header -->
-              <div class="section-header flex justify-between items-center flex-wrap gap-3">
-                <h3 class="section-title">Structure List</h3>
-                <div class="flex flex-wrap gap-3 items-center">
-                  <!-- Select Box -->
-                  <select
-                    x-model="selectedStructureId"
-                    class="dark-theme-input px-3 py-2 text-sm min-w-[260px]"
-                  >
-                    <option value="">Select Structure</option>
-                    <template x-for="item in structures" :key="item.id">
-                      <option
-                        :value="item.id"
-                        x-text="item.option_name"
-                      ></option>
-                    </template>
-                  </select>
-                  <!-- Generate Button -->
-                  <button
-                    class="dark-theme-btn-primary px-4 py-2 text-sm"
-                    @click="generateStructures()"
-                    :disabled="!selectedProjectId || loadingStructures"
-                  >
-                    <span x-show="!loadingStructures">Generate</span>
-                    <span x-show="loadingStructures">Generating...</span>
-                  </button>
-                  <!-- Select Button -->
-                  <button
-                    class="dark-theme-btn-primary px-4 py-2 text-sm"
-                    @click="selectStructure()"
-                    :disabled="!selectedStructureId"
-                  >
-                    Select
-                  </button>
+          <div class="section-card">
+            <div class="section-header">
+              <h3 class="section-title">Authority map</h3>
+              <button class="dark-theme-btn-primary px-4 py-2 text-sm"
+                :disabled="!selectedProjectId || loadingAuthorityMap" @click="runAuthorityMap()">
+                <span x-show="!loadingAuthorityMap">Run Authority</span>
+                <span x-show="loadingAuthorityMap">Running...</span>
+              </button>
+            </div>
+
+            <div class="p-4">
+              <div x-show="loadingAuthorityMap" class="flex flex-col items-center justify-center py-10 gap-3">
+                <div class="loader"></div>
+                <div class="text-[#f1c40f] text-sm font-semibold">
+                  Fetching authority results...
                 </div>
               </div>
-              <!-- Table -->
-              <div class="project-table-wrap">
-                <table class="project-table" x-show="structures.length > 0">
-                  <thead>
-                    <tr>
-                      <th>No</th>
-                      <th>Structure Name</th>
-                      <th>Structure Summary</th>
-                      <th>Why Fit</th>
-                      <th>Chapter Count</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <template x-for="(item,index) in structures" :key="item.id">
-                      <tr
-                        class="cursor-pointer"
-                        @click="selectedStructureId = item.id"
-                        :class="selectedStructureId === item.id ? 'bg-[rgba(241,196,15,0.14)]' : ''"
-                      >
-                        <td x-text="index + 1"></td>
-                        <td x-text="item.option_name"></td>
-                        <td>
-                          <span
-                            class="long-text-preview"
-                            :class="expandedStructures[item.id + '_summary'] ? '' : 'clamped'"
-                            x-text="item.option_summary || '-'"
-                          ></span>
-          
-                          <button
-                            x-show="(item.option_summary || '').length > 120"
-                            @click.stop="toggleStructureText(item.id + '_summary')"
-                            class="dark-theme-btn-primary px-2 py-1 text-xs mt-2"
-                          >
-                            <span
-                              x-text="expandedStructures[item.id + '_summary'] ? 'Hide' : 'Show'"
-                            ></span>
-                          </button>
-                        </td>
-                        <td>
-                          <span
-                            class="long-text-preview"
-                            :class="expandedStructures[item.id + '_fit'] ? '' : 'clamped'"
-                            x-text="item.why_this_structure_fits || '-'"
-                          ></span>
-          
-                          <button
-                            x-show="(item.why_this_structure_fits || '').length > 120"
-                            @click.stop="toggleStructureText(item.id + '_fit')"
-                            class="dark-theme-btn-primary px-2 py-1 text-xs mt-2"
-                          >
-                            <span
-                              x-text="expandedStructures[item.id + '_fit'] ? 'Hide' : 'Show'"
-                            ></span>
-                          </button>
-                        </td>
-                        <td x-text="item.chapter_count_estimate"></td>
-                      </tr>
-                    </template>
-                  </tbody>
-                </table>
-                <div
-                  class="project-empty"
-                  x-show="structures.length === 0 && !loadingStructures"
-                >
-                  No structures found.
-                </div>
-                <div
-                  class="project-empty"
-                  x-show="loadingStructures"
-                >
-                  Loading structures...
-                </div>
+
+              <div class="project-empty" x-show="!loadingAuthorityMap && authorityMapError" x-text="authorityMapError">
+              </div>
+
+              <div class="project-empty"
+                x-show="!loadingAuthorityMap && !authorityMapError && authorityMapItems.length === 0">
+                No authority results yet.
+              </div>
+
+              <div class="space-y-4 max-h-[35vh] overflow-y-auto pr-2"
+                x-show="!loadingAuthorityMap && authorityMapItems.length > 0">
+                <template x-for="(item, idx) in authorityMapItems" :key="idx">
+                  <div class="dark-theme-card p-4 space-y-3">
+                    <div class="text-[#f1c40f] font-semibold text-sm" x-text="`Result ${idx + 1}`"></div>
+
+                    <div x-show="item.why_author_credible">
+                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                        Why author credible
+                      </div>
+
+                      <template x-if="getParsedStringListBullets(item.why_author_credible).length > 0">
+                        <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
+                          <template x-for="(v, i) in getParsedStringListBullets(item.why_author_credible)" :key="i">
+                            <li x-text="v"></li>
+                          </template>
+                        </ul>
+                      </template>
+
+                      <div class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
+                        x-text="item.why_author_credible"
+                        x-show="getParsedStringListBullets(item.why_author_credible).length === 0"></div>
+                    </div>
+
+                    <div x-show="item.weak_areas && item.weak_areas.length">
+                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                        Weak areas
+                      </div>
+                      <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
+                        <template x-for="(v, i) in item.weak_areas" :key="i">
+                          <li x-text="v"></li>
+                        </template>
+                      </ul>
+                    </div>
+
+                    <div x-show="item.experience_areas && item.experience_areas.length">
+                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                        Experience areas
+                      </div>
+                      <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
+                        <template x-for="(v, i) in item.experience_areas" :key="i">
+                          <li x-text="v"></li>
+                        </template>
+                      </ul>
+                    </div>
+
+                    <div x-show="item.caution_flags">
+                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                        Caution flags
+                      </div>
+
+                      <template x-if="getParsedStringListBullets(item.caution_flags).length > 0">
+                        <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
+                          <template x-for="(v, i) in getParsedStringListBullets(item.caution_flags)" :key="i">
+                            <li x-text="v"></li>
+                          </template>
+                        </ul>
+                      </template>
+
+                      <div class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
+                        x-text="item.caution_flags"
+                        x-show="getParsedStringListBullets(item.caution_flags).length === 0"></div>
+                    </div>
+
+                    <div x-show="item.created_at">
+                      <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                        Created at
+                      </div>
+                      <div class="text-[#ddd] text-sm" x-text="item.created_at"></div>
+                    </div>
+                  </div>
+                </template>
               </div>
             </div>
           </div>
         </div>
+        <!-- ================= SCREEN 3 ================= -->
+        <div x-show="activeScreen === 'screen3'" class="p-4">
+          <div class="section-card">
+            <div class="section-header">
+              <h3 class="section-title">Principle</h3>
+              <button class="dark-theme-btn-primary px-4 py-2 text-sm"
+                :disabled="!selectedProjectId || generatingPrinciples" @click="generatePrinciples()">
+                <span x-show="!generatingPrinciples">Create Principle</span>
+                <span x-show="generatingPrinciples">Generating...</span>
+              </button>
+            </div>
+            <div class="project-table-wrap" style="max-height: 220px; overflow-y: auto;">
+              <table class="project-table" x-show="screen3Principles.length > 0">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th class="concept-thesis-col">Principle</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="(p, idx) in screen3Principles" :key="p.id">
+                    <tr class="cursor-pointer">
+                      <td x-text="idx + 1"></td>
+                      <td class="concept-thesis-col">
+                        <span class="long-text-preview" :class="expandedPrincipleTexts[p.id] ? '' : 'clamped'"
+                          x-text="p.text || '-'"></span>
+                        <button x-show="(p.text || '').length > 120" @click.stop="togglePrincipleText(p.id)"
+                          class="dark-theme-btn-primary px-2 py-1 text-xs mt-2">
+                          <span x-text="expandedPrincipleTexts[p.id] ? 'Hide' : 'Show'"></span>
+                        </button>
+                      </td>
+                      <td x-text="p.status || '-'"></td>
+                      <td @click.stop>
+                        <button class="dark-theme-btn-primary px-3 py-1 text-xs"
+                          :disabled="p.status === 'approved' || approvingPrincipleId === p.id" @click="approvePrinciple(p.id)">
+                          <span x-show="p.status === 'approved'">Approved</span>
+                          <span x-show="p.status !== 'approved' && approvingPrincipleId !== p.id">Approve</span>
+                          <span x-show="p.status !== 'approved' && approvingPrincipleId === p.id">Approving...</span>
+                        </button>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+            <div class="project-empty" x-show="!selectedProjectId">Select a concept to view principles.</div>
+            <div class="project-empty" x-show="loadingPrinciples">Loading principles...</div>
+            <div class="project-empty"
+              x-show="selectedProjectId && !loadingPrinciples && screen3Principles.length === 0">No principles found.
+            </div>
+            <div class="project-empty !text-red-400" x-show="principlesError" x-text="principlesError"></div>
+          </div>
 
-        <div
-          class="modal-backdrop"
-          x-show="showCreateConceptModal"
-          x-transition.opacity
-          @click="closeCreateConceptModal()"
-        >
-          <div class="create-project-modal" @click.stop>
-            <div class="flex items-start justify-between gap-3 mb-5">
-              <h4 class="text-2xl font-bold text-[#f1c40f]">Create Concept</h4>
-              <button
-                class="text-[#8f9bb3] text-xl leading-none"
-                @click="closeCreateConceptModal()"
-              >
+          <!-- Story Bank -->
+          <div class="section-card mt-4">
+            <div class="section-header">
+              <h3 class="section-title">Story Bank</h3>
+              <button class="dark-theme-btn-primary px-4 py-2 text-sm"
+                :disabled="!selectedProjectId || generatingStories" @click="generateStory()">
+                <span x-show="!generatingStories">Create Story</span>
+                <span x-show="generatingStories">Generating...</span>
+              </button>
+            </div>
+            <div class="p-4">
+              <div x-show="loadingStories" class="flex flex-col items-center justify-center py-10 gap-3">
+                <div class="loader"></div>
+                <div class="text-[#f1c40f] text-sm font-semibold">Loading stories...</div>
+              </div>
+
+              <div class="project-empty" x-show="!selectedProjectId && !loadingStories">Select a concept to view
+                stories.</div>
+
+              <div class="project-empty"
+                x-show="selectedProjectId && !loadingStories && storyBankItems.length === 0 && !storiesError">No stories
+                found.</div>
+
+              <div class="project-empty !text-red-400" x-show="storiesError" x-text="storiesError"></div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[55vh] overflow-y-auto pr-2"
+                x-show="!loadingStories && storyBankItems.length > 0">
+                <template x-for="(story, idx) in storyBankItems" :key="story.id || idx">
+                  <div class="dark-theme-card p-4 space-y-3">
+                    <div class="flex items-center justify-between gap-3">
+                      <div class="text-[#f1c40f] font-semibold text-sm" x-text="story.title || `Story ${idx + 1}`">
+                      </div>
+                      <div class="flex items-center gap-2 text-xs">
+                        <button 
+                          class="dark-theme-btn-primary px-3 py-1 text-xs" 
+                          :disabled="story.approved || approvingStoryId === story.id" 
+                          @click="approveStory(story.id)"
+                        >
+                          <span x-show="story.approved">Approved</span>
+                          <span x-show="!story.approved && approvingStoryId !== story.id">Approve</span>
+                          <span x-show="!story.approved && approvingStoryId === story.id">Approving...</span>
+                        </button>
+                      </div>
+                    </div>
+                    <div x-show="story.content || story.text || story.story_text"
+                      class="text-[#ddd] text-sm leading-6 break-words text-left">
+                      <span class="text-left"
+                        x-text="(story.content || story.text || story.story_text || '-').trim()"></span>
+                    </div>
+                    <div x-show="story.principle_text" class="text-xs text-[#aaa] leading-5">
+                      <span class="text-[#f1c40f] font-semibold">Principle:</span>
+                      <span x-text="story.principle_text"></span>
+                    </div>
+                    <div class="text-xs mt-1 text-[#aaa]">
+                      <span>Status:</span>
+                      <span :class="story.approved ? 'text-green-500' : 'text-yellow-500'" class="font-semibold" x-text="story.approved ? 'Approved' : 'Pending'"></span>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- ================= SCREEN 4 ================= -->
+        <div x-show="activeScreen === 'screen4'" class="p-4">
+          <div class="section-card">
+            <!-- Header -->
+            <div class="section-header flex justify-between items-center flex-wrap gap-3">
+              <h3 class="section-title">Structure List</h3>
+              <div class="flex flex-wrap gap-3 items-center">
+                <!-- Select Box -->
+                <select x-model="selectedStructureId" class="dark-theme-input px-3 py-2 text-sm min-w-[260px]">
+                  <option value="">Select Structure</option>
+                  <template x-for="item in structures" :key="item.id">
+                    <option :value="item.id" x-text="item.option_name"></option>
+                  </template>
+                </select>
+                <!-- Generate Button -->
+                <button class="dark-theme-btn-primary px-4 py-2 text-sm" @click="generateStructures()"
+                  :disabled="!selectedProjectId || loadingStructures">
+                  <span x-show="!loadingStructures">Generate</span>
+                  <span x-show="loadingStructures">Generating...</span>
+                </button>
+                <!-- Select Button -->
+                <button class="dark-theme-btn-primary px-4 py-2 text-sm" @click="selectStructure()"
+                  :disabled="!selectedStructureId">
+                  Select
+                </button>
+              </div>
+            </div>
+            <!-- Table -->
+            <div class="project-table-wrap">
+              <table class="project-table" x-show="structures.length > 0">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Structure Name</th>
+                    <th>Structure Summary</th>
+                    <th>Why Fit</th>
+                    <th>Chapter Count</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="(item,index) in structures" :key="item.id">
+                    <tr class="cursor-pointer" @click="selectedStructureId = item.id"
+                      :class="selectedStructureId === item.id ? 'bg-[rgba(241,196,15,0.14)]' : ''">
+                      <td x-text="index + 1"></td>
+                      <td x-text="item.option_name"></td>
+                      <td>
+                        <span class="long-text-preview"
+                          :class="expandedStructures[item.id + '_summary'] ? '' : 'clamped'"
+                          x-text="item.option_summary || '-'"></span>
+
+                        <button x-show="(item.option_summary || '').length > 120"
+                          @click.stop="toggleStructureText(item.id + '_summary')"
+                          class="dark-theme-btn-primary px-2 py-1 text-xs mt-2">
+                          <span x-text="expandedStructures[item.id + '_summary'] ? 'Hide' : 'Show'"></span>
+                        </button>
+                      </td>
+                      <td>
+                        <span class="long-text-preview" :class="expandedStructures[item.id + '_fit'] ? '' : 'clamped'"
+                          x-text="item.why_this_structure_fits || '-'"></span>
+
+                        <button x-show="(item.why_this_structure_fits || '').length > 120"
+                          @click.stop="toggleStructureText(item.id + '_fit')"
+                          class="dark-theme-btn-primary px-2 py-1 text-xs mt-2">
+                          <span x-text="expandedStructures[item.id + '_fit'] ? 'Hide' : 'Show'"></span>
+                        </button>
+                      </td>
+                      <td x-text="item.chapter_count_estimate"></td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+              <div class="project-empty" x-show="structures.length === 0 && !loadingStructures">
+                No structures found.
+              </div>
+              <div class="project-empty" x-show="loadingStructures">
+                Loading structures...
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-backdrop" x-show="showCreateConceptModal" x-transition.opacity
+        @click="closeCreateConceptModal()">
+        <div class="create-project-modal" @click.stop>
+          <div class="flex items-start justify-between gap-3 mb-5">
+            <h4 class="text-2xl font-bold text-[#f1c40f]">Create Concept</h4>
+            <button class="text-[#8f9bb3] text-xl leading-none" @click="closeCreateConceptModal()">
+              ×
+            </button>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Working
+                Title</label>
+              <input type="text" x-model.trim="newConceptWorkingTitle" placeholder="Enter working title"
+                class="w-full p-3 dark-theme-input text-sm" />
+            </div>
+            <div>
+              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Concept
+                Brief</label>
+              <textarea x-model.trim="newConceptBrief" placeholder="Enter concept brief" rows="3"
+                class="w-full p-3 dark-theme-input text-sm resize-none"></textarea>
+            </div>
+            <div>
+              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Rough
+                Thesis</label>
+              <textarea x-model.trim="newConceptRoughThesis" placeholder="Enter rough thesis" rows="5"
+                class="w-full p-3 dark-theme-input text-sm resize-none"></textarea>
+            </div>
+            <p x-show="createProjectError" class="error-message mt-0" x-text="createProjectError"></p>
+            <button @click="submitConcept()" :disabled="creatingConcept"
+              class="dark-theme-btn-primary w-full py-3 text-lg font-bold">
+              <span x-show="!creatingConcept">Submit</span>
+              <span x-show="creatingConcept">Submitting...</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Generated Question Modal -->
+      <div class="modal-backdrop" x-show="showQuestionModal" x-transition.opacity>
+        <div class="create-project-modal question-list-modal" @click.stop>
+          <!-- Choice View -->
+          <div x-show="modalView === 'choice'" class="py-6 space-y-6">
+            <div class="flex justify-between items-center mb-4">
+              <h4 class="text-2xl font-bold text-[#f1c40f]">Refine Thesis</h4>
+              <button class="text-[#8f9bb3] text-2xl leading-none" @click="closeQuestionModal()">
                 ×
               </button>
             </div>
-            <div class="space-y-4">
-              <div>
-                <label
-                  class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide"
-                  >Working Title</label
-                >
-                <input
-                  type="text"
-                  x-model.trim="newConceptWorkingTitle"
-                  placeholder="Enter working title"
-                  class="w-full p-3 dark-theme-input text-sm"
-                />
-              </div>
-              <div>
-                <label
-                  class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide"
-                  >Concept Brief</label
-                >
-                <textarea
-                  x-model.trim="newConceptBrief"
-                  placeholder="Enter concept brief"
-                  rows="3"
-                  class="w-full p-3 dark-theme-input text-sm resize-none"
-                ></textarea>
-              </div>
-              <div>
-                <label
-                  class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide"
-                  >Rough Thesis</label
-                >
-                <textarea
-                  x-model.trim="newConceptRoughThesis"
-                  placeholder="Enter rough thesis"
-                  rows="5"
-                  class="w-full p-3 dark-theme-input text-sm resize-none"
-                ></textarea>
-              </div>
-              <p
-                x-show="createProjectError"
-                class="error-message mt-0"
-                x-text="createProjectError"
-              ></p>
-              <button
-                @click="submitConcept()"
-                :disabled="creatingConcept"
-                class="dark-theme-btn-primary w-full py-3 text-lg font-bold"
-              >
-                <span x-show="!creatingConcept">Submit</span>
-                <span x-show="creatingConcept">Submitting...</span>
+            <p class="text-[#ddd] text-center mb-6">
+              How would you like to refine your thesis?
+            </p>
+            <div class="grid grid-cols-1 gap-4">
+              <button @click="refineThesis()" class="dark-theme-btn-primary py-4 text-lg font-bold shadow-lg"
+                :disabled="refiningThesis">
+                <span x-show="!refiningThesis">Refine Directly</span>
+                <span x-show="refiningThesis">Refining...</span>
+              </button>
+              <div class="text-center text-[#555] font-bold">OR</div>
+              <button @click="startQuestionGeneration()"
+                class="border-2 border-[#f1c40f] text-[#f1c40f] hover:bg-[#f1c40f]/10 py-4 rounded-xl text-lg font-bold transition-all">
+                Generate Questions First
               </button>
             </div>
           </div>
-        </div>
 
-        <!-- Generated Question Modal -->
-        <div
-          class="modal-backdrop"
-          x-show="showQuestionModal"
-          x-transition.opacity
-        >
-          <div class="create-project-modal question-list-modal" @click.stop>
-            <!-- Choice View -->
-            <div x-show="modalView === 'choice'" class="py-6 space-y-6">
-              <div class="flex justify-between items-center mb-4">
-                <h4 class="text-2xl font-bold text-[#f1c40f]">Refine Thesis</h4>
-                <button
-                  class="text-[#8f9bb3] text-2xl leading-none"
-                  @click="closeQuestionModal()"
-                >
+          <!-- Questions View -->
+          <div x-show="modalView === 'questions'">
+            <div
+              class="flex items-center justify-between gap-3 sticky top-[-20px] bg-[#111] z-10 -mx-5 px-5 py-4 border-b border-[rgba(241,196,15,0.25)] mb-5 rounded-t-xl">
+              <h4 class="text-2xl font-bold text-[#f1c40f]">
+                Generated Questions
+              </h4>
+              <div class="flex items-center gap-3">
+                <button class="dark-theme-btn-primary px-4 py-1.5 text-sm" @click="submitBulkAnswers()"
+                  :disabled="refiningThesis">
+                  <span x-show="!refiningThesis">Save</span>
+                  <span x-show="refiningThesis">Saving...</span>
+                </button>
+                <button class="text-[#8f9bb3] text-2xl leading-none" @click="closeQuestionModal()">
                   ×
                 </button>
               </div>
-              <p class="text-[#ddd] text-center mb-6">
-                How would you like to refine your thesis?
-              </p>
-              <div class="grid grid-cols-1 gap-4">
-                <button
-                  @click="refineThesis()"
-                  class="dark-theme-btn-primary py-4 text-lg font-bold shadow-lg"
-                  :disabled="refiningThesis"
-                >
-                  <span x-show="!refiningThesis">Refine Directly</span>
-                  <span x-show="refiningThesis">Refining...</span>
-                </button>
-                <div class="text-center text-[#555] font-bold">OR</div>
-                <button
-                  @click="startQuestionGeneration()"
-                  class="border-2 border-[#f1c40f] text-[#f1c40f] hover:bg-[#f1c40f]/10 py-4 rounded-xl text-lg font-bold transition-all"
-                >
-                  Generate Questions First
-                </button>
-              </div>
             </div>
-
-            <!-- Questions View -->
-            <div x-show="modalView === 'questions'">
-              <div
-                class="flex items-center justify-between gap-3 sticky top-[-20px] bg-[#111] z-10 -mx-5 px-5 py-4 border-b border-[rgba(241,196,15,0.25)] mb-5 rounded-t-xl"
-              >
-                <h4 class="text-2xl font-bold text-[#f1c40f]">
-                  Generated Questions
-                </h4>
-                <div class="flex items-center gap-3">
-                  <button
-                    class="dark-theme-btn-primary px-4 py-1.5 text-sm"
-                    @click="submitBulkAnswers()"
-                    :disabled="refiningThesis"
-                  >
-                    <span x-show="!refiningThesis">Save</span>
-                    <span x-show="refiningThesis">Saving...</span>
-                  </button>
-                  <button
-                    class="text-[#8f9bb3] text-2xl leading-none"
-                    @click="closeQuestionModal()"
-                  >
-                    ×
-                  </button>
-                </div>
-              </div>
             <div class="space-y-4">
-              <p
-                x-show="questionError"
-                class="error-message mt-0"
-                x-text="questionError"
-              ></p>
+              <p x-show="questionError" class="error-message mt-0" x-text="questionError"></p>
 
-              <div
-                x-show="loadingQuestions"
-                class="flex flex-col items-center justify-center py-10"
-              >
+              <div x-show="loadingQuestions" class="flex flex-col items-center justify-center py-10">
                 <div class="loader"></div>
                 <p class="text-[#f1c40f] text-sm mt-3 animate-pulse">
                   Generating questions...
                 </p>
               </div>
 
-              <template
-                x-for="(question, idx) in generatedQuestions"
-                :key="question.id"
-              >
+              <template x-for="(question, idx) in generatedQuestions" :key="question.id">
                 <div class="dark-theme-card p-4 space-y-3">
-                  <div
-                    class="text-[#f1c40f] font-semibold text-sm"
-                    x-text="`${idx + 1}. ${question.question || '-'}`"
-                  ></div>
-                  <textarea
-                    rows="3"
-                    x-model.trim="questionAnswers[question.id]"
-                    placeholder="Enter answer"
-                    class="w-full p-3 dark-theme-input text-sm resize-none"
-                  ></textarea>
+                  <div class="text-[#f1c40f] font-semibold text-sm" x-text="`${idx + 1}. ${question.question || '-'}`">
+                  </div>
+                  <textarea rows="3" x-model.trim="questionAnswers[question.id]" placeholder="Enter answer"
+                    class="w-full p-3 dark-theme-input text-sm resize-none"></textarea>
                 </div>
               </template>
-              <div
-                class="project-empty"
-                x-show="!loadingQuestions && generatedQuestions.length === 0"
-              >
+              <div class="project-empty" x-show="!loadingQuestions && generatedQuestions.length === 0">
                 No questions found.
               </div>
             </div>
@@ -1590,12 +1427,12 @@
           expandedThesisStatements: {},
           selectedProjectId: "",
           screens: [
-             { id: "screen1", label: "Concept Dashboard" },
+            { id: "screen1", label: "Concept Dashboard" },
             { id: "screen2", label: "Novelty and Positioning" },
             { id: "screen3", label: "Principles and Story Bank" },
             { id: "screen4", label: "Structure Options" },
             { id: "screen5", label: "Chapter Cards" },
-             { id: "screen6", label: "Chapter Lab" },
+            { id: "screen6", label: "Chapter Lab" },
           ],
           activeScreen: "screen1",
           loadingConcepts: false,
@@ -1632,6 +1469,22 @@
           authorityMapError: "",
           authorityMapLastProjectId: "",
 
+          // Screen 3: Principles
+          screen3Principles: [],
+          loadingPrinciples: false,
+          principlesError: "",
+          expandedPrincipleTexts: {},
+          generatingPrinciples: false,
+          approvingPrincipleId: "",
+
+          // Screen 3: Story Bank
+          storyBankItems: [],
+          loadingStories: false,
+          storiesError: "",
+          expandedStoryTexts: {},
+          generatingStories: false,
+          approvingStoryId: "",
+
           init() {
             const token = localStorage.getItem("bookBuilderToken");
             const email = localStorage.getItem("bookBuilderEmail");
@@ -1659,6 +1512,10 @@
               if (value === "screen2") {
                 this.loadNoveltyScanList();
                 this.loadAuthorityMapList();
+              }
+              if (value === "screen3") {
+                this.loadPrinciples();
+                this.loadStories();
               }
             });
           },
@@ -2280,12 +2137,202 @@
               this.loadNoveltyScanList({ force: false });
               this.loadAuthorityMapList({ force: false });
             }
+            this.loadPrinciples();
+            this.loadStories();
           },
           toggleStructureText(key) {
             this.expandedStructures = {
               ...this.expandedStructures,
               [key]: !this.expandedStructures[key]
             };
+          },
+
+          // ── Screen 3 methods ──
+          async loadPrinciples() {
+            if (!this.selectedProjectId) return;
+            this.loadingPrinciples = true;
+            this.principlesError = "";
+            try {
+              const headers = this.getAuthHeaders();
+              if (!headers) return;
+              const res = await fetch(
+                `${API_BASE_URL}/bookbuilder/principles/${this.selectedProjectId}`,
+                { headers }
+              );
+              if (res.status === 401 || res.status === 403) {
+                handle401();
+                return;
+              }
+              if (!res.ok) throw new Error("Failed to fetch principles");
+              const data = await res.json();
+              this.screen3Principles = Array.isArray(data) ? data : [];
+            } catch (err) {
+              this.principlesError = err.message || "Unable to load principles";
+              this.screen3Principles = [];
+            } finally {
+              this.loadingPrinciples = false;
+            }
+          },
+
+          togglePrincipleText(principleId) {
+            this.expandedPrincipleTexts = {
+              ...this.expandedPrincipleTexts,
+              [principleId]: !this.expandedPrincipleTexts[principleId],
+            };
+          },
+
+          async generatePrinciples() {
+            if (!this.selectedProjectId) return;
+            this.generatingPrinciples = true;
+            this.principlesError = "";
+            try {
+              const headers = this.getAuthHeaders();
+              if (!headers) return;
+              const res = await fetch(
+                `${API_BASE_URL}/bookbuilder/principles/${this.selectedProjectId}/generate`,
+                {
+                  method: "POST",
+                  headers,
+                }
+              );
+              if (res.status === 401 || res.status === 403) {
+                handle401();
+                return;
+              }
+              if (!res.ok) {
+                const errorJson = await res.json().catch(() => ({}));
+                throw new Error(errorJson.detail || "Failed to generate principles");
+              }
+              await this.loadPrinciples();
+            } catch (err) {
+              this.principlesError = err.message || "Unable to generate principles";
+            } finally {
+              this.generatingPrinciples = false;
+            }
+          },
+
+          async approvePrinciple(principleId) {
+            if (!principleId) return;
+            this.approvingPrincipleId = principleId;
+            this.principlesError = "";
+            try {
+              const headers = this.getAuthHeaders();
+              if (!headers) return;
+              const res = await fetch(
+                `${API_BASE_URL}/bookbuilder/principles/${principleId}/approve`,
+                {
+                  method: "POST",
+                  headers,
+                }
+              );
+              if (res.status === 401 || res.status === 403) {
+                handle401();
+                return;
+              }
+              if (!res.ok) {
+                const errorJson = await res.json().catch(() => ({}));
+                throw new Error(errorJson.detail || "Failed to approve principle");
+              }
+              await this.loadPrinciples();
+            } catch (err) {
+              this.principlesError = err.message || "Unable to approve principle";
+            } finally {
+              this.approvingPrincipleId = "";
+            }
+          },
+
+          // ── Screen 3: Story Bank methods ──
+          async loadStories() {
+            if (!this.selectedProjectId) return;
+            this.loadingStories = true;
+            this.storiesError = "";
+            try {
+              const headers = this.getAuthHeaders();
+              if (!headers) return;
+              const res = await fetch(
+                `${API_BASE_URL}/bookbuilder/stories/${this.selectedProjectId}`,
+                { headers }
+              );
+              if (res.status === 401 || res.status === 403) {
+                handle401();
+                return;
+              }
+              if (!res.ok) throw new Error("Failed to fetch stories");
+              const data = await res.json();
+              this.storyBankItems = Array.isArray(data) ? data : [];
+            } catch (err) {
+              this.storiesError = err.message || "Unable to load stories";
+              this.storyBankItems = [];
+            } finally {
+              this.loadingStories = false;
+            }
+          },
+
+          toggleStoryText(storyId) {
+            this.expandedStoryTexts = {
+              ...this.expandedStoryTexts,
+              [storyId]: !this.expandedStoryTexts[storyId],
+            };
+          },
+
+          async generateStory() {
+            if (!this.selectedProjectId) return;
+            this.generatingStories = true;
+            this.storiesError = "";
+            try {
+              const headers = this.getAuthHeaders();
+              if (!headers) return;
+              const res = await fetch(
+                `${API_BASE_URL}/bookbuilder/stories/${this.selectedProjectId}/generate`,
+                {
+                  method: "POST",
+                  headers,
+                }
+              );
+              if (res.status === 401 || res.status === 403) {
+                handle401();
+                return;
+              }
+              if (!res.ok) {
+                const errorJson = await res.json().catch(() => ({}));
+                throw new Error(errorJson.detail || "Failed to generate story");
+              }
+              await this.loadStories();
+            } catch (err) {
+              this.storiesError = err.message || "Unable to generate story";
+            } finally {
+              this.generatingStories = false;
+            }
+          },
+
+          async approveStory(storyId) {
+            if (!storyId) return;
+            this.approvingStoryId = storyId;
+            this.storiesError = "";
+            try {
+              const headers = this.getAuthHeaders();
+              if (!headers) return;
+              const res = await fetch(
+                `${API_BASE_URL}/bookbuilder/stories/${storyId}/approve`,
+                {
+                  method: "POST",
+                  headers,
+                }
+              );
+              if (res.status === 401 || res.status === 403) {
+                handle401();
+                return;
+              }
+              if (!res.ok) {
+                const errorJson = await res.json().catch(() => ({}));
+                throw new Error(errorJson.detail || "Failed to approve story");
+              }
+              await this.loadStories();
+            } catch (err) {
+              this.storiesError = err.message || "Unable to approve story";
+            } finally {
+              this.approvingStoryId = "";
+            }
           },
         };
       }
@@ -2388,5 +2435,6 @@
         }
       });
     </script>
-  </body>
+</body>
+
 </html>
