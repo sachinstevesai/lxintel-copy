@@ -726,7 +726,7 @@
 
         <div x-show="activeScreen === 'screen1'" class="screen-one-grid">
           <div class="screen-one-panel">
-            <h4>generate QA questions</h4>
+            <h4>generated guided questions that would be helpful in refining the thesis</h4>
             <button class="dark-theme-btn-primary px-4 py-2 text-sm" :disabled="!selectedProjectId || loadingQuestions"
               @click="openQuestionModal()">
               <span x-show="!loadingQuestions">Generate Question</span>
@@ -735,7 +735,7 @@
           </div>
 
           <div class="screen-one-panel">
-            <h4>refine thesis</h4>
+            <h4>Refine your thesis</h4>
             <div class="flex items-center gap-2 mb-3">
               <button class="dark-theme-btn-primary px-4 py-2 text-sm" :disabled="!selectedProjectId || refiningThesis"
                 @click="refineThesis()">
