@@ -752,6 +752,54 @@
               x-text="refinedThesisText || 'Refined thesis will appear here.'"></div>
           </div>
         </div>
+
+        <div x-show="activeScreen === 'screen3'" class="p-4">
+          <div class="section-card">
+            <div class="section-header">
+              <h3 class="section-title">Principle</h3>
+              <button class="dark-theme-btn-primary px-4 py-2 text-sm"
+                :disabled="!selectedProjectId || generatingPrinciples"
+                @click="generatePrinciples()">
+                <span x-show="!generatingPrinciples">Create Principle</span>
+                <span x-show="generatingPrinciples">Generating...</span>
+              </button>
+            </div>
+            <div class="project-table-wrap">
+              <table class="project-table" x-show="screen3Principles.length > 0">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th class="concept-thesis-col">Principle</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="(p, idx) in screen3Principles" :key="p.id">
+                    <tr class="cursor-pointer">
+                      <td x-text="idx + 1"></td>
+                      <td class="concept-thesis-col">
+                        <span class="long-text-preview"
+                          :class="expandedPrincipleTexts[p.id] ? '' : 'clamped'"
+                          x-text="p.text || '-'"></span>
+                        <button x-show="(p.text || '').length > 120"
+                          @click.stop="togglePrincipleText(p.id)"
+                          class="dark-theme-btn-primary px-2 py-1 text-xs mt-2">
+                          <span x-text="expandedPrincipleTexts[p.id] ? 'Hide' : 'Show'"></span>
+                        </button>
+                      </td>
+                      <td x-text="p.status || '-'"></td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+            <div class="project-empty" x-show="!selectedProjectId">Select a concept to view principles.</div>
+            <div class="project-empty" x-show="loadingPrinciples">Loading principles...</div>
+            <div class="project-empty" x-show="selectedProjectId && !loadingPrinciples && screen3Principles.length === 0">No principles found.</div>
+            <div class="project-empty !text-red-400" x-show="principlesError" x-text="principlesError"></div>
+          </div>
+        </div>
+
       </div>
 
       <div class="modal-backdrop" x-show="showCreateConceptModal" x-transition.opacity
@@ -939,6 +987,14 @@
         refiningThesis: false,
         refinedThesisText: "",
 
+        // ── Screen 3 state ──
+        screen3Principles: [],
+        loadingPrinciples: false,
+        principlesError: "",
+        expandedPrincipleTexts: {},
+        generatingPrinciples: false,
+
+
         init() {
           const token = localStorage.getItem("bookBuilderToken");
           const email = localStorage.getItem("bookBuilderEmail");
@@ -1029,6 +1085,7 @@
           if (!projectId || this.selectedProjectId === projectId) return;
           this.selectedProjectId = projectId;
           this.refinedThesisText = "";
+          this.loadPrinciples();
         },
 
         openCreateConceptModal() {
@@ -1140,7 +1197,7 @@
           }
         },
 
-        closeQuestionModal() {
+        closeQuestionModal() {  
           this.showQuestionModal = false;
         },
 
@@ -1203,6 +1260,68 @@
             this.refiningThesis = false;
           }
         },
+
+        // ── Screen 3 methods ──
+        async loadPrinciples() {
+          if (!this.selectedProjectId) return;
+          this.loadingPrinciples = true;
+          this.principlesError = "";
+          try {
+            const headers = this.getAuthHeaders();
+            if (!headers) return;
+            const res = await fetch(`${API_BASE_URL}/bookbuilder/principles/${this.selectedProjectId}`, {
+              headers
+            });
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
+            if (!res.ok) throw new Error("Failed to fetch principles");
+            const data = await res.json();
+            this.screen3Principles = Array.isArray(data) ? data : [];
+          } catch (err) {
+            this.principlesError = err.message || "Unable to load principles";
+            this.screen3Principles = [];
+          } finally {
+            this.loadingPrinciples = false;
+          }
+        },
+
+        togglePrincipleText(principleId) {
+          this.expandedPrincipleTexts = {
+            ...this.expandedPrincipleTexts,
+            [principleId]: !this.expandedPrincipleTexts[principleId],
+          };
+        },
+
+        async generatePrinciples() {
+          if (!this.selectedProjectId) return;
+          this.generatingPrinciples = true;
+          this.principlesError = "";
+          try {
+            const headers = this.getAuthHeaders();
+            if (!headers) return;
+            const res = await fetch(`${API_BASE_URL}/bookbuilder/principles/${this.selectedProjectId}/generate`, {
+              method: "POST",
+              headers,
+            });
+            if (res.status === 401 || res.status === 403) {
+              handle401();
+              return;
+            }
+            if (!res.ok) {
+              const errorJson = await res.json().catch(() => ({}));
+              throw new Error(errorJson.detail || "Failed to generate principles");
+            }
+            await this.loadPrinciples();
+          } catch (err) {
+            this.principlesError = err.message || "Unable to generate principles";
+          } finally {
+            this.generatingPrinciples = false;
+          }
+        },
+
+
       };
     }
 
