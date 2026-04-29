@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Screen 4 - Structure Select</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+<style>
+body{
+  background:#111;
+  color:#fff;
+}
+
+.card{
+  background:#1a1a1a;
+  border:1px solid rgba(241,196,15,.25);
+  border-radius:12px;
+  padding:20px;
+}
+
+.btn-primary{
+  background:#f1c40f;
+  color:#000;
+  padding:10px 18px;
+  border-radius:8px;
+  font-weight:bold;
+}
+
+.btn-primary:hover{
+  background:#d4ac0d;
+}
+
+.select-box{
+  background:#000;
+  border:1px solid #444;
+  color:#fff;
+  padding:10px;
+  border-radius:8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="max-w-6xl mx-auto p-6" x-data="screenFourApp()">
+
+  <!-- HEADER -->
+  <div class="card">
+
+    <div class="flex flex-col md:flex-row gap-4 md:items-end md:justify-between">
+
+      <!-- LEFT -->
+      <div>
+        <h1 class="text-2xl font-bold text-yellow-400">
+          Screen 4 - Structure List
+        </h1>
+
+        <p class="text-gray-400 mt-2">
+          Generate structure and select from dropdown.
+        </p>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+
+        <!-- SELECT BOX -->
+        <select
+          x-model="selectedStructureId"
+          class="select-box min-w-[320px]"
+        >
+          <option value="">Select Structure</option>
+
+          <template x-for="item in structures" :key="item.id">
+            <option
+              :value="item.id"
+              x-text="item.structure_name"
+            ></option>
+          </template>
+
+        </select>
+
+        <!-- GENERATE -->
+        <button
+          class="btn-primary"
+          @click="generateStructures()"
+          :disabled="loading"
+        >
+          <span x-show="!loading">Generate</span>
+          <span x-show="loading">Generating...</span>
+        </button>
+
+        <!-- SELECT BUTTON -->
+        <button
+          class="btn-primary"
+          @click="selectStructure()"
+        >
+          Select
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- DETAILS -->
+  <div class="card mt-6" x-show="selectedData">
+
+    <h2
+      class="text-xl font-bold text-yellow-400"
+      x-text="selectedData?.structure_name"
+    ></h2>
+
+    <p
+      class="text-gray-300 mt-3"
+      x-text="selectedData?.why_fit"
+    ></p>
+
+    <div class="mt-5">
+      <div class="text-sm text-gray-400 mb-2">
+        Chapters
+      </div>
+
+      <template
+        x-for="(chapter,index) in selectedData?.chapters"
+        :key="index"
+      >
+        <div class="text-yellow-300 mb-1">
+          <span x-text="index+1"></span>.
+          <span x-text="chapter"></span>
+        </div>
+      </template>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function screenFourApp() {
+  return {
+
+    API_BASE_URL: "http://localhost:8000",
+
+    projectId: "c9db8424-96a8-4575-a0a1-239c2dd21267",
+
+    structures: [],
+
+    selectedStructureId: "",
+
+    loading: false,
+
+    get selectedData() {
+      return this.structures.find(
+        x => x.id === this.selectedStructureId
+      );
+    },
+
+    getHeaders() {
+      const token = localStorage.getItem("bookBuilderToken");
+
+      return {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      };
+    },
+
+    async generateStructures() {
+
+      this.loading = true;
+
+      try {
+
+        await fetch(
+          `${this.API_BASE_URL}/bookbuilder/structure/${this.projectId}/generate`,
+          {
+            method: "POST",
+            headers: this.getHeaders()
+          }
+        );
+
+        await this.loadStructures();
+
+      } catch (e) {
+        alert("Generate failed");
+      }
+
+      this.loading = false;
+    },
+
+    async loadStructures() {
+
+      try {
+
+        const res = await fetch(
+          `${this.API_BASE_URL}/bookbuilder/structure/${this.projectId}`,
+          {
+            headers: this.getHeaders()
+          }
+        );
+
+        const data = await res.json();
+
+        this.structures = Array.isArray(data) ? data : [];
+
+      } catch (e) {
+        alert("Load failed");
+      }
+    },
+
+    async selectStructure() {
+
+      if (!this.selectedStructureId) {
+        alert("Please select structure");
+        return;
+      }
+
+      try {
+
+        await fetch(
+          `${this.API_BASE_URL}/bookbuilder/structure/${this.projectId}/select/${this.selectedStructureId}`,
+          {
+            method: "POST",
+            headers: this.getHeaders()
+          }
+        );
+
+        alert("Selected Successfully");
+
+      } catch (e) {
+        alert("Selection failed");
+      }
+    },
+
+    init() {
+      this.loadStructures();
+    }
+
+  }
+}
+</script>
+
+</body>
+</html>

@@ -752,6 +752,96 @@
               x-text="refinedThesisText || 'Refined thesis will appear here.'"></div>
           </div>
         </div>
+        <!-- ================= SCREEN 4 ================= -->
+        <div x-show="activeScreen === 'screen4'" class="p-4">
+          <div class="section-card">
+            <!-- Header -->
+            <div class="section-header flex justify-between items-center flex-wrap gap-3">
+              <h3 class="section-title">Structure List</h3>
+              <div class="flex flex-wrap gap-3 items-center">
+                <!-- Select Box -->
+                <select
+                  x-model="selectedStructureId"
+                  class="dark-theme-input px-3 py-2 text-sm min-w-[260px]"
+                >
+                  <option value="">Select Structure</option>
+                  <template x-for="item in structures" :key="item.id">
+                    <option
+                      :value="item.id"
+                      x-text="item.option_name"
+                    ></option>
+                  </template>
+                </select>
+                <!-- Generate Button -->
+                <button
+                  class="dark-theme-btn-primary px-4 py-2 text-sm"
+                  @click="generateStructures()"
+                  :disabled="!selectedProjectId || loadingStructures"
+                >
+                  <span x-show="!loadingStructures">Generate</span>
+                  <span x-show="loadingStructures">Generating...</span>
+                </button>
+                <!-- Select Button -->
+                <button
+                  class="dark-theme-btn-primary px-4 py-2 text-sm"
+                  @click="selectStructure()"
+                  :disabled="!selectedStructureId"
+                >
+                  Select
+                </button>
+              </div>
+            </div>
+            <!-- Table -->
+            <div class="project-table-wrap">
+              <table class="project-table" x-show="structures.length > 0">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Structure Name</th>
+                    <th>Structure Summary</th>
+                    <th>Why Fit</th>
+                    <th>Chapter Count</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="(item,index) in structures" :key="item.id">
+                    <tr
+                      class="cursor-pointer"
+                      @click="selectedStructureId = item.id"
+                      :class="selectedStructureId === item.id ? 'bg-[rgba(241,196,15,0.14)]' : ''"
+                    >
+                      <td x-text="index + 1"></td>
+                      <td x-text="item.option_name"></td>
+                      <td>
+                        <span class="long-text-preview clamped"
+                          x-text="item.option_summary || '-'">
+                        </span>
+                      </td>
+                      <td>
+                        <span class="long-text-preview clamped"
+                          x-text="item.why_this_structure_fits || '-'">
+                        </span>
+                      </td>
+                      <td x-text="item.chapter_count_estimate"></td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+              <div
+                class="project-empty"
+                x-show="structures.length === 0 && !loadingStructures"
+              >
+                No structures found.
+              </div>
+              <div
+                class="project-empty"
+                x-show="loadingStructures"
+              >
+                Loading structures...
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="modal-backdrop" x-show="showCreateConceptModal" x-transition.opacity
@@ -938,6 +1028,9 @@
         submittingAnswerId: "",
         refiningThesis: false,
         refinedThesisText: "",
+        structures: [],
+        selectedStructureId: "",
+        loadingStructures: false,
 
         init() {
           const token = localStorage.getItem("bookBuilderToken");
@@ -1202,6 +1295,84 @@
           } finally {
             this.refiningThesis = false;
           }
+        },
+
+        async loadStructures() {
+          if (!this.selectedProjectId) return;
+          this.loadingStructures = true;
+          try {
+            const headers = this.getAuthHeaders();
+            if (!headers) return;
+            const res = await fetch(
+              `${API_BASE_URL}/bookbuilder/structure/${this.selectedProjectId}`,
+              {
+                method: "GET",
+                headers
+              }
+            );
+            if (!res.ok) {
+              throw new Error("Failed to load structures");
+            }
+            const data = await res.json();
+            this.structures = Array.isArray(data) ? data : [];
+          } catch (error) {
+            this.structures = [];
+          } finally {
+            this.loadingStructures = false;
+          }
+        },
+         /* ==========================
+          GENERATE STRUCTURES
+        ========================== */
+        async generateStructures() {
+          if (!this.selectedProjectId) return;
+          this.loadingStructures = true;
+          try {
+            const headers = this.getAuthHeaders();
+            if (!headers) return;
+            await fetch(
+              `${API_BASE_URL}/bookbuilder/structure/${this.selectedProjectId}/generate`,
+              {
+                method: "POST",
+                headers
+              }
+            );
+            await this.loadStructures();
+          } catch (error) {
+            alert("Failed to generate structures");
+          } finally {
+            this.loadingStructures = false;
+          }
+        },
+        /* ==========================
+        SELECT STRUCTURE
+        ========================== */
+        async selectStructure() {
+          if (!this.selectedProjectId || !this.selectedStructureId) return;
+          try {
+            const headers = this.getAuthHeaders();
+            if (!headers) return;
+            await fetch(
+              `${API_BASE_URL}/bookbuilder/structure/${this.selectedProjectId}/select/${this.selectedStructureId}`,
+              {
+                method: "POST",
+                headers
+              }
+            );
+            alert("Structure Selected Successfully");
+          } catch (error) {
+            alert("Failed to select structure");
+          }
+        },
+        /* ==========================
+        SELECT PROJECT
+        ========================== */
+        selectProject(projectId) {
+          if (!projectId) return;
+          this.selectedProjectId = projectId;
+          this.refinedThesisText = "";
+          this.selectedStructureId = "";
+          this.loadStructures();   // auto load screen4 data
         },
       };
     }
