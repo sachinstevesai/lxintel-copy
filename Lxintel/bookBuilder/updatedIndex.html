@@ -764,13 +764,14 @@
                 <span x-show="generatingPrinciples">Generating...</span>
               </button>
             </div>
-            <div class="project-table-wrap">
+            <div class="project-table-wrap" style="max-height: 220px; overflow-y: auto;">
               <table class="project-table" x-show="screen3Principles.length > 0">
                 <thead>
                   <tr>
                     <th>No</th>
                     <th class="concept-thesis-col">Principle</th>
                     <th>Status</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -788,6 +789,11 @@
                         </button>
                       </td>
                       <td x-text="p.status || '-'"></td>
+                      <td @click.stop>
+                        <button class="dark-theme-btn-primary px-3 py-1 text-xs">
+                          Approve
+                        </button>
+                      </td>
                     </tr>
                   </template>
                 </tbody>
