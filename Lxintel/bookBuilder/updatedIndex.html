@@ -863,6 +863,321 @@
               ></div>
             </div>
           </div>
+
+          <div x-show="activeScreen === 'screen2'" class="screen-one-grid">
+            <div class="section-card">
+              <div class="section-header">
+                <h3 class="section-title">Novelty scan list</h3>
+                <button
+                  class="dark-theme-btn-primary px-4 py-2 text-sm"
+                  :disabled="!selectedProjectId || loadingNoveltyScan"
+                  @click="runNoveltyScan()"
+                >
+                  <span x-show="!loadingNoveltyScan">Run Novelty</span>
+                  <span x-show="loadingNoveltyScan">Running...</span>
+                </button>
+              </div>
+
+              <div class="p-4">
+                <div
+                  x-show="loadingNoveltyScan"
+                  class="flex flex-col items-center justify-center py-10 gap-3"
+                >
+                  <div class="loader"></div>
+                  <div class="text-[#f1c40f] text-sm font-semibold">
+                    Fetching novelty results...
+                  </div>
+                </div>
+
+                <div
+                  class="project-empty"
+                  x-show="!loadingNoveltyScan && noveltyScanError"
+                  x-text="noveltyScanError"
+                ></div>
+
+                <div
+                  class="project-empty"
+                  x-show="!loadingNoveltyScan && !noveltyScanError && noveltyScanItems.length === 0"
+                >
+                  No novelty results yet.
+                </div>
+
+                <div
+                  class="space-y-4 max-h-[55vh] overflow-y-auto pr-2"
+                  x-show="!loadingNoveltyScan && noveltyScanItems.length > 0"
+                >
+                  <template
+                    x-for="(item, idx) in noveltyScanItems"
+                    :key="idx"
+                  >
+                    <div class="dark-theme-card p-4 space-y-3">
+                      <div
+                        class="text-[#f1c40f] font-semibold text-sm"
+                        x-text="`Result ${idx + 1}`"
+                      ></div>
+
+                      <div x-show="item.query_context">
+                        <div
+                          class="text-[#f1c40f] font-semibold text-sm mb-1"
+                        >
+                          Query context
+                        </div>
+                        <div
+                          class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
+                          x-text="item.query_context"
+                        ></div>
+                      </div>
+
+                      <div
+                        x-show="item.adjacent_books && item.adjacent_books.length"
+                      >
+                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                          Adjacent books
+                        </div>
+                        <ul
+                          class="list-disc pl-5 text-[#ddd] text-sm space-y-1"
+                        >
+                          <template
+                            x-for="(book, bidx) in item.adjacent_books"
+                            :key="bidx"
+                          >
+                            <li x-text="book"></li>
+                          </template>
+                        </ul>
+                      </div>
+
+                      <div x-show="item.derivative_risk">
+                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                          Derivative risk
+                        </div>
+                        <div class="text-[#ddd] text-sm" x-text="item.derivative_risk"></div>
+                      </div>
+
+                      <div
+                        x-show="item.recommendations && item.recommendations.length"
+                      >
+                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                          Recommendations
+                        </div>
+                        <ul
+                          class="list-disc pl-5 text-[#ddd] text-sm space-y-1"
+                        >
+                          <template
+                            x-for="(rec, ridx) in item.recommendations"
+                            :key="ridx"
+                          >
+                            <li x-text="rec"></li>
+                          </template>
+                        </ul>
+                      </div>
+
+                      <div x-show="item.gap_analysis">
+                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                          Gap analysis
+                        </div>
+                        <div
+                          class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
+                          x-text="item.gap_analysis"
+                        ></div>
+                      </div>
+
+                      <div
+                        x-show="item.overlapping_titles && item.overlapping_titles.length"
+                      >
+                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                          Overlapping titles
+                        </div>
+                        <ul
+                          class="list-disc pl-5 text-[#ddd] text-sm space-y-2"
+                        >
+                          <template
+                            x-for="(ot, tidx) in item.overlapping_titles"
+                            :key="tidx"
+                          >
+                            <li class="space-y-0.5">
+                              <div
+                                class="font-semibold text-sm"
+                                x-text="typeof ot === 'string' ? ot : (ot.title || '-')"
+                              ></div>
+                              <div
+                                class="text-xs text-[#aaa]"
+                                x-show="typeof ot !== 'string' && ot.author"
+                                x-text="ot.author"
+                              ></div>
+                              <div
+                                class="text-xs text-[#aaa] leading-5 whitespace-pre-wrap break-words"
+                                x-show="typeof ot !== 'string' && ot.overlap"
+                                x-text="ot.overlap"
+                              ></div>
+                            </li>
+                          </template>
+                        </ul>
+                      </div>
+
+                      <div x-show="item.uniqueness_summary">
+                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                          Uniqueness summary
+                        </div>
+                        <div
+                          class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
+                          x-text="item.uniqueness_summary"
+                        ></div>
+                      </div>
+
+                      <div x-show="item.created_at">
+                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                          Created at
+                        </div>
+                        <div class="text-[#ddd] text-sm" x-text="item.created_at"></div>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+            <div class="section-card">
+              <div class="section-header">
+                <h3 class="section-title">Authority map</h3>
+                <button
+                  class="dark-theme-btn-primary px-4 py-2 text-sm"
+                  :disabled="!selectedProjectId || loadingAuthorityMap"
+                  @click="runAuthorityMap()"
+                >
+                  <span x-show="!loadingAuthorityMap"
+                    >Run Authority</span
+                  >
+                  <span x-show="loadingAuthorityMap">Running...</span>
+                </button>
+              </div>
+
+              <div class="p-4">
+                <div
+                  x-show="loadingAuthorityMap"
+                  class="flex flex-col items-center justify-center py-10 gap-3"
+                >
+                  <div class="loader"></div>
+                  <div class="text-[#f1c40f] text-sm font-semibold">
+                    Fetching authority results...
+                  </div>
+                </div>
+
+                <div
+                  class="project-empty"
+                  x-show="!loadingAuthorityMap && authorityMapError"
+                  x-text="authorityMapError"
+                ></div>
+
+                <div
+                  class="project-empty"
+                  x-show="!loadingAuthorityMap && !authorityMapError && authorityMapItems.length === 0"
+                >
+                  No authority results yet.
+                </div>
+
+                <div
+                  class="space-y-4 max-h-[35vh] overflow-y-auto pr-2"
+                  x-show="!loadingAuthorityMap && authorityMapItems.length > 0"
+                >
+                  <template
+                    x-for="(item, idx) in authorityMapItems"
+                    :key="idx"
+                  >
+                    <div class="dark-theme-card p-4 space-y-3">
+                      <div
+                        class="text-[#f1c40f] font-semibold text-sm"
+                        x-text="`Result ${idx + 1}`"
+                      ></div>
+
+                      <div x-show="item.why_author_credible">
+                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                          Why author credible
+                        </div>
+
+                        <template
+                          x-if="getParsedStringListBullets(item.why_author_credible).length > 0"
+                        >
+                          <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
+                            <template
+                              x-for="(v, i) in getParsedStringListBullets(item.why_author_credible)"
+                              :key="i"
+                            >
+                              <li x-text="v"></li>
+                            </template>
+                          </ul>
+                        </template>
+
+                        <div
+                          class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
+                          x-text="item.why_author_credible"
+                          x-show="getParsedStringListBullets(item.why_author_credible).length === 0"
+                        ></div>
+                      </div>
+
+                      <div x-show="item.weak_areas && item.weak_areas.length">
+                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                          Weak areas
+                        </div>
+                        <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
+                          <template
+                            x-for="(v, i) in item.weak_areas"
+                            :key="i"
+                          >
+                            <li x-text="v"></li>
+                          </template>
+                        </ul>
+                      </div>
+
+                      <div x-show="item.experience_areas && item.experience_areas.length">
+                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                          Experience areas
+                        </div>
+                        <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
+                          <template
+                            x-for="(v, i) in item.experience_areas"
+                            :key="i"
+                          >
+                            <li x-text="v"></li>
+                          </template>
+                        </ul>
+                      </div>
+
+                      <div x-show="item.caution_flags">
+                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                          Caution flags
+                        </div>
+
+                        <template
+                          x-if="getParsedStringListBullets(item.caution_flags).length > 0"
+                        >
+                          <ul class="list-disc pl-5 text-[#ddd] text-sm space-y-1">
+                            <template
+                              x-for="(v, i) in getParsedStringListBullets(item.caution_flags)"
+                              :key="i"
+                            >
+                              <li x-text="v"></li>
+                            </template>
+                          </ul>
+                        </template>
+
+                        <div
+                          class="text-[#ddd] text-sm leading-6 whitespace-pre-wrap break-words"
+                          x-text="item.caution_flags"
+                          x-show="getParsedStringListBullets(item.caution_flags).length === 0"
+                        ></div>
+                      </div>
+
+                      <div x-show="item.created_at">
+                        <div class="text-[#f1c40f] font-semibold text-sm mb-1">
+                          Created at
+                        </div>
+                        <div class="text-[#ddd] text-sm" x-text="item.created_at"></div>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div
@@ -1172,6 +1487,18 @@
           refinedThesisText: "",
           modalView: "choice",
 
+          // Screen 2: Novelty scan
+          noveltyScanItems: [],
+          loadingNoveltyScan: false,
+          noveltyScanError: "",
+          noveltyScanLastProjectId: "",
+
+          // Screen 2: Authority map
+          authorityMapItems: [],
+          loadingAuthorityMap: false,
+          authorityMapError: "",
+          authorityMapLastProjectId: "",
+
           init() {
             const token = localStorage.getItem("bookBuilderToken");
             const email = localStorage.getItem("bookBuilderEmail");
@@ -1192,6 +1519,14 @@
             window.addEventListener("logout-success", () => {
               this.isLoggedIn = false;
               this.userEmail = "";
+            });
+
+            // Auto-load Screen 2 results when user opens that tab.
+            this.$watch("activeScreen", (value) => {
+              if (value === "screen2") {
+                this.loadNoveltyScanList();
+                this.loadAuthorityMapList();
+              }
             });
           },
 
@@ -1288,6 +1623,12 @@
             this.selectedProjectId = projectId;
             this.refinedThesisText = "";
             this.loadRefinedThesis();
+
+            // Keep Screen 2 in sync with the selected project.
+            if (this.activeScreen === "screen2") {
+              this.loadNoveltyScanList({ force: false });
+              this.loadAuthorityMapList({ force: false });
+            }
           },
 
           openCreateConceptModal() {
@@ -1529,6 +1870,196 @@
               this.projectError = err.message || "Unable to refine thesis";
             } finally {
               this.refiningThesis = false;
+            }
+          },
+
+          stripIds(value) {
+            // Remove ids from the API response (including nested ones).
+            if (Array.isArray(value)) return value.map((v) => this.stripIds(v));
+            if (value && typeof value === "object") {
+              const out = {};
+              for (const [k, v] of Object.entries(value)) {
+                if (k === "id" || k === "project_id") continue;
+                out[k] = this.stripIds(v);
+              }
+              return out;
+            }
+            return value;
+          },
+
+          formatNoveltyItem(item) {
+            try {
+              return JSON.stringify(item, null, 2);
+            } catch (_) {
+              return String(item);
+            }
+          },
+
+          getParsedStringListBullets(value) {
+            // The API sometimes returns list-like strings such as:
+            // "['a', \"b\", 'c']"
+            if (typeof value !== "string") return [];
+            const trimmed = value.trim();
+            if (!trimmed) return [];
+
+            // Capture both single-quoted and double-quoted list items.
+            const regex = /'([^']*)'|"([^"]*)"/g;
+            const out = [];
+            let match = null;
+            while ((match = regex.exec(trimmed)) !== null) {
+              const v = (match[1] ?? match[2] ?? "").trim();
+              if (v) out.push(v);
+            }
+            return out;
+          },
+
+          async loadNoveltyScanList({ force = false } = {}) {
+            if (!this.selectedProjectId) return;
+            if (!force && this.noveltyScanLastProjectId === this.selectedProjectId) return;
+
+            this.loadingNoveltyScan = true;
+            this.noveltyScanError = "";
+
+            try {
+              const headers = this.getAuthHeaders({
+                "ngrok-skip-browser-warning": "true",
+                "Accept": "application/json",
+              });
+              if (!headers) return;
+
+              const url = `${API_BASE_URL}/bookbuilder/research/${this.selectedProjectId}/novelty-scan`;
+              const res = await fetch(url, { headers });
+
+              if (res.status === 401 || res.status === 403) {
+                handle401();
+                return;
+              }
+              if (!res.ok) {
+                const errorJson = await res.json().catch(() => ({}));
+                throw new Error(errorJson.detail || "Failed to fetch novelty results");
+              }
+
+              const data = await res.json().catch(() => []);
+              const list = Array.isArray(data) ? data : [];
+              this.noveltyScanItems = list.map((item) => this.stripIds(item));
+              this.noveltyScanLastProjectId = this.selectedProjectId;
+            } catch (err) {
+              this.noveltyScanError = err.message || "Unable to load novelty results";
+              this.noveltyScanItems = [];
+            } finally {
+              this.loadingNoveltyScan = false;
+            }
+          },
+
+          async runNoveltyScan() {
+            if (!this.selectedProjectId) return;
+            this.loadingNoveltyScan = true;
+            this.noveltyScanError = "";
+
+            try {
+              const headers = this.getAuthHeaders({
+                "Accept": "application/json",
+              });
+              if (!headers) return;
+
+              const url = `${API_BASE_URL}/bookbuilder/research/${this.selectedProjectId}/novelty-scan`;
+
+              // 1) Trigger novelty scan generation
+              const postRes = await fetch(url, { method: "POST", headers });
+              if (postRes.status === 401 || postRes.status === 403) {
+                handle401();
+                return;
+              }
+              if (!postRes.ok) {
+                const errorJson = await postRes.json().catch(() => ({}));
+                throw new Error(errorJson.detail || "Failed to run novelty scan");
+              }
+
+              // 2) Fetch list to display
+              await this.loadNoveltyScanList({ force: true });
+            } catch (err) {
+              this.noveltyScanError = err.message || "Unable to run novelty scan";
+              this.noveltyScanItems = [];
+            } finally {
+              this.loadingNoveltyScan = false;
+            }
+          },
+
+          async loadAuthorityMapList({ force = false } = {}) {
+            if (!this.selectedProjectId) return;
+            if (!force && this.authorityMapLastProjectId === this.selectedProjectId) return;
+
+            this.loadingAuthorityMap = true;
+            this.authorityMapError = "";
+
+            try {
+              const headers = this.getAuthHeaders({
+                "ngrok-skip-browser-warning": "true",
+                Accept: "application/json",
+              });
+              if (!headers) return;
+
+              const url = `${API_BASE_URL}/bookbuilder/research/${this.selectedProjectId}/authority-map`;
+              const res = await fetch(url, { headers });
+
+              if (res.status === 401 || res.status === 403) {
+                handle401();
+                return;
+              }
+              if (!res.ok) {
+                const errorJson = await res.json().catch(() => ({}));
+                throw new Error(
+                  errorJson.detail || "Failed to fetch authority results",
+                );
+              }
+
+              const data = await res.json().catch(() => []);
+              const list = Array.isArray(data) ? data : [];
+              this.authorityMapItems = list.map((item) => this.stripIds(item));
+              this.authorityMapLastProjectId = this.selectedProjectId;
+            } catch (err) {
+              this.authorityMapError =
+                err.message || "Unable to load authority results";
+              this.authorityMapItems = [];
+            } finally {
+              this.loadingAuthorityMap = false;
+            }
+          },
+
+          async runAuthorityMap() {
+            if (!this.selectedProjectId) return;
+            this.loadingAuthorityMap = true;
+            this.authorityMapError = "";
+
+            try {
+              const headers = this.getAuthHeaders({
+                Accept: "application/json",
+              });
+              if (!headers) return;
+
+              const url = `${API_BASE_URL}/bookbuilder/research/${this.selectedProjectId}/authority-map`;
+
+              // 1) Trigger authority map generation
+              const postRes = await fetch(url, { method: "POST", headers });
+              if (postRes.status === 401 || postRes.status === 403) {
+                handle401();
+                return;
+              }
+              if (!postRes.ok) {
+                const errorJson = await postRes.json().catch(() => ({}));
+                throw new Error(
+                  errorJson.detail || "Failed to run authority map",
+                );
+              }
+
+              // 2) Fetch list to display
+              await this.loadAuthorityMapList({ force: true });
+            } catch (err) {
+              this.authorityMapError =
+                err.message || "Unable to run authority map";
+              this.authorityMapItems = [];
+            } finally {
+              this.loadingAuthorityMap = false;
             }
           },
         };
