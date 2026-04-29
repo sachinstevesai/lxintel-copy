@@ -2271,8 +2271,15 @@
             if (!projectId) return;
             this.selectedProjectId = projectId;
             this.refinedThesisText = "";
+            this.loadRefinedThesis();
             this.selectedStructureId = "";
-            this.loadStructures();   // auto load screen4 data
+            this.loadStructures(); // auto load screen4 data
+
+            // Keep Screen 2 in sync with the selected project.
+            if (this.activeScreen === "screen2") {
+              this.loadNoveltyScanList({ force: false });
+              this.loadAuthorityMapList({ force: false });
+            }
           },
           toggleStructureText(key) {
             this.expandedStructures = {
