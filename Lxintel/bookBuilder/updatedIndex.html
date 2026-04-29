@@ -50,6 +50,31 @@
       z-index: -1;
     }
 
+    /* Custom Scrollbar Styles */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(241, 196, 15, 0.35);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(241, 196, 15, 0.6);
+    }
+
+    /* Firefox Scrollbar Support */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(241, 196, 15, 0.35) rgba(0, 0, 0, 0.2);
+    }
+
     .dark-theme-card {
       background-color: #111;
       border-radius: 12px;
@@ -326,8 +351,11 @@
     }
 
     .qa-table-wrap,
-    .thesis-table-wrap {
-      max-height: 340px;
+    .thesis-table-wrap,
+    .structure-table-wrap,
+    .chapter-table-wrap,
+    .lab-table-wrap {
+      max-height: 400px;
       overflow-y: auto;
       overflow-x: auto;
     }
@@ -825,7 +853,7 @@
                 No novelty results yet.
               </div>
 
-              <div class="space-y-4 max-h-[55vh] overflow-y-auto pr-2"
+              <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2"
                 x-show="!loadingNoveltyScan && noveltyScanItems.length > 0">
                 <template x-for="(item, idx) in noveltyScanItems" :key="idx">
                   <div class="dark-theme-card p-4 space-y-3">
@@ -939,7 +967,7 @@
                 No authority results yet.
               </div>
 
-              <div class="space-y-4 max-h-[35vh] overflow-y-auto pr-2"
+              <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2"
                 x-show="!loadingAuthorityMap && authorityMapItems.length > 0">
                 <template x-for="(item, idx) in authorityMapItems" :key="idx">
                   <div class="dark-theme-card p-4 space-y-3">
@@ -1161,7 +1189,7 @@
               </div>
             </div>
             <!-- Table -->
-            <div class="project-table-wrap">
+            <div class="project-table-wrap structure-table-wrap">
               <table class="project-table" x-show="structures.length > 0">
                 <thead>
                   <tr>
@@ -1235,7 +1263,7 @@
         
             <!-- Table -->
             <div class="p-4">
-              <div class="project-table-wrap">
+              <div class="project-table-wrap chapter-table-wrap">
                 <table class="project-table" x-show="chapterCards.length > 0">
                   <thead>
                     <tr>
