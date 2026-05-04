@@ -690,6 +690,76 @@
     .markdown-content ol { list-style-type: decimal; margin-left: 1.2rem; margin-bottom: 0.4rem; }
     .markdown-content li { margin-bottom: 0.15rem; }
     .markdown-content strong { color: #f1c40f; }
+    .message-modal-content {
+      background: #111;
+      border: 1px solid rgba(241, 196, 15, 0.4);
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+      max-width: 400px;
+      width: 95%;
+      padding: 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      animation: modalScaleIn 0.3s ease-out;
+    }
+
+    @keyframes modalScaleIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .message-modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      color: #777;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+
+    .message-modal-close:hover {
+      color: #f1c40f;
+      background: rgba(241, 196, 15, 0.1);
+    }
+
+    .message-modal-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .message-modal-icon.success {
+      background: rgba(46, 204, 113, 0.1);
+      border: 2px solid #2ecc71;
+      color: #2ecc71;
+    }
+
+    .message-modal-icon.error {
+      background: rgba(231, 76, 60, 0.1);
+      border: 2px solid #e74c3c;
+      color: #e74c3c;
+    }
+
+    .message-modal-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #f1c40f;
+      margin-bottom: 0.75rem;
+    }
+
+    .message-modal-text {
+      color: #ddd;
+      font-size: 1rem;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
   </style>
 </head>
 
@@ -1211,7 +1281,7 @@
               <h3 class="section-title">Structure List</h3>
               <div class="flex flex-wrap gap-3 items-center">
                 <!-- Select Box -->
-                <select x-model="selectedStructureId" class="dark-theme-input px-3 py-2 text-sm min-w-[260px]">
+                <select x-model="selectedStructureId" @change="selectStructure()" class="dark-theme-input px-3 py-2 text-sm min-w-[260px]">
                   <option value="">Select Structure</option>
                   <template x-for="item in structures" :key="item.id">
                     <option :value="item.id" x-text="item.option_name"></option>
@@ -1223,11 +1293,7 @@
                   <span x-show="!loadingStructures">Generate</span>
                   <span x-show="loadingStructures">Generating...</span>
                 </button>
-                <!-- Select Button -->
-                <button class="dark-theme-btn-primary px-4 py-2 text-sm" @click="selectStructure()"
-                  :disabled="!selectedStructureId">
-                  Select
-                </button>
+
               </div>
             </div>
             <!-- Table -->
@@ -1240,11 +1306,12 @@
                     <th>Structure Summary</th>
                     <th>Why Fit</th>
                     <th>Chapter Count</th>
+                     <th>isSelected</th>
                   </tr>
                 </thead>
                 <tbody>
                   <template x-for="(item,index) in structures" :key="item.id">
-                    <tr class="cursor-pointer" @click="selectedStructureId = item.id"
+                    <tr class="cursor-pointer" @click="selectedStructureId = item.id; selectStructure()"
                       :class="selectedStructureId === item.id ? 'bg-[rgba(241,196,15,0.14)]' : ''">
                       <td x-text="index + 1"></td>
                       <td x-text="item.option_name"></td>
@@ -1270,6 +1337,13 @@
                         </button>
                       </td>
                       <td x-text="item.chapter_count_estimate"></td>
+                      <td style="text-align: center; vertical-align: middle;">
+                        <div x-show="item.recommended" style="color: #2ecc71; display: inline-flex; align-items: center; justify-content: center; ">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </div>
+                      </td>
                     </tr>
                   </template>
                 </tbody>
@@ -1426,7 +1500,7 @@
                 </thead>
                 <tbody>
                   <template x-for="(item,index) in chapterOutlines" :key="item.id || index">
-                    <tr class="cursor-pointer">
+                    <tr class="cursor-pointer" @click="selectedOutlineId = item.id; loadDrafts()" :class="selectedOutlineId === item.id ? 'bg-yellow-400/10' : ''">
                       <td x-text="index + 1"></td>
                       <td x-text="formatDate(item.created_at)"></td>
                       <td class="whitespace-normal align-top">
@@ -1478,7 +1552,7 @@
               <h3 class="section-title">Drafts Lab</h3>
               <div class="flex items-center gap-3">
                 <button class="dark-theme-btn-primary px-4 py-2 text-sm"
-                  :disabled="!selectedProjectId || loadingDrafts" @click="generateDraft()">
+                  :disabled="!selectedOutlineId || loadingDrafts" @click="generateDraft('')">
                   <span x-show="!loadingDrafts">Generate Drafts</span>
                   <span x-show="loadingDrafts">Generating...</span>
                 </button>
@@ -1502,7 +1576,7 @@
                       @click="openDraftDetails(draft.id)">
                       <div class="flex justify-between items-start border-b border-[rgba(241,196,15,0.2)] pb-2 mb-2">
                         <div class="text-[#f1c40f] font-bold text-xs" x-text="`Draft ${idx + 1}`"></div>
-                        <button @click.stop="regenerateDraft(draft.id)" :disabled="loadingDrafts"
+                        <button @click.stop="openInsightsModal('regenerate', draft.id)" :disabled="loadingDrafts"
                           class="bg-[#f1c40f]/10 border border-[#f1c40f] text-[#f1c40f] px-2 py-0.5 rounded text-[10px] hover:bg-[#f1c40f]/20">
                           Regenerate
                         </button>
@@ -1665,7 +1739,7 @@
         <div class="flex items-center justify-between gap-3 p-5 border-b border-[rgba(241,196,15,0.2)]">
           <h4 class="text-2xl font-bold text-[#f1c40f]">Draft Details</h4>
           <div class="flex items-center gap-3">
-            <button @click="regenerateDraft(selectedDraft.id)" :disabled="loadingDrafts"
+            <button @click="openInsightsModal('regenerate', selectedDraft.id)" :disabled="loadingDrafts"
               x-show="selectedDraft"
               class="bg-[#f1c40f]/10 border border-[#f1c40f] text-[#f1c40f] px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-[#f1c40f]/20 transition-all">
               <span x-show="!loadingDrafts">Regenerate</span>
@@ -1757,6 +1831,26 @@
       </div>
     </div>
     
+    <!-- User Insights Modal -->
+    <div class="modal-backdrop" x-show="showInsightsModal" x-transition.opacity @click="showInsightsModal = false" style="z-index: 60;">
+      <div class="create-project-modal !max-w-md w-[90%] overflow-hidden flex flex-col" @click.stop>
+        <div class="flex items-center justify-between gap-3 p-5 border-b border-[rgba(241,196,15,0.2)]">
+          <h4 class="text-xl font-bold text-[#f1c40f]">User Insights</h4>
+          <button class="text-[#8f9bb3] text-2xl leading-none" @click="showInsightsModal = false">×</button>
+        </div>
+        <div class="p-6 space-y-4">
+          <div>
+            <label class="block text-[#f1c40f] text-sm font-semibold mb-2">Instructions / Insights</label>
+            <textarea x-model="userInsights" class="w-full p-3 dark-theme-input text-sm resize-none" rows="4" placeholder="e.g. generate a meaningful draft..."></textarea>
+          </div>
+          <button class="dark-theme-btn-primary w-full py-3" @click="confirmInsightsAction()" :disabled="loadingDrafts">
+            <span x-show="!loadingDrafts">Proceed</span>
+            <span x-show="loadingDrafts">Processing...</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    
     <!-- Outline Details Modal -->
     <div class="modal-backdrop" x-show="showOutlineModal" x-transition.opacity @click="closeOutlineModal()">
       <div class="create-project-modal !max-w-4xl w-[90%] max-h-[90vh] overflow-hidden flex flex-col" @click.stop>
@@ -1792,29 +1886,66 @@
     </div>
 
     <script>
-      const API_BASE_URL = "https://slimy-leonia-kyphotic.ngrok-free.dev";
+      const API_BASE_URL = "https://laurene-clearheaded-nonaromatically.ngrok-free.dev";
+
+      function messageModal() {
+        return {
+          show: false,
+          type: "success",
+          title: "",
+          message: "",
+          callback: null,
+          init() {
+            window.showSuccess = (msg, title = "Success", cb = null) => {
+              this.type = "success";
+              this.title = title;
+              this.message = msg;
+              this.callback = cb;
+              this.show = true;
+            };
+            window.showError = (msg, title = "Error", cb = null) => {
+              this.type = "error";
+              this.title = title;
+              this.message = msg;
+              this.callback = cb;
+              this.show = true;
+            };
+          },
+          closeModal() {
+            this.show = false;
+            if (this.callback) {
+              this.callback();
+              this.callback = null;
+            }
+          },
+        };
+      }
 
       function requireToken() {
         const token = localStorage.getItem("bookBuilderToken");
         if (!token) {
-          alert(
+          showError(
             "Your session has expired or you are not logged in. Please log in first.",
+            "Auth Required",
+            () => {
+              localStorage.removeItem("bookBuilderToken");
+              localStorage.removeItem("bookBuilderEmail");
+              window.dispatchEvent(new Event("logout-success"));
+              location.reload();
+            },
           );
-          localStorage.removeItem("bookBuilderToken");
-          localStorage.removeItem("bookBuilderEmail");
-          window.dispatchEvent(new Event("logout-success"));
-          location.reload();
           return null;
         }
         return token;
       }
 
       function handle401() {
-        alert("Your session has expired. Please log in again.");
-        localStorage.removeItem("bookBuilderToken");
-        localStorage.removeItem("bookBuilderEmail");
-        window.dispatchEvent(new Event("logout-success"));
-        location.reload();
+        showError("Your session has expired. Please log in again.", "Session Expired", () => {
+          localStorage.removeItem("bookBuilderToken");
+          localStorage.removeItem("bookBuilderEmail");
+          window.dispatchEvent(new Event("logout-success"));
+          location.reload();
+        });
       }
 
       function loginApp() {
@@ -1891,6 +2022,27 @@
           concepts: [],
           expandedThesisStatements: {},
           selectedProjectId: "",
+          selectedOutlineId: "",
+          showInsightsModal: false,
+          userInsights: "",
+          pendingDraftAction: "",
+          pendingDraftId: null,
+
+          openInsightsModal(action, draftId = null) {
+            this.pendingDraftAction = action;
+            this.pendingDraftId = draftId;
+            this.userInsights = "";
+            this.showInsightsModal = true;
+          },
+
+          async confirmInsightsAction() {
+            this.showInsightsModal = false;
+            if (this.pendingDraftAction === 'generate') {
+              await this.generateDraft(this.userInsights);
+            } else if (this.pendingDraftAction === 'regenerate') {
+              await this.regenerateDraft(this.pendingDraftId, this.userInsights);
+            }
+          },
           screens: [
             { id: "screen1", label: "Concept Dashboard" },
             { id: "screen2", label: "Novelty and Positioning" },
@@ -2029,7 +2181,7 @@
                 this.selectChapterCardForLab(approvedCard.id);
                 return;
               }
-              alert("Please Approve a Chapter First");
+              showError("Please Approve a Chapter First", "Action Required");
               return;
             }
             this.activeScreen = screenId;
@@ -2603,7 +2755,7 @@
               );
               await this.loadStructures();
             } catch (error) {
-              alert("Failed to generate structures");
+              showError("Failed to generate structures");
             } finally {
               this.loadingStructures = false;
             }
@@ -2623,9 +2775,11 @@
                   headers
                 }
               );
-              alert("Structure Selected Successfully");
+              // recall the list api
+              this.loadStructures();
+              showSuccess("Structure Selected Successfully");
             } catch (error) {
-              alert("Failed to select structure");
+              showError("Failed to select structure");
             }
           },
           /* ==========================
@@ -2872,6 +3026,14 @@
               } else {
                 this.chapterOutlines = Array.isArray(data) ? data : [];
               }
+
+              if (!this.selectedOutlineId && this.chapterOutlines.length > 0) {
+                const approvedOutline = this.chapterOutlines?.find(o => o.approved);
+                if (approvedOutline) {
+                  this.selectedOutlineId = approvedOutline?.id;
+                  this.loadDrafts();
+                }
+              }
             } catch (err) {
               this.chapterOutlinesError =
                 err.message || "Unable to load chapter outlines";
@@ -2921,7 +3083,7 @@
               }
               await this.loadChapterOutlines();
             } catch (err) {
-              alert(err.message || "Unable to approve outline");
+              showError(err.message || "Unable to approve outline");
             } finally {
               this.approvingOutlineId = "";
             }
@@ -2951,7 +3113,7 @@
               }
               await this.loadChapterOutlines();
             } catch (err) {
-              alert(err.message || "Unable to generate outline");
+              showError(err.message || "Unable to generate outline");
             } finally {
               this.loadingChapterOutlines = false;
             }
@@ -3041,7 +3203,7 @@
               await this.loadChapterCards();
 
             } catch (error) {
-              alert("Failed to generate chapter cards");
+              showError("Failed to generate chapter cards");
             } finally {
               this.loadingChapterCards = false;
             }
@@ -3076,7 +3238,7 @@
               this.selectedChapterId = cardId;
 
             } catch (error) {
-              alert("Failed to approve chapter");
+              showError("Failed to approve chapter");
             } finally {
               this.approvingChapterId = "";
             }
@@ -3091,13 +3253,13 @@
           selectedChapterCardIdForDraft: "",
 
           async loadDrafts() {
-            if (!this.selectedProjectId) return;
+            if (!this.selectedOutlineId) return;
             this.loadingDrafts = true;
             this.draftError = "";
             try {
               const headers = this.getAuthHeaders();
               if (!headers) return;
-              const res = await fetch(`${API_BASE_URL}/bookbuilder/project/${this.selectedProjectId}/drafts`, {
+              const res = await fetch(`${API_BASE_URL}/bookbuilder/outline/${this.selectedOutlineId}/drafts`, {
                 headers,
               });
               if (res.status === 401 || res.status === 403) {
@@ -3115,15 +3277,19 @@
             }
           },
 
-          async generateDraft() {
+          async generateDraft(insights = "") {
             
-            if (!this.selectedChapterId) return;
+            if (!this.selectedOutlineId) return;
             this.loadingDrafts = true;
             try {
               const headers = this.getAuthHeaders();
               if (!headers) return;
+              
+              let url = `${API_BASE_URL}/bookbuilder/outline/${this.selectedOutlineId}/draft`;
+              if (insights) url += `?user_insights=${encodeURIComponent(insights)}`;
+
               const res = await fetch(
-                `${API_BASE_URL}/bookbuilder/chapters/${this.selectedChapterId}/draft`,
+                url,
                 {
                   method: "POST",
                   headers,
@@ -3138,22 +3304,26 @@
                 throw new Error(errJson.detail || "Failed to generate draft");
               }
               await this.loadDrafts();
-              alert("Draft generation started successfully!");
+              showSuccess("Draft generation started successfully!");
             } catch (err) {
-              alert(err.message || "Failed to generate draft");
+              showError(err.message || "Failed to generate draft");
             } finally {
               this.loadingDrafts = false;
             }
           },
 
-          async regenerateDraft(draftId) {
+          async regenerateDraft(draftId, insights = "") {
             if (!draftId) return;
             this.loadingDrafts = true;
             try {
               const headers = this.getAuthHeaders();
               if (!headers) return;
+
+              let url = `${API_BASE_URL}/bookbuilder/draft/${draftId}/regenerate`;
+              if (insights) url += `?user_insights=${encodeURIComponent(insights)}`;
+
               const res = await fetch(
-                `${API_BASE_URL}/bookbuilder/draft/${draftId}/regenerate`,
+                url,
                 {
                   method: "POST",
                   headers,
@@ -3171,9 +3341,9 @@
               if (this.showDraftModal && this.selectedDraft && this.selectedDraft.id === draftId) {
                 await this.openDraftDetails(draftId);
               }
-              alert("Draft regeneration started successfully!");
+              showSuccess("Draft regeneration started successfully!");
             } catch (err) {
-              alert(err.message || "Failed to regenerate draft");
+              showError(err.message || "Failed to regenerate draft");
             } finally {
               this.loadingDrafts = false;
             }
@@ -3198,7 +3368,7 @@
               if (!res.ok) throw new Error("Failed to fetch draft details");
               this.selectedDraft = await res.json();
             } catch (err) {
-              alert(err.message || "Failed to load draft details");
+              showError(err.message || "Failed to load draft details");
               this.closeDraftModal();
             } finally {
               this.loadingDraftDetails = false;
@@ -3310,6 +3480,34 @@
         }
       });
     </script>
-</body>
+    <div x-data="messageModal()" x-show="show" class="modal-backdrop" x-transition.opacity style="z-index: 9999; display: none;" :style="{ display: show ? 'flex' : 'none' }" @click="closeModal()">
+      <div class="message-modal-content" @click.stop>
+        <!-- Close Button -->
+        <div class="message-modal-close" @click="closeModal()">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </div>
+
+        <div class="message-modal-icon" :class="type">
+          <template x-if="type === 'success'">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </template>
+          <template x-if="type === 'error'">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+          </template>
+        </div>
+        <h3 class="message-modal-title" x-text="title"></h3>
+        <p class="message-modal-text" x-text="message"></p>
+        <button @click="closeModal()" class="dark-theme-btn-primary w-full py-3 font-bold uppercase tracking-wider text-sm">
+          Acknowledge
+        </button>
+      </div>
+    </div>
+  </body>
 
 </html>
