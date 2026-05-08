@@ -472,8 +472,15 @@
     }
 
     .concept-thesis-col {
-      min-width: 340px;
-      max-width: 340px;
+      min-width: 300px;
+      max-width: 300px;
+      white-space: normal !important;
+      vertical-align: top;
+    }
+
+    .concept-brief-col {
+      min-width: 250px;
+      max-width: 250px;
       white-space: normal !important;
       vertical-align: top;
     }
@@ -760,6 +767,36 @@
       line-height: 1.5;
       margin-bottom: 1.5rem;
     }
+
+    .upload-box {
+  border: 1px dashed #f1c40f;
+  padding: 14px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: 0.2s;
+  background: #0b0b0b;
+}
+
+.upload-box:hover {
+  background: rgba(241, 196, 15, 0.08);
+}
+
+.upload-icon {
+  font-size: 16px;
+}
+
+.upload-text {
+  color: #ddd;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 250px;
+}
   </style>
 </head>
 
@@ -863,10 +900,11 @@
           <table class="project-table" x-show="concepts.length > 0">
             <thead>
               <tr>
-                <th>No</th>
+                <th>No.</th>
                 <th>Working Title</th>
-                <th>Concept Brief</th>
+                <th class="concept-brief-col">Concept Brief</th>
                 <th class="concept-thesis-col">Thesis Statement</th>
+                
               </tr>
             </thead>
             <tbody>
@@ -875,14 +913,22 @@
                   :class="selectedProjectId === concept.project_id ? 'bg-[rgba(241,196,15,0.14)]' : ''">
                   <td x-text="idx + 1"></td>
                   <td x-text="concept.working_title || '-'"></td>
-                  <td x-text="concept.concept_brief || '-'"></td>
+                  <td class="concept-brief-col">
+                    <span class="long-text-preview clamped" 
+                      x-text="concept.concept_brief || '-'"></span>
+                    <button x-show="(concept.concept_brief || '').length > 60"
+                      @click.stop=" openConceptDetailsModal(concept)"
+                      class="dark-theme-btn-primary px-2 py-0.5 text-[10px] mt-1">
+                      Show
+                    </button>
+                  </td>
                   <td class="concept-thesis-col">
-                    <span class="long-text-preview" :class="expandedThesisStatements[concept.id] ? '' : 'clamped'"
-                      x-text="concept.thesis_statement || '-'"></span>
-                    <button x-show="(concept.thesis_statement || '').length > 120"
-                      @click.stop="toggleThesisStatement(concept.id)"
-                      class="dark-theme-btn-primary px-2 py-1 text-xs mt-2">
-                      <span x-text="expandedThesisStatements[concept.id] ? 'Hide' : 'Show'"></span>
+                    <span class="long-text-preview clamped" 
+                      x-text="concept.refined_thesis || concept.original_thesis || '-'"></span>
+                    <button x-show="(concept.refined_thesis || concept.original_thesis || '').length > 120"
+                      @click.stop=" openConceptDetailsModal(concept)"
+                      class="dark-theme-btn-primary px-2 py-0.5 text-[10px] mt-1">
+                      Show
                     </button>
                   </td>
                 </tr>
@@ -1243,6 +1289,10 @@
                       <div class="text-[#f1c40f] font-semibold text-sm" x-text="story.title || `Story ${idx + 1}`">
                       </div>
                       <div class="flex items-center gap-2 text-xs">
+                         <button x-show="story.approved"
+                          class="dark-theme-btn-primary px-3 py-1 text-xs" 
+                          @click="openEditStoryModal(story)"
+                        >Edit</button>
                         <button 
                           class="dark-theme-btn-primary px-3 py-1 text-xs" 
                           :disabled="story.approved || approvingStoryId === story.id" 
@@ -1622,6 +1672,39 @@
         </div>
       </div>
 
+      <!-- Story Edit Modal -->
+        <div class="modal-backdrop" x-show="showEditStoryModal" x-transition.opacity
+        @click="closeEditStoryModal()">
+        <div class="create-project-modal" @click.stop>
+          <div class="flex items-start justify-between gap-3 mb-5">
+            <h4 class="text-2xl font-bold text-[#f1c40f]">Edit Story</h4>
+            <button class="text-[#8f9bb3] text-xl leading-none" @click="closeEditStoryModal()">
+              ×
+            </button>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Working
+                Title</label>
+              <input type="text" x-model.trim="editStoryTitle" placeholder="Enter working title"
+                class="w-full p-3 dark-theme-input text-sm" />
+            </div>
+            <div>
+              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">
+                content</label>
+              <textarea x-model.trim="editStoryContent" placeholder="Enter rough thesis" rows="5"
+                class="w-full p-3 dark-theme-input text-sm resize-none"></textarea>
+            </div>
+            <p x-show="editStoryError" class="error-message mt-0" x-text="editStoryError"></p>
+            <button @click="submitEditStory()" 
+              class="dark-theme-btn-primary w-full py-3 text-lg font-bold">
+             Update
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Show Create Modal -->
       <div class="modal-backdrop" x-show="showCreateConceptModal" x-transition.opacity
         @click="closeCreateConceptModal()">
         <div class="create-project-modal" @click.stop>
@@ -1671,6 +1754,36 @@
                 ×
               </button>
             </div>
+         <div class="upload-box" @click="triggerFileInput()">
+  
+  <!-- 📎 Icon -->
+  <span class="upload-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <path d="M21.44 11.05l-8.49 8.49a5.5 5.5 0 01-7.78-7.78l9.19-9.19a3.5 3.5 0 114.95 4.95l-9.2 9.19a1.5 1.5 0 11-2.12-2.12l8.49-8.49"
+        stroke="#f1c40f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </span>
+
+  <span id="uploadText" class="upload-text">
+    Upload File (optional)
+  </span>
+
+  <!-- ⬆ Upload Icon -->
+  <span class="upload-arrow">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <path d="M12 16V4M12 4l-4 4M12 4l4 4M4 20h16"
+        stroke="#f1c40f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </span>
+
+  <!-- ✅ Hidden Input — onchange is bound dynamically by triggerFileInput() -->
+  <input
+    type="file"
+    id="fileInput"
+   accept=".pdf,.docx,image/*"
+    hidden
+  />
+</div>
             <p class="text-[#ddd] text-center mb-6">
               How would you like to refine your thesis?
             </p>
@@ -1739,6 +1852,12 @@
         <div class="flex items-center justify-between gap-3 p-5 border-b border-[rgba(241,196,15,0.2)]">
           <h4 class="text-2xl font-bold text-[#f1c40f]">Draft Details</h4>
           <div class="flex items-center gap-3">
+              <button @click="downloadDraft(selectedDraft)" :disabled="downloadingDraft"
+              x-show="selectedDraft"
+              class="bg-[#f1c40f]/10 border border-[#f1c40f] text-[#f1c40f] px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-[#f1c40f]/20 transition-all">
+              <span x-show="!downloadingDraft">Download</span>
+              <span x-show="downloadingDraft">Downloading...</span>
+            </button>
             <button @click="openInsightsModal('regenerate', selectedDraft.id)" :disabled="loadingDrafts"
               x-show="selectedDraft"
               class="bg-[#f1c40f]/10 border border-[#f1c40f] text-[#f1c40f] px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-[#f1c40f]/20 transition-all">
@@ -1832,8 +1951,8 @@
     </div>
     
     <!-- User Insights Modal -->
-    <div class="modal-backdrop" x-show="showInsightsModal" x-transition.opacity @click="showInsightsModal = false" style="z-index: 60;">
-      <div class="create-project-modal !max-w-md w-[90%] overflow-hidden flex flex-col" @click.stop>
+    <div class="modal-backdrop" x-show="showInsightsModal" x-transition.opacity @click="showInsightsModal = false" style="z-index: 9999 !important;">
+      <div class="create-project-modal !max-w-md w-[90%] overflow-hidden flex flex-col" @click.stop style="z-index: 10000 !important;">
         <div class="flex items-center justify-between gap-3 p-5 border-b border-[rgba(241,196,15,0.2)]">
           <h4 class="text-xl font-bold text-[#f1c40f]">User Insights</h4>
           <button class="text-[#8f9bb3] text-2xl leading-none" @click="showInsightsModal = false">×</button>
@@ -1885,8 +2004,92 @@
       </div>
     </div>
 
+
+     <!-- Concept Details Modal -->
+      <div class="modal-backdrop" x-transition.opacity x-show="showConceptDetailsModal" @click="closeConceptDetailsModal()">
+        <div class="dark-theme-card p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto space-y-6" @click.stop x-show="selectedConceptDetails !== null">
+          <template x-if="selectedConceptDetails">
+            <div>
+            <div class="flex justify-between items-center border-bottom border-gray-700 pb-3">
+              <h3 class="text-xl font-bold text-[#f1c40f]">Concept Details</h3>
+              <button @click="closeConceptDetailsModal()" class="text-gray-400 hover:text-[#f1c40f] text-2xl">&times;</button>
+            </div>
+
+            <div class="space-y-4">
+              <!-- <div>
+                <label class="block text-xs font-bold uppercase text-[#aaa] mb-1">ID</label>
+                <div class="text-[#ddd] text-sm break-all" x-text="selectedConceptDetails.id || selectedConceptDetails.project_id || '-'"></div>
+              </div> -->
+
+              <div>
+                <label class="block text-xs font-bold uppercase text-[#aaa] mb-1">Working Title</label>
+                <div class="text-[#f1c40f] text-lg font-semibold" x-text="selectedConceptDetails.working_title || '-'"></div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase text-[#aaa] mb-1">Concept Brief</label>
+                <div class="text-[#ddd] text-sm leading-relaxed whitespace-pre-wrap" x-text="selectedConceptDetails.concept_brief || '-'"></div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase text-[#aaa] mb-1">Original Thesis</label>
+                <div class="text-[#ddd] text-sm leading-relaxed whitespace-pre-wrap" x-text="selectedConceptDetails.original_thesis || selectedConceptDetails.rough_thesis || '-'"></div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase text-[#aaa] mb-1">Refined Thesis</label>
+                <div class="text-[#ddd] text-sm leading-relaxed whitespace-pre-wrap" x-text="selectedConceptDetails.refined_thesis || selectedConceptDetails.thesis_statement || '-'"></div>
+              </div>
+            </div>
+
+            <div class="pt-4 flex justify-end">
+              <button @click="closeConceptDetailsModal()" class="dark-theme-btn-primary px-6 py-2">Close</button>
+            </div>
+            </div>
+          </template>
+        </div>
+      </div>
+      <!-- Show Create Modal -->
+      <div class="modal-backdrop" x-show="showCreateConceptModal" x-transition.opacity
+        @click="closeCreateConceptModal()">
+        <div class="create-project-modal" @click.stop>
+          <div class="flex items-start justify-between gap-3 mb-5">
+            <h4 class="text-2xl font-bold text-[#f1c40f]">Create Concept</h4>
+            <button class="text-[#8f9bb3] text-xl leading-none" @click="closeCreateConceptModal()">
+              ×
+            </button>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Working
+                Title</label>
+              <input type="text" x-model.trim="newConceptWorkingTitle" placeholder="Enter working title"
+                class="w-full p-3 dark-theme-input text-sm" />
+            </div>
+            <div>
+              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Concept
+                Brief</label>
+              <textarea x-model.trim="newConceptBrief" placeholder="Enter concept brief" rows="3"
+                class="w-full p-3 dark-theme-input text-sm resize-none"></textarea>
+            </div>
+            <div>
+              <label class="block text-[#f1c40f] font-semibold mb-2 text-sm uppercase tracking-wide">Rough
+                Thesis</label>
+              <textarea x-model.trim="newConceptRoughThesis" placeholder="Enter rough thesis" rows="5"
+                class="w-full p-3 dark-theme-input text-sm resize-none"></textarea>
+            </div>
+            <p x-show="createProjectError" class="error-message mt-0" x-text="createProjectError"></p>
+            <button @click="submitConcept()" :disabled="creatingConcept"
+              class="dark-theme-btn-primary w-full py-3 text-lg font-bold">
+              <span x-show="!creatingConcept">Submit</span>
+              <span x-show="creatingConcept">Submitting...</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
     <script>
-      const API_BASE_URL = "https://laurene-clearheaded-nonaromatically.ngrok-free.dev";
+      const API_BASE_URL = "https://slimy-leonia-kyphotic.ngrok-free.dev";
 
       function messageModal() {
         return {
@@ -2014,15 +2217,25 @@
           },
         };
       }
+const allowedTypes = [
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // docx
+  "image/jpeg",
+  "image/png",
+  "image/jpg",
+  "image/webp"
+];
 
+let downloadingDraft=false;
       function bookBuilderApp() {
         return {
           isLoggedIn: false,
           userEmail: "",
           concepts: [],
-          expandedThesisStatements: {},
           selectedProjectId: "",
           selectedOutlineId: "",
+          showConceptDetailsModal: false,
+          selectedConceptDetails: null,
           showInsightsModal: false,
           userInsights: "",
           pendingDraftAction: "",
@@ -2034,6 +2247,56 @@
             this.userInsights = "";
             this.showInsightsModal = true;
           },
+          
+          async downloadDraft(draft) {
+            downloadingDraft=true;
+              const token = requireToken();
+
+              const draftId=draft?.id
+              if (!token) return;
+
+              if(!draftId) return;
+
+              try {
+                const res = await fetch(
+                  `${API_BASE_URL}/bookbuilder/draft/${draftId}/download`,
+                  {
+                    headers: {
+                      "ngrok-skip-browser-warning": "true",
+                      Authorization: `Bearer ${token}`,
+                    },
+                  }
+                );
+
+                if (!res.ok) {
+                  throw new Error("Failed to download draft");
+                }
+                const fileName = `draft_${draft?.version}`;
+                const blob = await res.blob();
+
+                const url = window.URL.createObjectURL(blob);
+
+                const a = document.createElement("a");
+
+                a.href = url;
+                a.download = fileName;
+
+               
+
+                document.body.appendChild(a);
+
+                a.click();
+
+                a.remove();
+
+                window.URL.revokeObjectURL(url);
+
+              } catch (err) {
+                showError(err.message || "Failed to download draft");
+              }finally{
+                downloadingDraft=false;
+              }
+            },
 
           async confirmInsightsAction() {
             this.showInsightsModal = false;
@@ -2054,6 +2317,11 @@
           activeScreen: "screen1",
           loadingConcepts: false,
           projectError: "",
+          showEditStoryModal: false,
+          editStoryContent: "",
+          editStoryTitle:"",
+          editStoryId:"",
+          editStoryError:"",
           showCreateConceptModal: false,
           newConceptWorkingTitle: "",
           newConceptBrief: "",
@@ -2068,6 +2336,7 @@
           submittingAnswerId: "",
           refiningThesis: false,
           refinedThesisText: "",
+          selectedFile : null,
           modalView: "choice",
           structures: [],
           selectedStructureId: "",
@@ -2267,22 +2536,36 @@
             }
           },
 
-          selectProject(projectId) {
-            if (!projectId || this.selectedProjectId === projectId) return;
-            this.selectedProjectId = projectId;
-            this.refinedThesisText = "";
-            this.loadRefinedThesis();
-
-            // Keep Screen 2 in sync with the selected project.
-            if (this.activeScreen === "screen2") {
-              this.loadNoveltyScanList({ force: false });
-              this.loadAuthorityMapList({ force: false });
-            }
-          },
-
           openCreateConceptModal() {
             this.showCreateConceptModal = true;
             this.createProjectError = "";
+          },
+
+          openConceptDetailsModal(concept) {
+
+            this.selectedConceptDetails = concept;
+            this.showConceptDetailsModal = true;
+          },
+
+          closeConceptDetailsModal() {
+            this.showConceptDetailsModal = false;
+            this.selectedConceptDetails = null;
+          },
+
+           openEditStoryModal(data) {
+            this.editStoryError="";
+            this.showEditStoryModal = true;
+            this.editStoryId = data.id;
+            this.editStoryTitle = data.title;
+            this.editStoryContent = data.content;
+          },
+
+          closeEditStoryModal() {
+            this.showEditStoryModal = false;
+            this.editStoryId = "";
+            this.editStoryTitle = "";
+            this.editStoryContent = "";
+            this.editStoryError = "";
           },
 
           closeCreateConceptModal() {
@@ -2298,6 +2581,38 @@
               ...this.expandedThesisStatements,
               [conceptId]: !this.expandedThesisStatements[conceptId],
             };
+          },
+
+          async submitEditStory() {
+            try {
+              const headers = this.getAuthHeaders({
+                "ngrok-skip-browser-warning": "true",
+                "Content-Type": "application/json"
+              });
+              if (!headers) return;
+              const res = await fetch(
+                `${API_BASE_URL}/bookbuilder/stories/${this.editStoryId}`,
+                {
+                  method: "PUT",
+                  headers,
+                   body: JSON.stringify({
+                    title: this.editStoryTitle,
+                    content: this.editStoryContent,
+                  }),
+                },
+              );
+              if (res.ok) {
+                const data = await res.json();
+
+                this.closeEditStoryModal();
+                this.editStoryError = "";
+                this.loadStories();
+                // this.refinedThesisText = data.refined_thesis || "";
+              }
+            } catch (err) {
+              this.editStoryError=JSON.stringify(err.message)  || "Unable to Edit Story";
+              console.error("Failed to load refined thesis", err);
+            }
           },
 
           async submitConcept() {
@@ -2407,6 +2722,38 @@
             this.showQuestionModal = false;
           },
 
+ handleFileUpload(event) {
+  const file = event.target.files[0];
+  const text = document.getElementById("uploadText");
+
+  if (!file) return;
+
+  // ✅ Validation
+ if (!allowedTypes.includes(file.type)) {
+  alert("Only PDF, DOCX, and Image files (JPG, PNG, WEBP) are allowed.");
+  
+  event.target.value = "";
+  this.selectedFile = null;
+  text.textContent = "Upload File (optional)";
+  
+  return;
+}
+
+  // ✅ Store in Alpine state + update UI label
+  this.selectedFile = file;
+  text.textContent = file.name;
+
+  // 🔥 DO NOT call API here
+},
+
+          triggerFileInput() {
+            const input = document.getElementById("fileInput");
+            if (!input) return;
+            // Bind the change event to this Alpine component instance
+            input.onchange = (event) => this.handleFileUpload(event);
+            input.click();
+          },
+
           async submitQuestionAnswer(questionId) {
             if (!this.selectedProjectId || !questionId) return;
             const answer = (this.questionAnswers[questionId] || "").trim();
@@ -2491,11 +2838,20 @@
               this.refiningThesis = false;
             }
           },
+          
 
-          async refineThesis() {
+          async refineThesis(file) {
             if (!this.selectedProjectId) return;
             this.refiningThesis = true;
             this.projectError = "";
+
+            // Use the file passed in, or fall back to the one stored via the upload box
+            const fileToSend = file || this.selectedFile;
+
+            const formData = new FormData();
+            if (fileToSend) {
+              formData.append("files", fileToSend); // 👈 must match backend key
+            }
             try {
               const headers = this.getAuthHeaders({
                 "ngrok-skip-browser-warning": "true",
@@ -2506,6 +2862,7 @@
                 {
                   method: "POST",
                   headers,
+                  body: fileToSend ? formData : undefined,
                 },
               );
               if (res.status === 401 || res.status === 403) {
@@ -2514,6 +2871,12 @@
               }
               if (!res.ok) throw new Error("Failed to refine thesis");
               await this.loadRefinedThesis();
+              // Reset file state after successful submission
+              this.selectedFile = null;
+              const uploadText = document.getElementById("uploadText");
+              if (uploadText) uploadText.textContent = "Upload File (optional)";
+              const fileInput = document.getElementById("fileInput");
+              if (fileInput) fileInput.value = "";
               this.closeQuestionModal();
             } catch (err) {
               this.projectError = err.message || "Unable to refine thesis";

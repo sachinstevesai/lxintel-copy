@@ -1,0 +1,1970 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ramos Law — Authentication</title>
+    <link
+      rel="icon"
+      type="image/webp"
+      href="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: { fontFamily: { sans: ["Montserrat", "system-ui"] } },
+        },
+      };
+    </script>
+
+    <style>
+      body,
+      html {
+        font-family: "Montserrat", sans-serif;
+        background-color: #111;
+        color: #f1c40f;
+      }
+
+      /* ── Background ── */
+      .video-background {
+        position: fixed;
+        inset: 0;
+        background-image: url("https://static.vecteezy.com/system/resources/previews/007/596/744/non_2x/abstract-digital-glossy-particles-and-lines-connected-3d-illustration-on-black-background-free-photo.jpg");
+        background-size: cover;
+        background-position: center top 150px;
+        z-index: -2;
+      }
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.75);
+        z-index: -1;
+      }
+
+      /* ── Scrollbar ── */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(241, 196, 15, 0.35);
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(241, 196, 15, 0.6);
+      }
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(241, 196, 15, 0.35) rgba(0, 0, 0, 0.2);
+      }
+
+      /* ── Card ── */
+      .dark-theme-card {
+        background-color: #111;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(241, 196, 15, 0.1);
+        border: 1px solid #333;
+        color: #f1c40f;
+      }
+
+      /* ── Input ── */
+      .dark-theme-input {
+        background-color: #000 !important;
+        color: #fff !important;
+        border: 1px solid #444 !important;
+        border-radius: 6px !important;
+        width: 100%;
+        padding: 12px;
+        font-size: 15px;
+        line-height: 28px;
+        font-family: "Montserrat", sans-serif;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .dark-theme-input:focus {
+        border-color: #f1c40f !important;
+      }
+      .dark-theme-input::placeholder {
+        color: #777 !important;
+        opacity: 0.7;
+      }
+
+      /* ── Buttons ── */
+      .dark-theme-btn-primary {
+        background-color: #f1c40f !important;
+        color: #000 !important;
+        font-weight: bold !important;
+        border: none !important;
+        border-radius: 6px !important;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+      .dark-theme-btn-primary:hover:not(:disabled) {
+        background-color: #d4ac0d !important;
+      }
+      .dark-theme-btn-primary:disabled {
+        background-color: #a08209 !important;
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+
+      .dark-theme-btn-ghost {
+        background: transparent !important;
+        color: #f1c40f !important;
+        border: 1px solid #444 !important;
+        border-radius: 6px !important;
+        cursor: pointer;
+        font-weight: 600;
+        transition:
+          border-color 0.2s,
+          background 0.2s;
+      }
+      .dark-theme-btn-ghost:hover {
+        border-color: #f1c40f !important;
+        background: rgba(241, 196, 15, 0.06) !important;
+      }
+
+      /* ── Error / Success ── */
+      .error-message {
+        color: #e74c3c;
+        background-color: rgba(231, 76, 60, 0.1);
+        padding: 10px;
+        border-radius: 6px;
+        font-size: 0.88rem;
+      }
+      .success-message {
+        color: #2ecc71;
+        background-color: rgba(46, 204, 113, 0.1);
+        padding: 10px;
+        border-radius: 6px;
+        font-size: 0.88rem;
+      }
+
+      /* ── Header ── */
+      .header-text {
+        text-align: center;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .header-text img {
+        max-height: 120px;
+        margin-bottom: 1rem;
+      }
+      .header-text h1 {
+        font-size: 3rem;
+        letter-spacing: 1px;
+        text-shadow: 1px 1px 8px rgba(241, 196, 15, 0.6);
+        color: #f1c40f;
+        margin: 0;
+      }
+      .header-text p {
+        color: #aaa;
+        margin: 0;
+        font-size: 1.1rem;
+      }
+
+      /* ── OTP Input Row ── */
+      .otp-inputs {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+      }
+      .otp-input {
+        width: 52px;
+        height: 56px;
+        text-align: center;
+        font-size: 22px;
+        font-weight: 700;
+        background: #000 !important;
+        color: #f1c40f !important;
+        border: 1px solid #444 !important;
+        border-radius: 8px !important;
+        outline: none;
+        font-family: "Montserrat", sans-serif;
+        transition: border-color 0.2s;
+      }
+      .otp-input:focus {
+        border-color: #f1c40f !important;
+      }
+
+      /* ── Spinner ── */
+      .loader {
+        border: 3px solid rgba(241, 196, 15, 0.15);
+        border-radius: 50%;
+        border-top: 3px solid #f1c40f;
+        width: 22px;
+        height: 22px;
+        animation: spin 0.8s linear infinite;
+        display: inline-block;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ── Step indicator ── */
+      .step-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        margin-bottom: 8px;
+      }
+      .step-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #333;
+        transition:
+          background 0.3s,
+          transform 0.3s;
+      }
+      .step-dot.active {
+        background: #f1c40f;
+        transform: scale(1.3);
+      }
+      .step-dot.done {
+        background: #2ecc71;
+      }
+
+      /* ── Password strength ── */
+      .strength-bar-wrap {
+        display: flex;
+        gap: 4px;
+        margin-top: 8px;
+      }
+      .strength-seg {
+        flex: 1;
+        height: 4px;
+        border-radius: 4px;
+        background: #333;
+        transition: background 0.3s;
+      }
+      .strength-seg.filled-weak {
+        background: #e74c3c;
+      }
+      .strength-seg.filled-medium {
+        background: #f39c12;
+      }
+      .strength-seg.filled-strong {
+        background: #2ecc71;
+      }
+
+      /* ── Resend timer ── */
+      .resend-link {
+        color: #f1c40f;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        font-family: "Montserrat", sans-serif;
+        font-size: 0.85rem;
+        text-decoration: underline;
+        padding: 0;
+      }
+      .resend-link:disabled {
+        color: #666;
+        cursor: default;
+        text-decoration: none;
+      }
+
+      /* ── Slide transition ── */
+      [x-cloak] {
+        display: none !important;
+      }
+      .slide-fade-enter-active,
+      .slide-fade-leave-active {
+        transition:
+          opacity 0.22s,
+          transform 0.22s;
+      }
+      .slide-fade-enter-from {
+        opacity: 0;
+        transform: translateX(18px);
+      }
+      .slide-fade-leave-to {
+        opacity: 0;
+        transform: translateX(-18px);
+      }
+
+      /* ── Eye toggle ── */
+      .input-wrap {
+        position: relative;
+      }
+      .eye-btn {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #777;
+        padding: 0;
+        line-height: 1;
+      }
+      .eye-btn:hover {
+        color: #f1c40f;
+      }
+
+      @media (max-width: 480px) {
+        .header-text h1 {
+          font-size: 2rem;
+        }
+        .otp-input {
+          width: 40px;
+          height: 48px;
+          font-size: 18px;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="min-h-screen p-4">
+    <div class="video-background"></div>
+    <div class="overlay"></div>
+
+    <div
+      id="auth-app"
+      class="w-full max-w-[40rem] relative z-10 mx-auto mt-6 md:mt-10"
+      style="display: none"
+    >
+      <!-- ── Header ── -->
+      <div class="header-text">
+        <img
+          src="https://www.ramoslaw.com/wp-content/uploads/2024/02/ramos-law-injury-intelligence-cross.webp"
+          alt="Ramos Law"
+        />
+        <h1>Ramos Law Book Builder</h1>
+        <p>Secure Access for Authorized Ramos Law Users</p>
+      </div>
+
+      <!-- ════════════════════════════════════
+         STEP: LOGIN (email + password)
+    ════════════════════════════════════ -->
+      <div
+        id="step-login"
+        class="dark-theme-card p-6 space-y-5"
+        style="display: none"
+      >
+        <h2
+          class="text-[32px] font-extrabold uppercase tracking-[0.5px] text-center text-[#f1c40f] mt-0 mb-0"
+        >
+          Login
+        </h2>
+
+        <!-- Email -->
+        <div>
+          <label class="block text-[#f1c40f] font-semibold mb-2">Email</label>
+          <input
+            type="email"
+            id="email-input"
+            placeholder="Enter your email"
+            class="dark-theme-input"
+          />
+          <p
+            id="email-error"
+            class="error-message mt-2"
+            style="display: none"
+          ></p>
+        </div>
+
+        <!-- Password — only shown after email verified & password is set -->
+        <div id="password-field-wrap" style="display: none">
+          <label class="block text-[#f1c40f] font-semibold mb-2"
+            >Password</label
+          >
+          <div class="input-wrap">
+            <input
+              type="password"
+              id="password-input"
+              placeholder="Enter your password"
+              class="dark-theme-input"
+              style="padding-right: 40px"
+            />
+            <button class="eye-btn" id="login-eye-btn" type="button">
+              <svg
+                id="login-eye-open"
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+              <svg
+                id="login-eye-closed"
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                style="display: none"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                />
+              </svg>
+            </button>
+          </div>
+          <!-- Forgot password link -->
+          <div class="text-right mt-1">
+            <button id="forgot-pw-link" class="resend-link text-xs">
+              Forgot password?
+            </button>
+          </div>
+        </div>
+
+        <p id="login-error" class="error-message" style="display: none"></p>
+
+        <!-- Continue / Login button -->
+        <button
+          id="login-continue-btn"
+          class="dark-theme-btn-primary w-full py-3 font-medium"
+        >
+          <span id="login-btn-text">Continue</span>
+          <span
+            id="login-btn-loading"
+            class="flex items-center justify-center gap-2"
+            style="display: none"
+          >
+            <span class="loader"></span> Please wait...
+          </span>
+        </button>
+      </div>
+
+      <!-- ════════════════════════════════════
+         STEP: SET PASSWORD (new user — password not set yet)
+         Flow: verify-email → send-otp → verify-otp → create-password
+    ════════════════════════════════════ -->
+
+      <!-- 2a. OTP sent — enter OTP -->
+      <div
+        id="step-otp"
+        class="dark-theme-card p-6 space-y-5"
+        style="display: none"
+      >
+        <div class="step-indicator">
+          <div class="step-dot done"></div>
+          <div class="step-dot active"></div>
+          <div class="step-dot"></div>
+        </div>
+        <h2
+          class="text-[26px] font-extrabold uppercase tracking-[0.5px] text-center text-[#f1c40f] mt-0 mb-0"
+        >
+          Enter OTP
+        </h2>
+        <p class="text-center text-[#aaa] text-sm">
+          A 6-digit code was sent to
+          <span
+            id="otp-email-display"
+            class="text-[#f1c40f] font-semibold"
+          ></span>
+        </p>
+
+        <div class="otp-inputs">
+          <input
+            type="text"
+            inputmode="numeric"
+            maxlength="1"
+            class="otp-input"
+            id="otp-0"
+          />
+          <input
+            type="text"
+            inputmode="numeric"
+            maxlength="1"
+            class="otp-input"
+            id="otp-1"
+          />
+          <input
+            type="text"
+            inputmode="numeric"
+            maxlength="1"
+            class="otp-input"
+            id="otp-2"
+          />
+          <input
+            type="text"
+            inputmode="numeric"
+            maxlength="1"
+            class="otp-input"
+            id="otp-3"
+          />
+          <input
+            type="text"
+            inputmode="numeric"
+            maxlength="1"
+            class="otp-input"
+            id="otp-4"
+          />
+          <input
+            type="text"
+            inputmode="numeric"
+            maxlength="1"
+            class="otp-input"
+            id="otp-5"
+          />
+        </div>
+
+        <p id="otp-error" class="error-message" style="display: none"></p>
+
+        <button
+          id="otp-verify-btn"
+          class="dark-theme-btn-primary w-full py-3 font-medium"
+        >
+          <span id="otp-verify-text">Verify OTP</span>
+          <span
+            id="otp-verify-loading"
+            class="flex items-center justify-center gap-2"
+            style="display: none"
+          >
+            <span class="loader"></span> Verifying...
+          </span>
+        </button>
+
+        <div class="text-center text-sm text-[#aaa]">
+          Didn't receive it?
+          <button id="resend-otp-btn" class="resend-link ml-1">
+            <span id="resend-otp-label">Resend OTP</span>
+            <span id="resend-otp-timer" style="display: none"
+              >Resend in <span id="resend-timer-count"></span>s</span
+            >
+          </button>
+        </div>
+
+        <button
+          id="otp-back-btn"
+          class="dark-theme-btn-ghost w-full py-2 font-medium text-sm"
+        >
+          ← Back
+        </button>
+      </div>
+
+      <!-- 2b. Create password (new user) -->
+      <div
+        id="step-create-password"
+        class="dark-theme-card p-6 space-y-5"
+        style="display: none"
+      >
+        <div class="step-indicator">
+          <div class="step-dot done"></div>
+          <div class="step-dot done"></div>
+          <div class="step-dot active"></div>
+        </div>
+        <h2
+          class="text-[26px] font-extrabold uppercase tracking-[0.5px] text-center text-[#f1c40f] mt-0 mb-0"
+        >
+          Create Password
+        </h2>
+        <p class="text-center text-[#aaa] text-sm">
+          Set a strong password for your account
+        </p>
+
+        <div>
+          <label class="block text-[#f1c40f] font-semibold mb-2"
+            >New Password</label
+          >
+          <div class="input-wrap">
+            <input
+              type="password"
+              id="new-password-input"
+              placeholder="Create a password"
+              class="dark-theme-input"
+              style="padding-right: 40px"
+            />
+            <button class="eye-btn" id="create-eye-btn" type="button">
+              <svg
+                id="create-eye-open"
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+              <svg
+                id="create-eye-closed"
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                style="display: none"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                />
+              </svg>
+            </button>
+          </div>
+          <!-- Strength bar -->
+          <div
+            id="create-strength-bar-wrap"
+            class="strength-bar-wrap"
+            style="display: none"
+          >
+            <div id="create-seg-1" class="strength-seg"></div>
+            <div id="create-seg-2" class="strength-seg"></div>
+            <div id="create-seg-3" class="strength-seg"></div>
+            <div id="create-seg-4" class="strength-seg"></div>
+          </div>
+          <p
+            id="create-strength-label"
+            class="text-xs mt-1 text-[#aaa]"
+            style="display: none"
+          ></p>
+        </div>
+
+        <div>
+          <label class="block text-[#f1c40f] font-semibold mb-2"
+            >Confirm Password</label
+          >
+          <div class="input-wrap">
+            <input
+              type="password"
+              id="confirm-password-input"
+              placeholder="Confirm your password"
+              class="dark-theme-input"
+              style="padding-right: 40px"
+            />
+            <button class="eye-btn" id="confirm-eye-btn" type="button">
+              <svg
+                id="confirm-eye-open"
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+              <svg
+                id="confirm-eye-closed"
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                style="display: none"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                />
+              </svg>
+            </button>
+          </div>
+          <p
+            id="create-pwd-mismatch"
+            class="error-message mt-2"
+            style="display: none"
+          >
+            Passwords do not match.
+          </p>
+        </div>
+
+        <p
+          id="create-pwd-error"
+          class="error-message"
+          style="display: none"
+        ></p>
+
+        <button
+          id="create-pwd-btn"
+          class="dark-theme-btn-primary w-full py-3 font-medium"
+        >
+          <span id="create-pwd-btn-text">Set Password &amp; Login</span>
+          <span
+            id="create-pwd-btn-loading"
+            class="flex items-center justify-center gap-2"
+            style="display: none"
+          >
+            <span class="loader"></span> Setting password...
+          </span>
+        </button>
+      </div>
+
+      <!-- ════════════════════════════════════
+         STEP: FORGOT PASSWORD
+         Flow: enter email → send-otp → verify-otp → reset-password
+    ════════════════════════════════════ -->
+
+      <!-- Forgot — enter email -->
+      <div
+        id="step-forgot"
+        class="dark-theme-card p-6 space-y-5"
+        style="display: none"
+      >
+        <h2
+          class="text-[26px] font-extrabold uppercase tracking-[0.5px] text-center text-[#f1c40f] mt-0 mb-0"
+        >
+          Forgot Password
+        </h2>
+        <p class="text-center text-[#aaa] text-sm">
+          Enter your registered email and we'll send you an OTP to reset your
+          password.
+        </p>
+
+        <div>
+          <label class="block text-[#f1c40f] font-semibold mb-2">Email</label>
+          <input
+            type="email"
+            id="forgot-email-input"
+            placeholder="Enter your email"
+            class="dark-theme-input"
+          />
+        </div>
+
+        <p id="forgot-error" class="error-message" style="display: none"></p>
+
+        <button
+          id="forgot-send-btn"
+          class="dark-theme-btn-primary w-full py-3 font-medium"
+        >
+          <span id="forgot-send-text">Send OTP</span>
+          <span
+            id="forgot-send-loading"
+            class="flex items-center justify-center gap-2"
+            style="display: none"
+          >
+            <span class="loader"></span> Sending...
+          </span>
+        </button>
+
+        <button
+          id="forgot-back-btn"
+          class="dark-theme-btn-ghost w-full py-2 font-medium text-sm"
+        >
+          ← Back to Login
+        </button>
+      </div>
+
+      <!-- Forgot — verify OTP -->
+      <div
+        id="step-forgot-otp"
+        class="dark-theme-card p-6 space-y-5"
+        style="display: none"
+      >
+        <div class="step-indicator">
+          <div class="step-dot done"></div>
+          <div class="step-dot active"></div>
+          <div class="step-dot"></div>
+        </div>
+        <h2
+          class="text-[26px] font-extrabold uppercase tracking-[0.5px] text-center text-[#f1c40f] mt-0 mb-0"
+        >
+          Verify OTP
+        </h2>
+        <p class="text-center text-[#aaa] text-sm">
+          OTP sent to
+          <span
+            id="fotp-email-display"
+            class="text-[#f1c40f] font-semibold"
+          ></span>
+        </p>
+
+        <div class="otp-inputs">
+          <input
+            type="text"
+            inputmode="numeric"
+            maxlength="1"
+            class="otp-input"
+            id="fotp-0"
+          />
+          <input
+            type="text"
+            inputmode="numeric"
+            maxlength="1"
+            class="otp-input"
+            id="fotp-1"
+          />
+          <input
+            type="text"
+            inputmode="numeric"
+            maxlength="1"
+            class="otp-input"
+            id="fotp-2"
+          />
+          <input
+            type="text"
+            inputmode="numeric"
+            maxlength="1"
+            class="otp-input"
+            id="fotp-3"
+          />
+          <input
+            type="text"
+            inputmode="numeric"
+            maxlength="1"
+            class="otp-input"
+            id="fotp-4"
+          />
+          <input
+            type="text"
+            inputmode="numeric"
+            maxlength="1"
+            class="otp-input"
+            id="fotp-5"
+          />
+        </div>
+
+        <p id="fotp-error" class="error-message" style="display: none"></p>
+
+        <button
+          id="fotp-verify-btn"
+          class="dark-theme-btn-primary w-full py-3 font-medium"
+        >
+          <span id="fotp-verify-text">Verify OTP</span>
+          <span
+            id="fotp-verify-loading"
+            class="flex items-center justify-center gap-2"
+            style="display: none"
+          >
+            <span class="loader"></span> Verifying...
+          </span>
+        </button>
+
+        <div class="text-center text-sm text-[#aaa]">
+          Didn't receive it?
+          <button id="resend-fotp-btn" class="resend-link ml-1">
+            <span id="resend-fotp-label">Resend OTP</span>
+            <span id="resend-fotp-timer" style="display: none"
+              >Resend in <span id="resend-ftimer-count"></span>s</span
+            >
+          </button>
+        </div>
+
+        <button
+          id="fotp-back-btn"
+          class="dark-theme-btn-ghost w-full py-2 font-medium text-sm"
+        >
+          ← Back
+        </button>
+      </div>
+
+      <!-- Forgot — reset password -->
+      <div
+        id="step-reset-password"
+        class="dark-theme-card p-6 space-y-5"
+        style="display: none"
+      >
+        <div class="step-indicator">
+          <div class="step-dot done"></div>
+          <div class="step-dot done"></div>
+          <div class="step-dot active"></div>
+        </div>
+        <h2
+          class="text-[26px] font-extrabold uppercase tracking-[0.5px] text-center text-[#f1c40f] mt-0 mb-0"
+        >
+          Reset Password
+        </h2>
+        <p class="text-center text-[#aaa] text-sm">
+          Choose a new password for your account
+        </p>
+
+        <div>
+          <label class="block text-[#f1c40f] font-semibold mb-2"
+            >New Password</label
+          >
+          <div class="input-wrap">
+            <input
+              type="password"
+              id="reset-new-password-input"
+              placeholder="New password"
+              class="dark-theme-input"
+              style="padding-right: 40px"
+            />
+            <button class="eye-btn" id="reset-eye-btn" type="button">
+              <svg
+                id="reset-eye-open"
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+              <svg
+                id="reset-eye-closed"
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                style="display: none"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                />
+              </svg>
+            </button>
+          </div>
+          <div
+            id="reset-strength-bar-wrap"
+            class="strength-bar-wrap"
+            style="display: none"
+          >
+            <div id="reset-seg-1" class="strength-seg"></div>
+            <div id="reset-seg-2" class="strength-seg"></div>
+            <div id="reset-seg-3" class="strength-seg"></div>
+            <div id="reset-seg-4" class="strength-seg"></div>
+          </div>
+          <p
+            id="reset-strength-label"
+            class="text-xs mt-1 text-[#aaa]"
+            style="display: none"
+          ></p>
+        </div>
+
+        <div>
+          <label class="block text-[#f1c40f] font-semibold mb-2"
+            >Confirm Password</label
+          >
+          <div class="input-wrap">
+            <input
+              type="password"
+              id="reset-confirm-input"
+              placeholder="Confirm password"
+              class="dark-theme-input"
+              style="padding-right: 40px"
+            />
+            <button class="eye-btn" id="reset-confirm-eye-btn" type="button">
+              <svg
+                id="reset-confirm-eye-open"
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+              <svg
+                id="reset-confirm-eye-closed"
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                style="display: none"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                />
+              </svg>
+            </button>
+          </div>
+          <p
+            id="reset-pwd-mismatch"
+            class="error-message mt-2"
+            style="display: none"
+          >
+            Passwords do not match.
+          </p>
+        </div>
+
+        <p id="reset-error" class="error-message" style="display: none"></p>
+
+        <button
+          id="reset-btn"
+          class="dark-theme-btn-primary w-full py-3 font-medium"
+        >
+          <span id="reset-btn-text">Reset Password &amp; Login</span>
+          <span
+            id="reset-btn-loading"
+            class="flex items-center justify-center gap-2"
+            style="display: none"
+          >
+            <span class="loader"></span> Resetting...
+          </span>
+        </button>
+      </div>
+
+      <!-- ════════════════════════════════════
+         STEP: SUCCESS
+    ════════════════════════════════════ -->
+      <div
+        id="step-success"
+        class="dark-theme-card p-6 space-y-5 text-center"
+        style="display: none"
+      >
+        <div class="flex justify-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="60"
+            height="60"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="#2ecc71"
+            stroke-width="1.5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+        <h2 class="text-[26px] font-extrabold uppercase text-[#2ecc71]">
+          Authenticated!
+        </h2>
+        <p class="text-[#aaa] text-sm">
+          Logged in as
+          <span id="success-email" class="text-[#f1c40f] font-semibold"></span>
+        </p>
+        <p class="text-[#aaa] text-xs">Redirecting…</p>
+      </div>
+    </div>
+    <!-- /app wrapper -->
+
+    <script>
+      // ══════════════════════════════════════════════════════
+      //  CONFIG — change this to point to your API
+      // ══════════════════════════════════════════════════════
+      // const API_BASE = "https://slimy-leonia-kyphotic.ngrok-free.dev/intakeops";
+      const API_BASE =
+        "https://laurene-clearheaded-nonaromatically.ngrok-free.dev";
+
+      // ══════════════════════════════════════════════════════
+      //  OPTIONAL: callback invoked on successful login
+      //  token  = JWT / access token string
+      //  email  = user's email
+      //  Replace the body of onLoginSuccess with your redirect
+      //  or postMessage logic.
+      // ══════════════════════════════════════════════════════
+      function onLoginSuccess(token, email) {
+        // Example: store token and reload app
+        // localStorage.setItem("access_token", token);
+        // window.location.href = "/app";
+        console.log("Login success", { token, email });
+      }
+
+      // ══════════════════════════════════════════════════════
+      //  STATE
+      // ══════════════════════════════════════════════════════
+      const state = {
+        step: "login", // login | otp | create-password | forgot | forgot-otp | reset-password | success
+        email: "",
+        password: "",
+        newPassword: "",
+        confirmPassword: "",
+        otpValue: "", // assembled 6-digit string
+        forgotOtp: "", // otp captured during forgot flow
+        error: "",
+        emailError: "",
+        loading: false,
+        showPasswordField: false,
+        showPwd: false,
+        showConfirmPwd: false,
+        strengthScore: 0,
+        resendTimer: 0,
+        _resendInterval: null,
+        _isNewUser: false, // true when password was not set yet
+      };
+
+      // ══════════════════════════════════════════════════════
+      //  RENDER — syncs all DOM to state
+      // ══════════════════════════════════════════════════════
+      function $show(id, visible) {
+        const el = document.getElementById(id);
+        if (el) el.style.display = visible ? "" : "none";
+      }
+      function $text(id, text) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = text;
+      }
+      function $attr(id, attr, val) {
+        const el = document.getElementById(id);
+        if (el) {
+          if (val === true) el.setAttribute(attr, "");
+          else if (val === false) el.removeAttribute(attr);
+          else el.setAttribute(attr, val);
+        }
+      }
+      function $disabled(id, disabled) {
+        const el = document.getElementById(id);
+        if (el) el.disabled = disabled;
+      }
+      function $type(id, type) {
+        const el = document.getElementById(id);
+        if (el) el.type = type;
+      }
+
+      function render() {
+        // ── Step visibility ──
+        const allSteps = [
+          "login",
+          "otp",
+          "create-password",
+          "forgot",
+          "forgot-otp",
+          "reset-password",
+          "success",
+        ];
+        allSteps.forEach((s) => $show("step-" + s, state.step === s));
+
+        // ── Sync email display fields ──
+        $text("otp-email-display", state.email);
+        $text("fotp-email-display", state.email);
+        $text("success-email", state.email);
+
+        // ══ LOGIN STEP ══
+        // Email error
+        $show("email-error", !!state.emailError);
+        $text("email-error", state.emailError);
+        // Password field visibility
+        $show("password-field-wrap", state.showPasswordField);
+        // Login error
+        $show("login-error", !!state.error && state.step === "login");
+        $text("login-error", state.error);
+        // Continue/Login button
+        $disabled("login-continue-btn", !state.email || state.loading);
+        $text("login-btn-text", state.showPasswordField ? "Login" : "Continue");
+        $show("login-btn-text", !state.loading);
+        $show("login-btn-loading", state.loading);
+        // Login password eye
+        $type("password-input", state.showPwd ? "text" : "password");
+        $show("login-eye-open", !state.showPwd);
+        $show("login-eye-closed", state.showPwd);
+
+        // ══ OTP STEP ══
+        $show("otp-error", !!state.error && state.step === "otp");
+        $text("otp-error", state.error);
+        $disabled("otp-verify-btn", state.otpValue.length < 6 || state.loading);
+        $show("otp-verify-text", !state.loading);
+        $show("otp-verify-loading", state.loading);
+        // Resend OTP
+        $disabled("resend-otp-btn", state.resendTimer > 0 || state.loading);
+        $show("resend-otp-label", state.resendTimer === 0);
+        $show("resend-otp-timer", state.resendTimer > 0);
+        $text("resend-timer-count", state.resendTimer);
+
+        // ══ CREATE PASSWORD STEP ══
+        $type("new-password-input", state.showPwd ? "text" : "password");
+        $show("create-eye-open", !state.showPwd);
+        $show("create-eye-closed", state.showPwd);
+        // Strength bar
+        $show("create-strength-bar-wrap", state.newPassword.length > 0);
+        $show("create-strength-label", state.newPassword.length > 0);
+        if (state.newPassword.length > 0) {
+          for (let seg = 1; seg <= 4; seg++) {
+            const el = document.getElementById("create-seg-" + seg);
+            if (el) {
+              el.className = "strength-seg";
+              const cls = strengthClass(seg);
+              if (cls) el.classList.add(cls);
+            }
+          }
+          const lbl = document.getElementById("create-strength-label");
+          if (lbl) {
+            lbl.textContent = strengthLabel();
+            lbl.className =
+              "text-xs mt-1 " +
+              (state.strengthScore >= 3 ? "text-[#2ecc71]" : "text-[#aaa]");
+          }
+        }
+        $type(
+          "confirm-password-input",
+          state.showConfirmPwd ? "text" : "password",
+        );
+        $show("confirm-eye-open", !state.showConfirmPwd);
+        $show("confirm-eye-closed", state.showConfirmPwd);
+        $show(
+          "create-pwd-mismatch",
+          !!(
+            state.confirmPassword && state.newPassword !== state.confirmPassword
+          ),
+        );
+        $show(
+          "create-pwd-error",
+          !!state.error && state.step === "create-password",
+        );
+        $text("create-pwd-error", state.error);
+        $disabled(
+          "create-pwd-btn",
+          !state.newPassword ||
+            state.newPassword !== state.confirmPassword ||
+            state.strengthScore < 2 ||
+            state.loading,
+        );
+        $show("create-pwd-btn-text", !state.loading);
+        $show("create-pwd-btn-loading", state.loading);
+
+        // ══ FORGOT STEP ══
+        $show("forgot-error", !!state.error && state.step === "forgot");
+        $text("forgot-error", state.error);
+        $disabled("forgot-send-btn", !state.email || state.loading);
+        $show("forgot-send-text", !state.loading);
+        $show("forgot-send-loading", state.loading);
+
+        // ══ FORGOT OTP STEP ══
+        $show("fotp-error", !!state.error && state.step === "forgot-otp");
+        $text("fotp-error", state.error);
+        $disabled(
+          "fotp-verify-btn",
+          state.otpValue.length < 6 || state.loading,
+        );
+        $show("fotp-verify-text", !state.loading);
+        $show("fotp-verify-loading", state.loading);
+        $disabled("resend-fotp-btn", state.resendTimer > 0 || state.loading);
+        $show("resend-fotp-label", state.resendTimer === 0);
+        $show("resend-fotp-timer", state.resendTimer > 0);
+        $text("resend-ftimer-count", state.resendTimer);
+
+        // ══ RESET PASSWORD STEP ══
+        $type("reset-new-password-input", state.showPwd ? "text" : "password");
+        $show("reset-eye-open", !state.showPwd);
+        $show("reset-eye-closed", state.showPwd);
+        $show("reset-strength-bar-wrap", state.newPassword.length > 0);
+        $show("reset-strength-label", state.newPassword.length > 0);
+        if (state.newPassword.length > 0) {
+          for (let seg = 1; seg <= 4; seg++) {
+            const el = document.getElementById("reset-seg-" + seg);
+            if (el) {
+              el.className = "strength-seg";
+              const cls = strengthClass(seg);
+              if (cls) el.classList.add(cls);
+            }
+          }
+          const lbl = document.getElementById("reset-strength-label");
+          if (lbl) {
+            lbl.textContent = strengthLabel();
+            lbl.className =
+              "text-xs mt-1 " +
+              (state.strengthScore >= 3 ? "text-[#2ecc71]" : "text-[#aaa]");
+          }
+        }
+        $type(
+          "reset-confirm-input",
+          state.showConfirmPwd ? "text" : "password",
+        );
+        $show("reset-confirm-eye-open", !state.showConfirmPwd);
+        $show("reset-confirm-eye-closed", state.showConfirmPwd);
+        $show(
+          "reset-pwd-mismatch",
+          !!(
+            state.confirmPassword && state.newPassword !== state.confirmPassword
+          ),
+        );
+        $show("reset-error", !!state.error && state.step === "reset-password");
+        $text("reset-error", state.error);
+        $disabled(
+          "reset-btn",
+          !state.newPassword ||
+            state.newPassword !== state.confirmPassword ||
+            state.strengthScore < 2 ||
+            state.loading,
+        );
+        $show("reset-btn-text", !state.loading);
+        $show("reset-btn-loading", state.loading);
+
+        // Show the app wrapper
+        document.getElementById("auth-app").style.display = "";
+      }
+
+      // ══════════════════════════════════════════════════════
+      //  LOGIN FLOW
+      // ══════════════════════════════════════════════════════
+
+      async function handleLoginEmailNext() {
+        state.emailError = "";
+        state.error = "";
+        if (!state.email) return;
+        state.loading = true;
+        render();
+        try {
+          const res = await fetch(
+            `${API_BASE}/verify-email?email=${encodeURIComponent(state.email)}`,
+            { headers: { "ngrok-skip-browser-warning": "true" } },
+          );
+          const data = await res.json();
+          if (!res.ok || !data.valid) {
+            state.emailError =
+              data.detail ||
+              "This email is not registered. Please contact your administrator.";
+            return;
+          }
+          if (data.isPasswordSet === false || data.isPasswordSet === "false") {
+            // New user — need to set password via OTP
+            state._isNewUser = true;
+            await _sendOtp();
+            state.step = "otp";
+            setTimeout(() => document.getElementById("otp-0")?.focus(), 0);
+          } else {
+            // Returning user — show password field
+            state.showPasswordField = true;
+          }
+        } catch (e) {
+          state.emailError = "Unable to reach the server. Please try again.";
+        } finally {
+          state.loading = false;
+          render();
+        }
+      }
+
+      async function doLogin() {
+        state.error = "";
+        if (!state.email || !state.password) return;
+        state.loading = true;
+        render();
+        try {
+          const body = new FormData();
+          body.append("username", state.email);
+          body.append("password", state.password);
+          const res = await fetch(`${API_BASE}/login`, {
+            method: "POST",
+            body,
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            state.error =
+              data.detail || "Incorrect password. Please try again.";
+            return;
+          }
+          _onSuccess(data);
+        } catch (e) {
+          state.error = "Unable to reach the server. Please try again.";
+        } finally {
+          state.loading = false;
+          render();
+        }
+      }
+
+      // ══════════════════════════════════════════════════════
+      //  NEW USER — OTP + CREATE PASSWORD
+      // ══════════════════════════════════════════════════════
+
+      async function _sendOtp() {
+        await fetch(
+          `${API_BASE}/send/otp?email=${encodeURIComponent(state.email)}`,
+          { method: "POST", body: "" },
+        );
+        _startResendTimer();
+      }
+
+      async function resendOtp() {
+        state.error = "";
+        resetOtp("otp");
+        state.loading = true;
+        render();
+        try {
+          await _sendOtp();
+        } catch (e) {
+          state.error = "Failed to resend OTP.";
+        } finally {
+          state.loading = false;
+          render();
+        }
+      }
+
+      async function doVerifyOtp() {
+        state.error = "";
+        if (state.otpValue.length < 6) return;
+        state.loading = true;
+        render();
+        try {
+          const res = await fetch(
+            `${API_BASE}/verify/otp?email=${encodeURIComponent(state.email)}&otp=${state.otpValue}`,
+            { method: "POST", body: "" },
+          );
+          const data = await res.json();
+          if (!res.ok) {
+            state.error = data.detail || "Invalid OTP. Please try again.";
+            return;
+          }
+          state.step = "create-password";
+        } catch (e) {
+          state.error = "Unable to reach the server.";
+        } finally {
+          state.loading = false;
+          render();
+        }
+      }
+
+      async function doCreatePassword() {
+        state.error = "";
+        if (!state.newPassword || state.newPassword !== state.confirmPassword)
+          return;
+        state.loading = true;
+        render();
+        try {
+          const res = await fetch(
+            `${API_BASE}/create/password?email=${encodeURIComponent(state.email)}&password=${encodeURIComponent(state.newPassword)}`,
+            { method: "POST", body: "" },
+          );
+          const data = await res.json();
+          if (!res.ok) {
+            state.error = data.detail || "Failed to set password.";
+            return;
+          }
+          // Auto-login after setting password
+          await _autoLogin();
+        } catch (e) {
+          state.error = "Unable to reach the server.";
+        } finally {
+          state.loading = false;
+          render();
+        }
+      }
+
+      // ══════════════════════════════════════════════════════
+      //  FORGOT PASSWORD FLOW
+      // ══════════════════════════════════════════════════════
+
+      function goForgotPassword() {
+        resetState();
+        state.step = "forgot";
+        // Pre-populate forgot email input with whatever was typed
+        setTimeout(() => {
+          const el = document.getElementById("forgot-email-input");
+          if (el) el.value = state.email;
+        }, 0);
+        render();
+      }
+
+      async function doSendForgotOtp() {
+        state.error = "";
+        if (!state.email) return;
+        state.loading = true;
+        render();
+        try {
+          const res = await fetch(
+            `${API_BASE}/forgot/password?email=${encodeURIComponent(state.email)}`,
+            { method: "POST", body: "" },
+          );
+          const data = await res.json();
+          if (!res.ok) {
+            state.error = data.detail || "Failed to send OTP.";
+            return;
+          }
+          _startResendTimer();
+          state.step = "forgot-otp";
+          setTimeout(() => document.getElementById("fotp-0")?.focus(), 0);
+        } catch (e) {
+          state.error = "Unable to reach the server.";
+        } finally {
+          state.loading = false;
+          render();
+        }
+      }
+
+      async function resendForgotOtp() {
+        state.error = "";
+        resetOtp("fotp");
+        state.loading = true;
+        render();
+        try {
+          const res = await fetch(
+            `${API_BASE}/forgot/password?email=${encodeURIComponent(state.email)}`,
+            { method: "POST", body: "" },
+          );
+          if (res.ok) _startResendTimer();
+          else state.error = "Failed to resend OTP.";
+        } catch (e) {
+          state.error = "Failed to resend OTP.";
+        } finally {
+          state.loading = false;
+          render();
+        }
+      }
+
+      async function doVerifyForgotOtp() {
+        state.error = "";
+        if (state.otpValue.length < 6) return;
+        // Store otp for reset step — API needs it together with new_password
+        state.forgotOtp = state.otpValue;
+        state.step = "reset-password";
+        resetOtp("fotp");
+        render();
+      }
+
+      async function doResetPassword() {
+        state.error = "";
+        if (!state.newPassword || state.newPassword !== state.confirmPassword)
+          return;
+        state.loading = true;
+        render();
+        try {
+          const res = await fetch(
+            `${API_BASE}/reset/password?email=${encodeURIComponent(state.email)}&otp=${state.forgotOtp}&new_password=${encodeURIComponent(state.newPassword)}`,
+            { method: "POST", body: "" },
+          );
+          const data = await res.json();
+          if (!res.ok) {
+            state.error = data.detail || "Failed to reset password.";
+            return;
+          }
+          // Auto-login after reset
+          await _autoLogin();
+        } catch (e) {
+          state.error = "Unable to reach the server.";
+        } finally {
+          state.loading = false;
+          render();
+        }
+      }
+
+      // ══════════════════════════════════════════════════════
+      //  HELPERS
+      // ══════════════════════════════════════════════════════
+
+      async function _autoLogin() {
+        const body = new FormData();
+        body.append("username", state.email);
+        body.append("password", state.newPassword || state.password);
+        try {
+          const res = await fetch(`${API_BASE}/login`, {
+            method: "POST",
+            body,
+          });
+          const data = await res.json();
+          if (res.ok) {
+            _onSuccess(data);
+            return;
+          }
+        } catch (_) {}
+        // If auto-login fails, send user back to login
+        state.step = "login";
+        state.showPasswordField = true;
+        state.password = "";
+        state.error = "Password set! Please log in.";
+        render();
+      }
+
+      function _onSuccess(data) {
+        state.step = "success";
+        const token = data.access_token || data.token || "";
+        onLoginSuccess(token, state.email);
+        render();
+        // Dispatch event for parent apps listening
+        window.dispatchEvent(
+          new CustomEvent("auth-success", {
+            detail: { token, email: state.email, data },
+          }),
+        );
+      }
+
+      // ── OTP box helpers ──
+      function otpMove(e, i, prefix) {
+        prefix = prefix || "otp";
+        const val = e.target.value.replace(/\D/g, "").slice(-1);
+        e.target.value = val;
+        _rebuildOtp(prefix);
+        if (val && i < 5)
+          document.getElementById(`${prefix}-${i + 1}`)?.focus();
+        render();
+      }
+      function otpKeydown(e, i, prefix) {
+        prefix = prefix || "otp";
+        if (e.key === "Backspace" && !e.target.value && i > 0) {
+          document.getElementById(`${prefix}-${i - 1}`)?.focus();
+        }
+      }
+      function otpPaste(e, prefix) {
+        prefix = prefix || "otp";
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData)
+          .getData("text")
+          .replace(/\D/g, "")
+          .slice(0, 6);
+        text.split("").forEach((ch, i) => {
+          const el = document.getElementById(`${prefix}-${i}`);
+          if (el) el.value = ch;
+        });
+        _rebuildOtp(prefix);
+        document
+          .getElementById(`${prefix}-${Math.min(text.length, 5)}`)
+          ?.focus();
+        render();
+      }
+      function _rebuildOtp(prefix) {
+        prefix = prefix || "otp";
+        let s = "";
+        for (let i = 0; i < 6; i++)
+          s += document.getElementById(`${prefix}-${i}`)?.value || "";
+        state.otpValue = s;
+      }
+      function resetOtp(prefix) {
+        prefix = prefix || "otp";
+        state.otpValue = "";
+        for (let i = 0; i < 6; i++) {
+          const el = document.getElementById(`${prefix}-${i}`);
+          if (el) el.value = "";
+        }
+        setTimeout(() => document.getElementById(`${prefix}-0`)?.focus(), 0);
+      }
+
+      // ── Resend timer ──
+      function _startResendTimer(seconds) {
+        seconds = seconds || 60;
+        clearInterval(state._resendInterval);
+        state.resendTimer = seconds;
+        state._resendInterval = setInterval(() => {
+          if (state.resendTimer > 0) state.resendTimer--;
+          else clearInterval(state._resendInterval);
+          render();
+        }, 1000);
+      }
+
+      // ── Password strength ──
+      function checkStrength() {
+        const p = state.newPassword;
+        let score = 0;
+        if (p.length >= 8) score++;
+        if (/[A-Z]/.test(p)) score++;
+        if (/[0-9]/.test(p)) score++;
+        if (/[^A-Za-z0-9]/.test(p)) score++;
+        state.strengthScore = score;
+      }
+      function strengthClass(seg) {
+        if (state.strengthScore === 0) return "";
+        const map = [
+          "",
+          "filled-weak",
+          "filled-weak",
+          "filled-medium",
+          "filled-strong",
+        ];
+        return seg <= state.strengthScore ? map[state.strengthScore] : "";
+      }
+      function strengthLabel() {
+        return (
+          ["", "Weak", "Fair", "Good", "Strong"][state.strengthScore] || ""
+        );
+      }
+
+      // ── Full reset ──
+      function resetState() {
+        state.password = "";
+        state.newPassword = "";
+        state.confirmPassword = "";
+        state.error = "";
+        state.emailError = "";
+        state.showPasswordField = false;
+        state.showPwd = false;
+        state.showConfirmPwd = false;
+        state.strengthScore = 0;
+        state.otpValue = "";
+        state.forgotOtp = "";
+        clearInterval(state._resendInterval);
+        state.resendTimer = 0;
+      }
+
+      // ══════════════════════════════════════════════════════
+      //  INIT — wire up all event listeners
+      // ══════════════════════════════════════════════════════
+      document.addEventListener("DOMContentLoaded", () => {
+        // ── LOGIN STEP ──
+        const emailInput = document.getElementById("email-input");
+        emailInput.addEventListener("input", (e) => {
+          state.email = e.target.value;
+          render();
+        });
+        emailInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") handleLoginEmailNext();
+        });
+
+        const passwordInput = document.getElementById("password-input");
+        passwordInput.addEventListener("input", (e) => {
+          state.password = e.target.value;
+          render();
+        });
+        passwordInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") doLogin();
+        });
+
+        document
+          .getElementById("login-eye-btn")
+          .addEventListener("click", () => {
+            state.showPwd = !state.showPwd;
+            render();
+          });
+
+        document
+          .getElementById("forgot-pw-link")
+          .addEventListener("click", () => {
+            goForgotPassword();
+          });
+
+        document
+          .getElementById("login-continue-btn")
+          .addEventListener("click", () => {
+            if (state.showPasswordField) doLogin();
+            else handleLoginEmailNext();
+          });
+
+        // ── OTP STEP ──
+        for (let i = 0; i < 6; i++) {
+          const box = document.getElementById(`otp-${i}`);
+          if (box) {
+            box.addEventListener("input", (e) => otpMove(e, i, "otp"));
+            box.addEventListener("keydown", (e) => otpKeydown(e, i, "otp"));
+            box.addEventListener("paste", (e) => otpPaste(e, "otp"));
+          }
+        }
+
+        document
+          .getElementById("otp-verify-btn")
+          .addEventListener("click", () => {
+            doVerifyOtp();
+          });
+
+        document
+          .getElementById("resend-otp-btn")
+          .addEventListener("click", () => {
+            resendOtp();
+          });
+
+        document
+          .getElementById("otp-back-btn")
+          .addEventListener("click", () => {
+            state.step = "login";
+            resetState();
+            render();
+          });
+
+        // ── CREATE PASSWORD STEP ──
+        const newPwdInput = document.getElementById("new-password-input");
+        newPwdInput.addEventListener("input", (e) => {
+          state.newPassword = e.target.value;
+          checkStrength();
+          render();
+        });
+        newPwdInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") doCreatePassword();
+        });
+
+        document
+          .getElementById("create-eye-btn")
+          .addEventListener("click", () => {
+            state.showPwd = !state.showPwd;
+            render();
+          });
+
+        const confirmPwdInput = document.getElementById(
+          "confirm-password-input",
+        );
+        confirmPwdInput.addEventListener("input", (e) => {
+          state.confirmPassword = e.target.value;
+          render();
+        });
+        confirmPwdInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") doCreatePassword();
+        });
+
+        document
+          .getElementById("confirm-eye-btn")
+          .addEventListener("click", () => {
+            state.showConfirmPwd = !state.showConfirmPwd;
+            render();
+          });
+
+        document
+          .getElementById("create-pwd-btn")
+          .addEventListener("click", () => {
+            doCreatePassword();
+          });
+
+        // ── FORGOT STEP ──
+        const forgotEmailInput = document.getElementById("forgot-email-input");
+        forgotEmailInput.addEventListener("input", (e) => {
+          state.email = e.target.value;
+          render();
+        });
+        forgotEmailInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") doSendForgotOtp();
+        });
+
+        document
+          .getElementById("forgot-send-btn")
+          .addEventListener("click", () => {
+            doSendForgotOtp();
+          });
+
+        document
+          .getElementById("forgot-back-btn")
+          .addEventListener("click", () => {
+            state.step = "login";
+            resetState();
+            render();
+            // Restore email in login input
+            setTimeout(() => {
+              const el = document.getElementById("email-input");
+              if (el) el.value = state.email;
+            }, 0);
+          });
+
+        // ── FORGOT OTP STEP ──
+        for (let i = 0; i < 6; i++) {
+          const box = document.getElementById(`fotp-${i}`);
+          if (box) {
+            box.addEventListener("input", (e) => otpMove(e, i, "fotp"));
+            box.addEventListener("keydown", (e) => otpKeydown(e, i, "fotp"));
+            box.addEventListener("paste", (e) => otpPaste(e, "fotp"));
+          }
+        }
+
+        document
+          .getElementById("fotp-verify-btn")
+          .addEventListener("click", () => {
+            doVerifyForgotOtp();
+          });
+
+        document
+          .getElementById("resend-fotp-btn")
+          .addEventListener("click", () => {
+            resendForgotOtp();
+          });
+
+        document
+          .getElementById("fotp-back-btn")
+          .addEventListener("click", () => {
+            state.step = "forgot";
+            resetOtp("fotp");
+            render();
+          });
+
+        // ── RESET PASSWORD STEP ──
+        const resetNewPwdInput = document.getElementById(
+          "reset-new-password-input",
+        );
+        resetNewPwdInput.addEventListener("input", (e) => {
+          state.newPassword = e.target.value;
+          checkStrength();
+          render();
+        });
+        resetNewPwdInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") doResetPassword();
+        });
+
+        document
+          .getElementById("reset-eye-btn")
+          .addEventListener("click", () => {
+            state.showPwd = !state.showPwd;
+            render();
+          });
+
+        const resetConfirmInput = document.getElementById(
+          "reset-confirm-input",
+        );
+        resetConfirmInput.addEventListener("input", (e) => {
+          state.confirmPassword = e.target.value;
+          render();
+        });
+        resetConfirmInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") doResetPassword();
+        });
+
+        document
+          .getElementById("reset-confirm-eye-btn")
+          .addEventListener("click", () => {
+            state.showConfirmPwd = !state.showConfirmPwd;
+            render();
+          });
+
+        document.getElementById("reset-btn").addEventListener("click", () => {
+          doResetPassword();
+        });
+
+        // Initial render
+        render();
+      });
+    </script>
+  </body>
+</html>
