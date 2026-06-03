@@ -29,12 +29,12 @@
     <style>
       :root {
         --gold: #f1c40f;
-        --gold-dim: rgba(241, 196, 15, 0.15);
-        --gold-border: rgba(241, 196, 15, 0.25);
-        --bg: #111;
-        --surface: rgba(0, 0, 0, 0.5);
-        --text: #e0e0e0;
-        --muted: #888;
+      --gold-dim: rgba(241, 196, 15, 0.15);
+      --gold-border: rgba(241, 196, 15, 0.25);
+      --bg: #111;
+      --surface: rgba(0, 0, 0, 0.5);
+      --text: #e0e0e0;
+      --muted: #888;
         --bg: #0d0d0d;
         --panel: #181715;
         --panel-2: #1f1d1a;
@@ -56,37 +56,37 @@
       }
 
       .header-btn {
-        background: var(--gold-dim);
-        color: var(--gold);
-        border: 1px solid var(--gold-border);
-        padding: 8px 16px;
-        border-radius: 7px;
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.25s;
-        font-family: "Montserrat", sans-serif;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
+      background: var(--gold-dim);
+      color: var(--gold);
+      border: 1px solid var(--gold-border);
+      padding: 8px 16px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s;
+      font-family: "Montserrat", sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
       .header-btn:hover {
-        background: rgba(241, 196, 15, 0.25);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(241, 196, 15, 0.2);
-      }
+      background: rgba(241, 196, 15, 0.25);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(241, 196, 15, 0.2);
+    }
 
       .header-btn.logout {
-        background: rgba(231, 76, 60, 0.1);
-        color: #e74c3c;
-        border-color: rgba(231, 76, 60, 0.3);
-      }
+      background: rgba(231, 76, 60, 0.1);
+      color: #e74c3c;
+      border-color: rgba(231, 76, 60, 0.3);
+    }
 
       .header-btn.logout:hover {
-        background: rgba(231, 76, 60, 0.2);
-        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
-      }
+      background: rgba(231, 76, 60, 0.2);
+      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
+    }
 
       * {
         box-sizing: border-box;
@@ -121,19 +121,19 @@
         filter: drop-shadow(0 0 10px rgba(241, 196, 15, 0.3));
       }
 
-      /* ── HEADER ── */
-      .app-header {
-        background: rgba(17, 17, 17, 0.98);
-        backdrop-filter: blur(20px);
-        border-bottom: 2px solid var(--gold-border);
-        padding: 16px 28px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        box-shadow: 0 4px 20px rgba(241, 196, 15, 0.12);
-        position: relative;
-        z-index: 100;
-      }
+       /* ── HEADER ── */
+    .app-header {
+      background: rgba(17, 17, 17, 0.98);
+      backdrop-filter: blur(20px);
+      border-bottom: 2px solid var(--gold-border);
+      padding: 16px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(241, 196, 15, 0.12);
+      position: relative;
+      z-index: 100;
+    }
 
       
       .title-block {
@@ -422,35 +422,35 @@
       }
 
       .live-dot {
-        width: 7px;
-        height: 7px;
-        background: #2ecc71 !important;
-        border-radius: 50%;
-        flex-shrink: 0;
-        animation: livePulse 2s infinite;
-      }
+      width: 7px;
+      height: 7px;
+      background: #2ecc71 !important;
+      border-radius: 50%;
+      flex-shrink: 0;
+      animation: livePulse 2s infinite;
+    }
 
-      .analytics-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-        align-items: stretch;
-        padding-bottom: 10px;
-      }
+    .analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  align-items: stretch;
+  padding-bottom: 10px;
+}
 
-      /* Medium devices */
-      @media (max-width: 992px) {
-        .analytics-grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
-      }
+/* Medium devices */
+@media (max-width: 992px) {
+  .analytics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
 
-      /* Small devices */
-      @media (max-width: 576px) {
-        .analytics-grid {
-          grid-template-columns: 1fr;
-        }
-      }
+/* Small devices */
+@media (max-width: 576px) {
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+}
 
       .chart-title {
         color: var(--gold);
@@ -1787,6 +1787,10 @@
           grid-template-columns: repeat(3, 1fr);
         }
 
+        .analytics-grid {
+          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        }
+
         .two-col {
           grid-template-columns: 1fr;
         }
@@ -2539,48 +2543,6 @@
         position: relative;
         overflow: visible;
         z-index: 1;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .chart-canvas-wrap {
-        position: relative;
-        width: 100%;
-        flex: 1 1 auto;
-        min-height: 0;
-        height: 180px;
-        max-height: 220px;
-      }
-
-      .chart-card-jvx {
-        grid-row: span 2;
-      }
-
-      .chart-card-jvx .chart-canvas-wrap {
-        height: 100%;
-        max-height: 420px;
-        min-height: 200px;
-      }
-
-      /* Workload inner layout */
-      #workload-container {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        height: 180px;
-      }
-
-      #workload-container .chart-canvas-wrap {
-        flex: 1 1 auto;
-        height: auto;
-        max-height: 140px;
-      }
-
-      /* Risk donut: legend stacks below on small widths */
-      .risk-donut-inner {
-        position: relative;
-        width: 100%;
-        height: 100%;
       }
 
       .achart-card:hover {
@@ -5101,21 +5063,21 @@
 
       /* Individual Cards Structure */
       .instr-card {
-        flex: 0 0 215px;
-        min-width: 215px;
-        background: rgba(10, 10, 10, 0.7);
-        border: 1px solid rgba(241, 196, 15, 0.18);
-        border-radius: 10px;
-        padding: 12px 14px 10px;
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        position: relative;
-        overflow: visible;
-        transition:
-          border-color 0.2s,
-          box-shadow 0.2s;
-      }
+      flex: 0 0 215px;
+      min-width: 215px;
+      background: rgba(10, 10, 10, 0.7);
+      border: 1px solid rgba(241, 196, 15, 0.18);
+      border-radius: 10px;
+      padding: 12px 14px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      position: relative;
+      overflow: visible;
+      transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+    }
 
       /* Theme Adaptive Border-Left System accents */
       .instr-card.instr-blue {
@@ -5414,7 +5376,7 @@
         .deadline-summary-table,
         .nested-deadline-table,
         .sync-table {
-          /* width: max-content !important; */
+          width: max-content !important;
           min-width: 760px;
         }
 
@@ -5738,370 +5700,10 @@
         color: var(--text);
       }
 
-      /* ══════════════════════════════════════
-   ANALYTICS GRID + CHART CARDS — FULLY RESPONSIVE
-══════════════════════════════════════ */
-
-      .analytics-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-        padding-bottom: 10px;
-      }
-
-      /* Base chart card */
-      .achart-card {
-        background: rgba(0, 0, 0, 0.4);
-        border: 1px solid rgba(241, 196, 15, 0.12);
-        border-radius: 8px;
-        padding: 12px 14px;
-        position: relative;
-        overflow: visible;
-        z-index: 1;
-        display: flex;
-        flex-direction: column;
-        min-width: 0; /* prevents grid blowout */
-      }
-
-      .achart-card:hover {
-        z-index: 50;
-      }
-
-      /* Unified chart canvas wrapper — the single height source of truth */
-      .chart-canvas-wrap {
-        position: relative;
-        width: 100%;
-        flex: 1 1 auto;
-        min-height: 0;
-        height: 180px;
-        max-height: 220px;
-      }
-
-      /* Jurisdiction card spans 2 rows on desktop */
-      .chart-card-jvx {
-        grid-row: span 2;
-      }
-
-      .chart-card-jvx .chart-canvas-wrap {
-        height: 100%;
-        min-height: 200px;
-        max-height: 440px;
-      }
-
-      /* Workload card inner layout */
-      #workload-container {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        flex: 1 1 auto;
-        min-height: 0;
-      }
-
-      #workload-container .chart-canvas-wrap {
-        flex: 1 1 auto;
-        height: 130px;
-        max-height: 150px;
-        min-height: 80px;
-      }
-
-      #peak-period-badge {
-        flex-shrink: 0;
-      }
-
-      /* ── OUTER TABLE SCROLL WRAPPER ── */
-      .table-scroll {
-        width: 100%;
-        overflow-x: auto;
-        overflow-y: visible;
-        -webkit-overflow-scrolling: touch;
-        display: block;
-      }
-
-      /* ── OUTER DEADLINE SUMMARY TABLE ── */
-      .deadline-summary-table {
-        table-layout: auto; /* drop fixed — let columns breathe */
-        min-width: 640px; /* forces horizontal scroll before columns crush */
-        width: 100%;
-      }
-
-      /* Column hints (soft, not hard) */
-      .deadline-summary-table th:nth-child(1),
-      .deadline-summary-table td:nth-child(1) {
-        min-width: 110px;
-      }
-
-      .deadline-summary-table th:nth-child(2),
-      .deadline-summary-table td:nth-child(2) {
-        min-width: 200px;
-      }
-
-      .deadline-summary-table th:nth-child(3),
-      .deadline-summary-table td:nth-child(3) {
-        min-width: 130px;
-      }
-
-      .deadline-summary-table th:nth-child(4),
-      .deadline-summary-table td:nth-child(4) {
-        min-width: 100px;
-      }
-
-      .deadline-summary-table th:nth-child(5),
-      .deadline-summary-table td:nth-child(5) {
-        min-width: 110px;
-      }
-
-      /* Prevent text from wrapping inside td (keeps scroll clean) */
-      .deadline-summary-table th,
-      .deadline-summary-table td {
-        white-space: nowrap;
-      }
-
-      /* ── NESTED TABLE WRAPPER ── */
-      .nested-deadline-wrap {
-        padding: 10px 14px 14px;
-        overflow-x: auto;
-        overflow-y: visible;
-        -webkit-overflow-scrolling: touch;
-        display: block;
-      }
-
-      /* ── NESTED TABLE ── */
-      .nested-deadline-table {
-        border-radius: 6px;
-        background: #111;
-        min-width: 820px; /* keep your existing min-width */
-        table-layout: auto;
-        width: 100%;
-      }
-
-      .nested-deadline-table th,
-      .nested-deadline-table td {
-        padding: 9px 10px;
-        white-space: nowrap;
-      }
-
-      /* Column hints for nested table */
-      .nested-deadline-table th:nth-child(1),
-      .nested-deadline-table td:nth-child(1) {
-        min-width: 30px;
-        width: 30px;
-      } /* checkbox */
-
-      .nested-deadline-table th:nth-child(2),
-      .nested-deadline-table td:nth-child(2) {
-        min-width: 180px;
-      } /* deadline type */
-
-      .nested-deadline-table th:nth-child(3),
-      .nested-deadline-table td:nth-child(3) {
-        min-width: 110px;
-      } /* category */
-
-      .nested-deadline-table th:nth-child(4),
-      .nested-deadline-table td:nth-child(4) {
-        min-width: 110px;
-      } /* due date */
-
-      .nested-deadline-table th:nth-child(5),
-      .nested-deadline-table td:nth-child(5) {
-        min-width: 90px;
-      } /* countdown */
-
-      .nested-deadline-table th:nth-child(6),
-      .nested-deadline-table td:nth-child(6) {
-        min-width: 90px;
-      } /* status */
-
-      .nested-deadline-table th:nth-child(7),
-      .nested-deadline-table td:nth-child(7) {
-        /* notes */
-        min-width: 160px;
-        white-space: normal; /* notes can wrap */
-        overflow-wrap: anywhere;
-        line-height: 1.4;
-      }
-
-      .nested-deadline-table th:nth-child(8),
-      .nested-deadline-table td:nth-child(8) {
-        min-width: 160px;
-      } /* actions */
-
-      /* ── MOBILE: tighten scrollable table containers ── */
-      @media (max-width: 900px) {
-        .table-scroll,
-        .nested-deadline-wrap {
-          margin-left: -4px;
-          margin-right: -4px;
-        }
-      }
-
-      /* ── 2-col at ≤1100px ── */
-      @media (max-width: 1100px) {
-        .analytics-grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
-
-        .chart-card-jvx {
-          grid-row: auto;
-          grid-column: 1 / -1;
-        }
-
-        .chart-card-jvx .chart-canvas-wrap {
-          height: 200px;
-          max-height: 260px;
-          min-height: 160px;
-        }
-      }
-
-      /* ── 1-col at ≤768px ── */
-      @media (max-width: 768px) {
-        .analytics-grid {
-          grid-template-columns: 1fr !important;
-          gap: 12px;
-        }
-
-        .analytics-grid .achart-card,
-        .analytics-grid .chart-card-jvx {
-          grid-column: 1 / -1 !important;
-          grid-row: auto !important;
-        }
-
-        .chart-canvas-wrap {
-          height: 180px;
-          max-height: 220px;
-        }
-
-        .chart-card-jvx .chart-canvas-wrap {
-          height: 200px;
-          max-height: 240px;
-          min-height: 160px;
-        }
-
-        #workload-container {
-          min-height: 160px;
-        }
-
-        #workload-container .chart-canvas-wrap {
-          height: 110px;
-          max-height: 130px;
-        }
-      }
-
-      /* ── tighter on small phones ── */
-      @media (max-width: 480px) {
-        .analytics-grid {
-          gap: 10px !important;
-        }
-
-        .achart-card {
-          padding: 10px 10px;
-        }
-
-        .chart-canvas-wrap {
-          height: 150px;
-          max-height: 180px;
-        }
-
-        .chart-card-jvx .chart-canvas-wrap {
-          height: 170px;
-          max-height: 200px;
-        }
-
-        #workload-container .chart-canvas-wrap {
-          height: 100px;
-          max-height: 120px;
-        }
-      }
-
       @media (max-width: 720px) {
         #export-matter-select {
           min-width: 100%;
           width: 100%;
-        }
-      }
-
-      /* 2-col at medium */
-      @media (max-width: 1100px) {
-        .analytics-grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
-        .chart-card-jvx {
-          grid-row: auto;
-          grid-column: 1 / -1;
-        }
-        .chart-card-jvx .chart-canvas-wrap {
-          height: 200px;
-          max-height: 240px;
-        }
-        .achart-card.cc-col-1.cc-row-2 {
-          grid-column: 1 / -1 !important;
-          grid-row: auto !important;
-        }
-        #panel-analytics .analytics-grid .chart-card-jvx {
-          grid-column: 1 / -1 !important;
-          grid-row: auto !important;
-        }
-      }
-
-      /* 1-col on mobile */
-      @media (max-width: 640px) {
-        .analytics-grid {
-          grid-template-columns: 1fr !important;
-          gap: 10px !important;
-        }
-        .chart-card-jvx {
-          grid-row: auto;
-          grid-column: 1 / -1;
-        }
-        .chart-canvas-wrap,
-        .chart-card-jvx .chart-canvas-wrap {
-          height: 160px;
-          max-height: 200px;
-        }
-        #workload-container {
-          height: 160px;
-        }
-        /* Risk donut: switch legend to bottom on very small screens */
-        #chart-risk-donut-legend-bottom {
-          display: flex !important;
-        }
-      }
-
-      /* Risk donut responsive legend */
-      @media (max-width: 480px) {
-        .chart-canvas-wrap {
-          height: 140px;
-        }
-      }
-
-      /* ── Panel analytics — header wraps on mobile ── */
-      @media (max-width: 900px) {
-        #panel-analytics .panel-header {
-          flex-wrap: wrap !important;
-          align-items: flex-start !important;
-          gap: 8px !important;
-        }
-
-        #panel-analytics .panel-header-actions {
-          width: 100% !important;
-          margin: 0 !important;
-          overflow-x: auto;
-        }
-
-        #panel-analytics .view-toggle {
-          width: 100%;
-        }
-
-        #panel-analytics .vtb {
-          flex: 1;
-          min-width: 0;
-          padding-left: 8px;
-          padding-right: 8px;
-        }
-
-        #panel-analytics canvas {
-          width: 100% !important;
-          max-width: 100% !important;
         }
       }
 
@@ -6921,7 +6523,7 @@
         <!-- ===================== DASHBOARD PANE ===================== -->
         <div class="tab-pane active" id="pane-dashboard">
           <!-- <div class="page-header"> -->
-          <!-- <div class="page-title-block">
+            <!-- <div class="page-title-block">
               <div class="eyebrow">DeadlineOps</div>
               <div class="page-title">Dashboard</div>
             </div> -->
@@ -6939,7 +6541,7 @@
           ></div>
 
           <!-- INSTRUMENT PANEL -->
-          <div class="panel collapsed" id="panel-instrument">
+          <div class="panel" id="panel-instrument">
             <!-- Header Layout Alignment Unified -->
             <div class="panel-header" onclick="togglePanel('panel-instrument')">
               <div class="panel-title">
@@ -6993,7 +6595,7 @@
           </div>
 
           <!-- ANALYTICS PANEL -->
-          <div class="panel collapsed" id="panel-analytics">
+          <div class="panel" id="panel-analytics">
             <div class="panel-header" onclick="togglePanel('panel-analytics')">
               <div class="panel-title">
                 <span class="live-dot"></span> Analytics Data
@@ -7053,49 +6655,57 @@
                       >ⓘ</span
                     >
                   </div>
-                  <div class="chart-canvas-wrap">
-                    <canvas id="chart-risk-donut"></canvas>
-                  </div>
-                </div>
-
-                <!-- Overview Metrics -->
-
-                <!-- Workload KPI -->
-                <div class="achart-card cc-col-2 cc-row-1">
                   <div
-                    class="chart-title"
                     style="
-                      display: flex;
-                      justify-content: space-between;
-                      align-items: center;
-                      margin-bottom: 12px;
+                      position: relative;
+                      height: 180px;
+                      display: grid;
+                      place-items: center;
                     "
                   >
-                    <span>Workload KPI</span>
-                    <span
-                      class="analytics-tooltip"
-                      data-tippy-content="Current pending vs threshold benchmarks."
-                      >ⓘ</span
-                    >
-                  </div>
-                  <div id="workload-container">
-                    <div class="chart-canvas-wrap">
-                      <canvas id="chart-workload"></canvas>
-                    </div>
-                    <div
-                      id="peak-period-badge"
+                    <canvas
+                      id="chart-risk-donut"
                       style="
-                        background: rgba(241, 196, 15, 0.1);
-                        border: 1px dashed #f1c40f;
-                        color: #f1c40f;
-                        padding: 6px;
-                        border-radius: 4px;
-                        font-size: 11px;
+                        grid-area: 1 / 1;
+                        max-height: 100%;
+                        max-width: 100%;
+                      "
+                    ></canvas>
+                    <div
+                      style="
+                        grid-area: 1 / 1;
                         text-align: center;
-                        flex-shrink: 0;
+                        pointer-events: none;
+                        display: none;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        transform: none;
                       "
                     >
-                      Peak Period: Fetching...
+                      <div
+                        id="donut-total"
+                        style="
+                          font-size: 24px;
+                          font-weight: 700;
+                          color: var(--gold);
+                          font-family: &quot;SF Mono&quot;, Monaco, monospace;
+                          line-height: 1.1;
+                        "
+                      >
+                        0
+                      </div>
+                      <div
+                        style="
+                          font-size: 10px;
+                          color: var(--text-dim);
+                          text-transform: uppercase;
+                          letter-spacing: 0.8px;
+                          margin-top: 2px;
+                        "
+                      >
+                        Total
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -7110,19 +6720,66 @@
                       margin-bottom: 12px;
                     "
                   >
-                    <span>Overview Metrics</span>
+                    <span style="text-transform: capitalize"
+                      >Overview Metrics</span
+                    >
                     <span
                       class="analytics-tooltip"
                       data-tippy-content="Core operational health check metrics."
                       >ⓘ</span
                     >
                   </div>
-                  <div class="chart-canvas-wrap">
+                  <div style="position: relative; height: 180px">
                     <canvas id="chart-overview-bar"></canvas>
                   </div>
                 </div>
 
-                <!-- Matters Operational Breakdown -->
+                <div class="achart-card cc-col-2 cc-row-1">
+                  <div
+                    class="chart-title"
+                    style="
+                      display: flex;
+                      justify-content: space-between;
+                      align-items: center;
+                      margin-bottom: 12px;
+                    "
+                  >
+                    <span style="text-transform: capitalize">Workload KPI</span>
+                    <span
+                      class="analytics-tooltip"
+                      data-tippy-content="Current pending vs threshold benchmarks."
+                      >ⓘ</span
+                    >
+                  </div>
+                  <div
+                    id="workload-container"
+                    style="
+                      display: flex;
+                      flex-direction: column;
+                      justify-content: space-between;
+                      height: 180px;
+                    "
+                  >
+                    <div style="position: relative; height: 120px">
+                      <canvas id="chart-workload"></canvas>
+                    </div>
+                    <div
+                      id="peak-period-badge"
+                      style="
+                        background: rgba(241, 196, 15, 0.1);
+                        border: 1px dashed #f1c40f;
+                        color: #f1c40f;
+                        padding: 6px;
+                        border-radius: 4px;
+                        font-size: 11px;
+                        text-align: center;
+                      "
+                    >
+                      Peak Period: Fetching...
+                    </div>
+                  </div>
+                </div>
+
                 <div class="achart-card cc-col-2 cc-row-2">
                   <div
                     class="chart-title"
@@ -7133,14 +6790,16 @@
                       margin-bottom: 12px;
                     "
                   >
-                    <span>Matters Operational Breakdown</span>
+                    <span style="text-transform: capitalize"
+                      >Matters Operational Breakdown</span
+                    >
                     <span
                       class="analytics-tooltip"
                       data-tippy-content="Cross-comparison of individual active matter milestones."
                       >ⓘ</span
                     >
                   </div>
-                  <div class="chart-canvas-wrap">
+                  <div style="position: relative; height: 180px">
                     <canvas id="chart-matters-multi"></canvas>
                   </div>
                 </div>
@@ -7155,14 +6814,16 @@
                       margin-bottom: 12px;
                     "
                   >
-                    <span>Jurisdiction Volumes</span>
+                    <span style="text-transform: capitalize"
+                      >Jurisdiction Volumes</span
+                    >
                     <span
                       class="analytics-tooltip"
                       data-tippy-content="Distribution of total matters across legal boundaries."
                       >ⓘ</span
                     >
                   </div>
-                  <div class="chart-canvas-wrap">
+                  <div class="chart-wrapper">
                     <canvas id="chart-jurisdiction-bar"></canvas>
                   </div>
                 </div>
@@ -7176,78 +6837,58 @@
               class="panel-header"
               onclick="togglePanel('panel-dashboard-table')"
             >
-              <div style="padding: 10px 0px" class="panel-title">
+              <div style="padding: 10px 0px;" class="panel-title">
                 Deadlines Table
               </div>
             </div>
-            <div
-              style="
-                display: flex;
-                gap: 10px;
-                justify-content: flex-end;
-                margin-bottom: 10px;
-                flex-wrap: wrap;
-                align-items: center;
-              "
-            >
-              <label
-                for="export-matter-select"
-                style="
-                  color: var(--text-dim);
-                  font-size: 11px;
-                  letter-spacing: 0.4px;
-                "
-              >
-                Export Scope
-              </label>
-              <select
-                id="export-matter-select"
-                style="min-width: 240px"
-                aria-label="Choose export scope: all matters or a single matter"
-              >
-                <option value="">All Matters (Export all)</option>
-              </select>
-              <button
-                class="btn btn-primary"
-                id="btn-export-csv"
-                type="button"
-                onclick="exportMatterDeadlines('csv')"
-              >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="7 10 12 15 17 10"></polyline>
-                  <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                Export CSV
-              </button>
-              <button
-                class="btn btn-primary"
-                id="btn-export-excel"
-                type="button"
-                onclick="exportMatterDeadlines('excel')"
-              >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="7 10 12 15 17 10"></polyline>
-                  <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                Export Excel
-              </button>
-            </div>
+       <div style="display: flex; gap: 10px; justify-content: flex-end; margin-bottom: 10px; flex-wrap: wrap; align-items: center;">
+        <label for="export-matter-select" style="color: var(--text-dim); font-size: 11px; letter-spacing: 0.4px;">
+          Export Scope
+        </label>
+        <select id="export-matter-select" style="min-width: 240px;" aria-label="Choose export scope: all matters or a single matter">
+          <option value="">All Matters (Export all)</option>
+        </select>
+        <button
+        class="btn btn-primary"
+           id="btn-export-csv"
+           type="button"
+           onclick="exportMatterDeadlines('csv')"
+         >
+         <svg 
+         width="20" 
+         height="20" 
+         viewBox="0 0 24 24" 
+         fill="none" 
+         stroke="currentColor" 
+         stroke-width="2"
+       >
+         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+         <polyline points="7 10 12 15 17 10"></polyline>
+         <line x1="12" y1="15" x2="12" y2="3"></line>
+       </svg>
+           Export CSV
+         </button>
+         <button
+         class="btn btn-primary"
+           id="btn-export-excel"
+           type="button"
+           onclick="exportMatterDeadlines('excel')"
+         >
+         <svg 
+         width="20" 
+         height="20" 
+         viewBox="0 0 24 24" 
+         fill="none" 
+         stroke="currentColor" 
+         stroke-width="2"
+       >
+         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+         <polyline points="7 10 12 15 17 10"></polyline>
+         <line x1="12" y1="15" x2="12" y2="3"></line>
+       </svg>
+           Export Excel
+         </button>
+       </div>
             <div class="panel-body" style="padding-top: 16px">
               <!-- Filters inside Dashboard section -->
               <div
@@ -7279,7 +6920,7 @@
                 <button class="tab active" data-filter="all">
                   All Deadlines <span class="count" id="tab-count-all">—</span>
                 </button>
-                <button class="tab" data-filter="upcoming">
+                <button class="tab" data-filter="upcoming"> 
                   Upcoming &lt; 7d
                   <span class="count" id="tab-count-upcoming">—</span>
                 </button>
@@ -8066,123 +7707,123 @@
           </div>
         </div>
       </div>
-      <!-- ACTIVE TODAY MODAL -->
+  <!-- ACTIVE TODAY MODAL -->
   <div id="active-overlay" onclick="closeActiveToday()" style="
-          display: none;
-          position: fixed;
-          inset: 0;
-          background: rgba(0, 0, 0, 0.65);
-          z-index: 8000;
-          backdrop-filter: blur(4px);
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.65);
+        z-index: 8000;
+        backdrop-filter: blur(4px);
       "></div>
   <div id="active-modal" style="
-          display: none;
-          position: fixed;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          z-index: 8100;
-          width: 420px;
-          max-width: 94vw;
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 8100;
+        width: 420px;
+        max-width: 94vw;
       ">
     <div style="
-            background: #1a1a1a;
-            border: 1px solid rgba(241, 196, 15, 0.3);
-            border-radius: 14px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
-            overflow: hidden;
+          background: #1a1a1a;
+          border: 1px solid rgba(241, 196, 15, 0.3);
+          border-radius: 14px;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+          overflow: hidden;
         ">
       <div style="
-              padding: 18px 22px 14px;
-              border-bottom: 1px solid rgba(241, 196, 15, 0.15);
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
+            padding: 18px 22px 14px;
+            border-bottom: 1px solid rgba(241, 196, 15, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
           ">
-            <div style="display: flex; align-items: center; gap: 10px">
+        <div style="display: flex; align-items: center; gap: 10px">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f1c40f" stroke-width="2">
-                <circle cx="12" cy="12" r="10" />
-                <polyline points="12 6 12 12 16 14" />
-              </svg>
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
           <span style="
-                  font-size: 13px;
-                  font-weight: 700;
-                  color: #f1c40f;
-                  text-transform: uppercase;
-                  letter-spacing: 1px;
+                font-size: 13px;
+                font-weight: 700;
+                color: #f1c40f;
+                text-transform: uppercase;
+                letter-spacing: 1px;
               ">Active Today</span>
-            </div>
+        </div>
         <button onclick="closeActiveToday()" style="
-                background: none;
-                border: none;
-                color: #666;
-                cursor: pointer;
-                font-size: 20px;
-                line-height: 1;
-                padding: 2px 6px;
-                border-radius: 4px;
-                transition: color 0.15s;
+              background: none;
+              border: none;
+              color: #666;
+              cursor: pointer;
+              font-size: 20px;
+              line-height: 1;
+              padding: 2px 6px;
+              border-radius: 4px;
+              transition: color 0.15s;
             " onmouseover="this.style.color = '#aaa'" onmouseout="this.style.color = '#666'">
-              ✕
-            </button>
-          </div>
+          ✕
+        </button>
+      </div>
       <div id="active-modal-body" style="padding: 18px 22px; max-height: 360px; overflow-y: auto">
         <div style="display: flex; justify-content: center; padding: 24px 0">
-              <span class="spinner"></span>
-            </div>
-          </div>
-      <div style="
-              padding: 12px 22px;
-              border-top: 1px solid rgba(241, 196, 15, 0.1);
-              display: flex;
-              justify-content: flex-end;
-              gap: 10px;
-          ">
-        <button onclick="openActiveToday()" style="
-                background: rgba(241, 196, 15, 0.12);
-                color: #f1c40f;
-                border: 1px solid rgba(241, 196, 15, 0.3);
-                padding: 7px 16px;
-                border-radius: 7px;
-                font-size: 12px;
-                font-weight: 600;
-                cursor: pointer;
-                font-family: &quot;Montserrat&quot;, sans-serif;
-                transition: all 0.2s;
-            " onmouseover="this.style.background = 'rgba(241,196,15,0.22)'"
-          onmouseout="this.style.background = 'rgba(241,196,15,0.12)'">
-              ↺ Refresh
-            </button>
-        <button onclick="closeActiveToday()" style="
-                background: rgba(255, 255, 255, 0.06);
-                color: #aaa;
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                padding: 7px 16px;
-                border-radius: 7px;
-                font-size: 12px;
-                font-weight: 600;
-                cursor: pointer;
-                font-family: &quot;Montserrat&quot;, sans-serif;
-                transition: all 0.2s;
-            " onmouseover="this.style.color = '#fff'" onmouseout="this.style.color = '#aaa'">
-              Close
-            </button>
-          </div>
+          <span class="spinner"></span>
         </div>
       </div>
+      <div style="
+            padding: 12px 22px;
+            border-top: 1px solid rgba(241, 196, 15, 0.1);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+          ">
+        <button onclick="openActiveToday()" style="
+              background: rgba(241, 196, 15, 0.12);
+              color: #f1c40f;
+              border: 1px solid rgba(241, 196, 15, 0.3);
+              padding: 7px 16px;
+              border-radius: 7px;
+              font-size: 12px;
+              font-weight: 600;
+              cursor: pointer;
+              font-family: &quot;Montserrat&quot;, sans-serif;
+              transition: all 0.2s;
+            " onmouseover="this.style.background = 'rgba(241,196,15,0.22)'"
+          onmouseout="this.style.background = 'rgba(241,196,15,0.12)'">
+          ↺ Refresh
+        </button>
+        <button onclick="closeActiveToday()" style="
+              background: rgba(255, 255, 255, 0.06);
+              color: #aaa;
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              padding: 7px 16px;
+              border-radius: 7px;
+              font-size: 12px;
+              font-weight: 600;
+              cursor: pointer;
+              font-family: &quot;Montserrat&quot;, sans-serif;
+              transition: all 0.2s;
+            " onmouseover="this.style.color = '#fff'" onmouseout="this.style.color = '#aaa'">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
 
       <div id="toast-container" class="toast-container"></div>
     </div>
 
     <script>
 
-      /* ── HELPERS ── */
-      function esc(str) {
-        if (!str) return "";
-        const d = document.createElement("div");
-        d.textContent = String(str);
-        return d.innerHTML;
-      }
+          /* ── HELPERS ── */
+    function esc(str) {
+      if (!str) return "";
+      const d = document.createElement("div");
+      d.textContent = String(str);
+      return d.innerHTML;
+    }
 
       // ========== CLOCK ==========
       function tickClock() {
@@ -9039,44 +8680,44 @@
         showApp();
       }
 
-      /* ── ACTIVE TODAY ── */
-      async function openActiveToday() {
-        document.getElementById("active-overlay").style.display = "block";
-        document.getElementById("active-modal").style.display = "block";
-        const body = document.getElementById("active-modal-body");
-        body.innerHTML = `<div style="display:flex;justify-content:center;padding:24px 0;"><span class="spinner"></span></div>`;
-        try {
-          const res = await fetch(`${API_BASE_URL}/deadlineops/active-today`, {
-            headers: authHeaders(),
-          });
-          if (res.status === 401) {
-            closeActiveToday();
-            doLogout();
-            return;
-          }
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          const data = await res.json();
-          if (!data.length) {
-            body.innerHTML = `<div style="text-align:center;padding:28px 0;color:#555;font-size:13px;">No users active today.</div>`;
-            return;
-          }
-          body.innerHTML = data
-            .map((u) => {
-              const ts = u.last_active ? new Date(u.last_active) : null;
-              const timeStr = ts
-                ? ts.toLocaleTimeString("en-US", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                : "—";
-              const dateStr = ts
-                ? ts.toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  })
-                : "—";
-              const initials = (u.email || "?").slice(0, 2).toUpperCase();
-              return `
+        /* ── ACTIVE TODAY ── */
+    async function openActiveToday() {
+      document.getElementById("active-overlay").style.display = "block";
+      document.getElementById("active-modal").style.display = "block";
+      const body = document.getElementById("active-modal-body");
+      body.innerHTML = `<div style="display:flex;justify-content:center;padding:24px 0;"><span class="spinner"></span></div>`;
+      try {
+        const res = await fetch(`${API_BASE_URL}/deadlineops/active-today`, {
+          headers: authHeaders(),
+        });
+        if (res.status === 401) {
+          closeActiveToday();
+          doLogout();
+          return;
+        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (!data.length) {
+          body.innerHTML = `<div style="text-align:center;padding:28px 0;color:#555;font-size:13px;">No users active today.</div>`;
+          return;
+        }
+        body.innerHTML = data
+          .map((u) => {
+            const ts = u.last_active ? new Date(u.last_active) : null;
+            const timeStr = ts
+              ? ts.toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+              : "—";
+            const dateStr = ts
+              ? ts.toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              })
+              : "—";
+            const initials = (u.email || "?").slice(0, 2).toUpperCase();
+            return `
             <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
               <div style="width:36px;height:36px;border-radius:50%;background:rgba(241,196,15,0.15);border:1px solid rgba(241,196,15,0.35);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#f1c40f;flex-shrink:0;">${esc(initials)}</div>
               <div style="flex:1;min-width:0;">
@@ -9088,17 +8729,17 @@
                 <span style="font-size:10px;color:#2ecc71;font-weight:600;">Active</span>
               </div>
             </div>`;
-            })
-            .join("");
-        } catch (err) {
-          body.innerHTML = `<div style="text-align:center;padding:24px;color:#e74c3c;font-size:12px;">Failed to load: ${esc(err.message)}</div>`;
-        }
+          })
+          .join("");
+      } catch (err) {
+        body.innerHTML = `<div style="text-align:center;padding:24px;color:#e74c3c;font-size:12px;">Failed to load: ${esc(err.message)}</div>`;
       }
+    }
 
-      function closeActiveToday() {
-        document.getElementById("active-overlay").style.display = "none";
-        document.getElementById("active-modal").style.display = "none";
-      }
+    function closeActiveToday() {
+      document.getElementById("active-overlay").style.display = "none";
+      document.getElementById("active-modal").style.display = "none";
+    }
 
       function otpMove(e, i, prefix) {
         prefix = prefix || "otp";
@@ -9850,16 +9491,15 @@
                 maintainAspectRatio: false,
                 plugins: {
                   legend: {
-                    position: "bottom", // ← was "right"
+                    position: "right",
                     labels: {
                       color: themeColors.textMain,
-                      font: { size: 10, family: "inherit" },
+                      font: { size: 11, family: "inherit" },
                       boxWidth: 10,
-                      padding: 8,
                     },
                   },
                 },
-                cutout: "68%", // ← slightly smaller cutout to give legend room
+                cutout: "78%",
               },
               plugins: [riskDonutCenterTextPlugin],
             },
@@ -10140,7 +9780,8 @@
       }
 
       function renderUpcomingList(list) {
-        const el = document.getElementById("analytics-upcoming-list");
+        const el = documen
+t.getElementById("analytics-upcoming-list");
         if (!el) return;
         if (!list || !list.length) {
           el.innerHTML =
@@ -12892,7 +12533,7 @@
 
       // ========== UPLOAD MODAL ==========
       const eventsModal = document.getElementById("events-modal");
-
+  
       const btnCloseEventsModal = document.getElementById(
         "btn-close-events-modal",
       );
